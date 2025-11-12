@@ -1,0 +1,232 @@
+/* ===================================================================
+   LEGEND STYLES (CON SCROLL EN EL CONTENIDO)
+====================================================================== */
+
+/* Contenedor principal: ahora es un contenedor Flex */
+.legend-container {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  max-width: 280px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-heavy);
+  font-family: var(--font-primary);
+  font-size: 0.875rem;
+}
+
+/* Encabezado de la leyenda (se mantiene "sticky") */
+.legend-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid #e9ecef;
+  background: rgba(248, 249, 250, 0.8);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Título de la leyenda */
+.legend-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+/* Pequeño indicador visual */
+.legend-badge {
+  background: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* Contenido principal (área con scroll) */
+.legend-content {
+  padding: 10px 15px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Sección individual dentro de la leyenda */
+.legend-section {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: var(--border-radius-sm);
+  background: white;
+  border: 1px solid #f0f0f0;
+  transition: all var(--transition-fast);
+}
+
+/* Estado de carga */
+.legend-section.loading {
+  opacity: 0.7;
+  background: rgba(248, 249, 250, 0.5);
+}
+
+.legend-section-header {
+  margin-bottom: 8px;
+}
+
+.legend-layer-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Indicador de carga */
+.legend-loading-indicator {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+}
+
+.loading-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Lista de ítems */
+.legend-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  padding: 2px 0;
+}
+
+.legend-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Símbolos dentro de la leyenda */
+.legend-symbol {
+  display: inline-block;
+  flex-shrink: 0;
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+}
+
+.legend-label {
+  font-size: 0.8rem;
+  color: var(--color-text-dark);
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+/* Nota inferior */
+.legend-note {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #e9ecef;
+}
+
+.legend-note small {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* Hover para resaltar secciones */
+.legend-section:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(138, 21, 56, 0.1);
+}
+
+/* Animación del spinner */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Estilos para la barra de scroll personalizada */
+.legend-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.legend-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.legend-content::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 3px;
+}
+
+.legend-content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}
+
+
+/* =============================
+   Selectores de simbología
+   ============================= */
+
+.legend-variant-wrapper {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.legend-variant-label {
+  font-size: 0.85rem;
+  color: var(--color-text-dark, #333);
+  font-weight: 500;
+}
+
+.legend-variant-select {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: 8px;
+  background-color: var(--color-bg-light, #fff);
+  color: var(--color-text-dark, #333);
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+
+.legend-variant-select:hover {
+  border-color: var(--color-primary, #2a74d6);
+  box-shadow: 0 2px 6px rgba(42, 116, 214, 0.15);
+}
+
+.legend-variant-select:focus {
+  border-color: var(--color-primary-dark, #1e56a0);
+  box-shadow: 0 0 0 2px rgba(42, 116, 214, 0.25);
+}

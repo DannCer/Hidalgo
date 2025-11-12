@@ -1,0 +1,73 @@
+@font-face {
+  font-family: 'Montserrat';
+  src: local('Montserrat'), url('../../assets/fonts/Montserrat/Montserrat-Regular.otf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../../assets/fonts/Montserrat/Montserrat-Bold.otf') format('truetype');
+  font-weight: 700;
+  font-style: bold;
+  font-display: swap;
+}
+
+@import url('https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css');
+
+html,
+body,
+#root {
+  height: 100%;
+  font-family: var(--font-primary);
+  background: #fff;
+  color: var(--color-gray-dark);
+  margin: 0;
+  padding: 0;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.navbar {
+  background: var(--color-primary);
+}
+
+.navbar .nav-link,
+.navbar .navbar-brand {
+  color: #fff !important;
+}
+
+.accordion-button {
+  background: transparent;
+  color: var(--color-primary-dark);
+}
+
+.accordion-button:not(.collapsed) {
+  background: var(--color-accent-2);
+}
+
+.container-max {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-bottom: 2rem;
+}
+
+.layout-principal {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+

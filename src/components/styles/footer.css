@@ -1,0 +1,119 @@
+/* ==========================================================================
+   FOOTER STYLES
+   ==========================================================================
+   Compatible con Bootstrap + variables.css
+   ========================================================================== */
+
+.footer {
+  background-color: var(--color-primary-dark);
+  color: #fff;
+  padding: 3rem 0 1.5rem;
+  font-family: var(--font-family-base, 'Montserrat');
+  position: relative;
+  z-index: 5;
+}
+
+/* ------------------------------
+   LOGOS Y ESCUDO
+--------------------------------- */
+
+.footer-logo {
+  max-height: 100px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+.footer-escudo {
+  max-height: 250px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.footer-logo:hover,
+.footer-escudo:hover {
+  transform: scale(1.05);
+}
+
+/* ------------------------------
+   CONTACTO
+--------------------------------- */
+
+.footer-contact-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-accent-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.footer-contact-info {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #e2e2e2;
+  white-space: pre-line;
+}
+
+.footer-contact-info a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.footer-contact-info a:hover {
+  color: var(--color-primary-light);
+}
+
+/* ------------------------------
+   SEPARADOR
+--------------------------------- */
+
+.footer-divider {
+  border: 0;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.3);
+  margin-top: 2rem;
+}
+
+/* ------------------------------
+   WIDGETS / COLUMNAS
+--------------------------------- */
+
+.footer .widget {
+  padding: 0 1rem;
+}
+
+.footer .row.align-items-center {
+  align-items: center !important;
+}
+
+.footer .container {
+  max-width: 1200px;
+}
+
+/* ------------------------------
+   RESPONSIVE DESIGN
+--------------------------------- */
+
+@media (max-width: 992px) {
+  .footer {
+    text-align: center;
+  }
+
+  .footer .footer-contact-title {
+    margin-top: 1.5rem;
+  }
+
+  .footer .footer-logo,
+  .footer .footer-escudo {
+    max-height: 80px;
+  }
+}
+
+@media (max-width: 576px) {
+  .footer {
+    padding: 2rem 0 1rem;
+  }
+
+  .footer-contact-info {
+    font-size: 0.9rem;
+  }
+}

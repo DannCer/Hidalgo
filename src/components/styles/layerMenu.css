@@ -1,0 +1,263 @@
+/* =========================================================
+   LAYER MENU — ESTILOS MODERNOS Y AMIGABLES (Montserrat)
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   CONTENEDOR PRINCIPAL
+--------------------------------------------------------- */
+.layermenu-container {
+  position: absolute;
+  left: 15px;
+  width: 340px;
+  max-height: calc(100vh - 100px);
+  background: #fff;
+  border: 1px solid #e3e3e3;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-heavy);
+  overflow-y: auto;
+  z-index: 1200;
+  font-family: var(--font-primary);
+  transition: all var(--transition-normal);
+}
+
+/* ---------------------------------------------------------
+   CABECERA DRAGGABLE
+--------------------------------------------------------- */
+.layermenu-handle {
+  cursor: move;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--color-text-light);
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+  background: var(--gradient-horizontal);
+  box-shadow: var(--shadow-light);
+}
+
+.layermenu-collapse-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: var(--color-text-light);
+  font-size: 1.25rem;
+  border-radius: var(--border-radius-sm);
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.layermenu-collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+/* ---------------------------------------------------------
+   TÍTULOS Y BLOQUES
+--------------------------------------------------------- */
+.layermenu-card-title {
+  display: block;
+  margin: 0.6rem 0;
+  padding-left: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  border-left: 3px solid var(--color-primary);
+}
+
+/* ---------------------------------------------------------
+   ELEMENTOS DE CAPA
+--------------------------------------------------------- */
+.layermenu-item {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--border-radius-sm);
+  padding: 0.8rem 0.9rem;
+  margin-bottom: 0.8rem;
+  box-shadow: var(--shadow-light);
+  transition: all var(--transition-normal);
+}
+
+.layermenu-item:hover {
+  background-color: #faf7f7;
+  transform: translateY(-1px);
+}
+
+.layermenu-active {
+  border-color: var(--color-primary);
+  background-color: #fff4f6;
+  box-shadow: 0 0 6px rgba(160, 33, 66, 0.25);
+}
+
+/* ---------------------------------------------------------
+   CONTENIDO Y FILAS
+--------------------------------------------------------- */
+.layermenu-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+}
+
+.layermenu-row .form-check {
+  flex: 1;
+  margin: 0;
+}
+
+.layermenu-row label {
+  color: var(--color-text-dark);
+  cursor: pointer;
+  font-weight: 500;
+  user-select: none;
+}
+
+/* ---------------------------------------------------------
+   BOTONES DE ACCIÓN
+--------------------------------------------------------- */
+.layermenu-buttons {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.layermenu-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.83rem;
+  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid #ddd;
+  background: #f8f8f8;
+  color: var(--color-text-dark);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-primary);
+}
+
+.layermenu-buttons button:hover {
+  background: var(--color-accent-2);
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+}
+
+/* ---------------------------------------------------------
+   ACORDEÓN
+--------------------------------------------------------- */
+.layermenu-container .accordion-item {
+  border: none;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 0.4rem;
+  overflow: hidden;
+  background-color: #fff !important;
+  color: var(--color-text-dark) !important;
+}
+
+.layermenu-container .accordion-button {
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-primary-dark) !important;
+  background-color: #fdfdfd !important;
+  border: none;
+  box-shadow: none;
+  transition: background var(--transition-fast);
+}
+
+.layermenu-container .accordion-button:not(.collapsed) {
+  color: var(--color-text-light) !important;
+  background-color: var(--color-primary) !important;
+}
+
+.layermenu-container .accordion-button::after {
+  filter: brightness(0) invert(0.3);
+}
+
+.layermenu-container .accordion-button:not(.collapsed)::after {
+  filter: brightness(10);
+}
+
+.layermenu-container .accordion-button:focus {
+  box-shadow: none !important;
+}
+
+.layermenu-container .accordion-body {
+  padding: 0.75rem;
+  background: #fff;
+  animation: fadeInAccordion 0.25s ease;
+}
+
+/* ---------------------------------------------------------
+   SCROLL PERSONALIZADO
+--------------------------------------------------------- */
+.layermenu-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.layermenu-container::-webkit-scrollbar-thumb {
+  background-color: rgba(160, 33, 66, 0.3);
+  border-radius: 4px;
+}
+
+.layermenu-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(160, 33, 66, 0.5);
+}
+
+/* ---------------------------------------------------------
+   ESTADOS Y ANIMACIONES
+--------------------------------------------------------- */
+.layermenu-item *:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+@keyframes fadeInAccordion {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estado deshabilitado */
+
+.layermenu-item.disabled input[type="checkbox"] {
+  cursor: not-allowed;
+  accent-color: var(--color-gray);
+}
+
+/* Tooltip sutil */
+.layermenu-item[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  background: var(--color-gray-dark);
+  color: var(--color-text-light);
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
+  top: 120%;
+  left: 0;
+  white-space: nowrap;
+  box-shadow: var(--shadow-light);
+  z-index: 20;
+}
+
+
+/* Capas deshabilitadas visualmente */
+.layermenu-item.disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.layermenu-item.disabled label {
+  color: var(--color-text-muted);
+}
+

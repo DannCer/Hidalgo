@@ -1,0 +1,57 @@
+/* ===================================================================
+   Estilos CORREGIDOS para el Componente AttributeTableModal
+====================================================================== */
+
+/* --- 1. Encabezado del Modal --- */
+
+/* Selector más específico para asegurar que anule los estilos de Bootstrap */
+.modal-content .modal-header {
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+  border-bottom: 2px solid var(--color-primary-dark);
+  cursor: move;
+}
+
+.modal-content .modal-header:active {
+    cursor: grabbing;
+}
+
+.modal-content .modal-title {
+  font-weight: 600;
+  /* El color se hereda del .modal-header, así que no es necesario volver a declararlo */
+}
+
+.modal-content .modal-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+
+/* --- 2. Pestañas (Tabs) dentro del Modal --- */
+/* (Estas reglas no necesitan cambios) */
+
+.nav-tabs {
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.nav-tabs .nav-link {
+  color: var(--color-primary);
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover,
+.nav-tabs .nav-link:focus {
+  color: var(--color-primary);
+  background-color: rgba(160, 33, 66, 0.1);
+  border-color: #dee2e6 #dee2e6 transparent;
+}
+
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+  color: var(--color-text-light) !important;
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  font-weight: 600;
+}

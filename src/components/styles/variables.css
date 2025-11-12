@@ -1,0 +1,27 @@
+:root {
+  --color-primary-dark: #691B31; /* Pantone 7421 C */
+  --color-primary: #A02142;      /* Pantone 7420 C */
+  --color-accent-1: #BC955B;     /* Pantone 465 C */
+  --color-accent-2: #DDC9A3;     /* Pantone 468 C */
+  --color-gray-dark: #6F7271;    /* Pantone 424 C */
+  --color-gray: #98989A;         /* Cool Gray 7 C */
+   /* Colores de texto */
+  --color-text-light: #ffffff;
+  --color-text-dark: #495057;
+  --color-text-muted: #6c757d;
+  /* Gradientes */
+  --gradient-primary: linear-gradient(135deg, #8A1538 0%, #B51B4A 50%, #8A1538 100%);
+  --gradient-primary-transparent: linear-gradient(45deg, rgba(138, 21, 56, 0.95) 0%, rgba(181, 27, 74, 0.85) 50%, rgba(138, 21, 56, 0.95) 100%);
+  --gradient-horizontal: linear-gradient(to right, #8A1538, #B51B4A, #8A1538);
+  /* Espaciados */
+  --border-radius-md: 1rem;
+  --border-radius-sm: 0.5rem;
+  /* Sombras */
+  --shadow-light: 0 4px 15px rgba(138, 21, 56, 0.2);
+  --shadow-medium: 0 8px 16px rgba(0, 0, 0, 0.2);
+  --shadow-heavy: 0 4px 12px rgba(0, 0, 0, 0.15);
+  /* Transiciones */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --font-primary: 'Montserrat', sans-serif;
+}

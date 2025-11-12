@@ -1,0 +1,114 @@
+/* ===================================================================
+   Estilos para el Componente AttributeTableContent
+====================================================================== */
+
+.btn-primary {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-text-light) !important;
+}
+
+/* Estado al pasar el cursor por encima */
+.btn-primary:hover {
+  background-color: var(--color-primary-dark) !important;
+  border-color: var(--color-primary-dark) !important;
+  color: var(--color-text-light) !important;
+}
+
+/* Estado al hacer foco (p. ej. con el tabulador) */
+.btn-primary:focus,
+.btn-primary.focus {
+  background-color: var(--color-primary-dark) !important;
+  border-color: var(--color-primary-dark) !important;
+  color: var(--color-text-light) !important;
+  box-shadow: 0 0 0 0.2rem rgba(160, 33, 66, 0.5) !important;
+}
+
+/* Estado al hacer clic */
+.btn-primary:active,
+.btn-primary.active {
+  background-color: var(--color-primary-dark) !important;
+  border-color: var(--color-primary-dark) !important;
+  color: var(--color-text-light) !important;
+}
+
+/* Estado deshabilitado */
+.btn-primary:disabled,
+.btn-primary.disabled {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  /* La opacidad por defecto de Bootstrap se encarga de darle la apariencia de deshabilitado */
+}
+
+/* Estilos para encabezados de tabla ordenables */
+.sortable-header {
+  cursor: pointer;
+  -webkit-user-select: none;
+  /* Safari */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* IE10+/Edge */
+  user-select: none;
+  /* Standard */
+  transition: background-color 0.2s ease;
+}
+
+.sortable-header:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  /* Un sutil color de fondo al pasar el cursor */
+}
+
+/* Estilos para el nuevo indicador de ordenamiento (SVG) */
+.sort-indicator {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 5px;
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Rota el indicador cuando la dirección es descendente */
+.sort-indicator.descending {
+  transform: rotate(180deg);
+}
+
+.sort-arrow {
+  width: 1em;
+  /* O el tamaño que prefieras, ej: 14px */
+  height: 1em;
+  fill: currentColor;
+  /* El ícono tomará el color del texto del encabezado */
+}
+
+/* ===================================================================
+   Estilos para el Componente AttributeTableContent
+====================================================================== */
+
+/* ... (tus estilos .btn-primary y .sortable-header se mantienen igual) ... */
+
+/* --- NUEVOS ESTILOS PARA LA TABLA CON SCROLL --- */
+
+/* 1. Contenedor de Scroll */
+.table-scroll-container {
+  /* Habilita AMBOS scrolls (vertical y horizontal) 
+     en este contenedor específico */
+  overflow: auto;
+}
+
+/* 2. Encabezado Fijo (Sticky) */
+.sticky-header th {
+  /* Fija el encabezado en la parte superior del .table-scroll-container */
+  position: sticky;
+  top: 0;
+
+  /* Asegura que el fondo sea opaco y cubra el contenido 
+     que pasa por debajo */
+  background-color: var(--bs-table-bg, white);
+
+  /* Asegura que el encabezado esté por encima del 
+     contenido del tbody */
+  z-index: 10;
+
+  /* Evita que el borde de la tabla se vea feo al hacer scroll */
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+}
