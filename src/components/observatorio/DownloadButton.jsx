@@ -35,6 +35,7 @@ const DownloadButton = ({
   displayName,
   className = '',
   format = 'shape-zip',
+  cqlFilter = null, // ✅ Nueva prop para filtros
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -47,7 +48,7 @@ const DownloadButton = ({
 
       // Si solo hay una capa, descarga directamente
       if (layers.length === 1) {
-        const url = getShapefileDownloadUrl(layers[0], format);
+        const url = getShapefileDownloadUrl(layers[0], format, cqlFilter); // ✅ Pasar cqlFilter
         window.open(url, '_blank');
         setIsDownloading(false);
         return;
@@ -57,10 +58,13 @@ const DownloadButton = ({
       const zip = new JSZip();
 
       for (const name of layers) {
-        const downloadUrl = getShapefileDownloadUrl(name, format);
+        const downloadUrl = getShapefileDownloadUrl(name, format, cqlFilter); // ✅ Pasar cqlFilter
         const layerShortName = name.split(':')[1] || name;
 
         console.log(`⬇️ Descargando capa: ${layerShortName}`);
+        if (cqlFilter) {
+          console.log(`🎯 Con filtro CQL: ${cqlFilter}`);
+        }
 
         const blob = await fetchFileAsBlob(downloadUrl);
 
@@ -89,7 +93,7 @@ const DownloadButton = ({
       onClick={handleDownload}
       disabled={isDownloading || !layerName}
       className={`download-btn ${className} ${isDownloading ? 'downloading' : ''}`}
-      title={`Descargar ${displayName || 'capa'} como Shapefile`}
+      title={`Descargar ${displayName || 'capa'} como Shapefile${cqlFilter ? ' (con filtro aplicado)' : ''}`}
     >
       {isDownloading ? (
         <>

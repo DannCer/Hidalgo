@@ -1,0 +1,232 @@
+/* ===== TIMELINE COMPONENT STYLES ===== */
+.timeline-container {
+  margin-top: 10px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: var(--border-radius-md);
+  border: 1px solid #e9ecef;
+  transition: all var(--transition-normal);
+}
+
+.timeline-container:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-light);
+}
+
+/* ===== SLIDER PERSONALIZADO CON COLOR PRIMARIO ===== */
+.timeline-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(
+    to right, 
+    var(--color-primary) 0%, 
+    var(--color-primary) var(--slider-progress, 50%), 
+    var(--color-gray) var(--slider-progress, 50%), 
+    var(--color-gray) 100%
+  );
+  outline: none;
+  cursor: pointer;
+  margin: 15px 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Track del slider - Webkit */
+.timeline-slider::-webkit-slider-track {
+  background: transparent;
+  height: 6px;
+  border-radius: 3px;
+}
+
+/* Thumb del slider - Webkit */
+.timeline-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--color-primary);
+  border: 3px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--shadow-medium);
+  transition: all var(--transition-fast);
+}
+
+.timeline-slider::-webkit-slider-thumb:hover {
+  background: var(--color-primary-dark);
+  transform: scale(1.1);
+}
+
+/* Track del slider - Firefox */
+.timeline-slider::-moz-range-track {
+  background: var(--color-gray);
+  height: 6px;
+  border-radius: 3px;
+  border: none;
+}
+
+/* Thumb del slider - Firefox */
+.timeline-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: var(--color-primary);
+  border: 3px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--shadow-medium);
+  transition: all var(--transition-fast);
+  border: none;
+}
+
+.timeline-slider::-moz-range-thumb:hover {
+  background: var(--color-primary-dark);
+  transform: scale(1.1);
+}
+
+/* ===== TIMELINE TRACK Y PUNTOS ===== */
+.timeline-track {
+  position: relative;
+  height: 4px;
+  background: var(--color-gray);
+  border-radius: 2px;
+  margin: 15px 0 20px;
+}
+
+.timeline-progress {
+  position: absolute;
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 2px;
+  transition: width var(--transition-normal);
+}
+
+.timeline-points {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.timeline-point {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.timeline-point-inner {
+  width: 12px;
+  height: 12px;
+  background: var(--color-gray);
+  border-radius: 50%;
+  transition: all var(--transition-normal);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.timeline-point.active .timeline-point-inner {
+  background: var(--color-primary);
+  transform: translate(-50%, -50%) scale(1.3);
+}
+
+.timeline-point.current .timeline-point-inner {
+  background: var(--color-primary-dark);
+  transform: translate(-50%, -50%) scale(1.5);
+  box-shadow: 0 0 0 3px rgba(160, 33, 66, 0.3);
+}
+
+.timeline-point:hover .timeline-point-inner {
+  transform: translate(-50%, -50%) scale(1.5);
+  background: var(--color-primary-dark);
+}
+
+/* ===== ETIQUETA ACTUAL ===== */
+.timeline-current-label {
+  text-align: center;
+  font-size: 0.9em;
+  color: var(--color-text-light);
+  font-weight: 600;
+  padding: 8px 12px;
+  background: var(--color-primary);
+  border-radius: var(--border-radius-sm);
+  border: none;
+  margin-top: 10px;
+  transition: all var(--transition-fast);
+}
+
+.timeline-current-label:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-light);
+}
+
+/* ===== TIMELINE BOX (PARA EL MENÚ DE CAPAS) ===== */
+.timeline-box {
+  margin-top: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: var(--border-radius-md);
+  border: 1px solid rgba(160, 33, 66, 0.1);
+  box-shadow: var(--shadow-light);
+  transition: all var(--transition-normal);
+}
+
+.timeline-box:hover {
+  border-color: rgba(160, 33, 66, 0.3);
+  box-shadow: 0 4px 12px rgba(160, 33, 66, 0.15);
+}
+
+.timeline-header {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.timeline-header small {
+  font-size: 0.8em;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .timeline-container {
+    padding: 8px;
+    margin-top: 8px;
+  }
+  
+  .timeline-slider {
+    margin: 10px 0;
+  }
+  
+  .timeline-current-label {
+    font-size: 0.85em;
+    padding: 6px 10px;
+  }
+}
+
+/* ===== ESTADOS DE FOCUS PARA ACCESIBILIDAD ===== */
+.timeline-slider:focus {
+  outline: none;
+}
+
+.timeline-slider:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(160, 33, 66, 0.3);
+}
+
+.timeline-slider:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 3px rgba(160, 33, 66, 0.3);
+}
+
+.timeline-point:focus {
+  outline: none;
+}
+
+.timeline-point:focus .timeline-point-inner {
+  box-shadow: 0 0 0 3px rgba(160, 33, 66, 0.3);
+}

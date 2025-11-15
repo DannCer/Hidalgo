@@ -122,7 +122,7 @@ export const getLayerInfo = (layerNameToFind) => {
 * @param {number} [maxFeatures=5000] - Número máximo de features a retornar.
 * @returns {Promise<Object>} Una promesa que resuelve a la colección de features en formato GeoJSON.
 */
-export const fetchWfsLayer = async (typeName, cql_filter, maxFeatures = 5000) => {
+export const fetchWfsLayer = async (typeName, cql_filter, maxFeatures = 5000, startIndex = 0) => {
   validateWfsParams(typeName, 'fetchWfsLayer');
 
   const params = new URLSearchParams({
@@ -135,17 +135,21 @@ export const fetchWfsLayer = async (typeName, cql_filter, maxFeatures = 5000) =>
     maxFeatures: Math.min(maxFeatures, 10000).toString()
   });
 
+  // ✅ AGREGAR: Parámetro startIndex para paginación
+  if (startIndex > 0) {
+    params.append('startIndex', startIndex.toString());
+  }
+
   if (cql_filter) {
     params.append('cql_filter', cql_filter);
   }
 
   const url = `${WFS_BASE_URL}?${params.toString()}`;
-  console.log(`🔄 Cargando capa ${typeName} con límite de ${maxFeatures} features`);
+  console.log(`🔄 Cargando capa ${typeName} con límite de ${maxFeatures} features, inicio: ${startIndex}`);
 
   try {
     const response = await fetchWithTimeout(url);
 
-    // --- INICIO DE MODIFICACIÓN ---
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`Error en fetchWfsLayer (Status NO OK) para ${typeName}:`, errorText, "URL:", url);
@@ -159,7 +163,6 @@ export const fetchWfsLayer = async (typeName, cql_filter, maxFeatures = 5000) =>
 
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
-      // Es JSON, es seguro continuar
       const data = await response.json();
 
       if (!data || typeof data !== 'object') {
@@ -194,8 +197,6 @@ export const fetchWfsLayer = async (typeName, cql_filter, maxFeatures = 5000) =>
         typeName
       );
     }
-    // --- FIN DE MODIFICACIÓN ---
-
   } catch (error) {
     console.error(`❌ Error en fetchWfsLayer para ${typeName}:`, error);
 
@@ -218,36 +219,36 @@ export const fetchWfsLayer = async (typeName, cql_filter, maxFeatures = 5000) =>
 * Consulta features en un punto específico usando filtros espaciales inteligentes.
 * @param {string} typeName - Nombre de la capa.
 * @param {object} latlng - Objeto con latitud y longitud { lat: number, lng: number }.
+* @param {string} [geomType] - Tipo de geometría (opcional, se obtiene de accordionData si no se proporciona).
 * @param {number} [maxFeatures=50] - Límite de features a retornar.
+* @param {string} [cqlFilter] - Filtro CQL adicional (para sequías por quincena).
 * @returns {Promise<Object>} GeoJSON con los features encontrados.
 */
-export const fetchFeaturesAtPoint = async (typeName, latlng, maxFeatures = 50) => {
+export const fetchFeaturesAtPoint = async (typeName, latlng, geomType, maxFeatures = 50, cqlFilter = null) => {
   validateWfsParams(typeName, 'fetchFeaturesAtPoint');
 
   if (!latlng || typeof latlng.lat !== 'number' || typeof latlng.lng !== 'number') {
     throw new Error('latlng debe ser un objeto con propiedades lat y lng numéricas');
   }
 
-  const layerInfo = getLayerInfo(typeName);
-
-  if (!layerInfo || !layerInfo.geomType) {
-    const errorMsg = `No se encontró metadata (geomType) para la capa ${typeName} en accordionData.`;
-    console.error(errorMsg);
-    throw new GeoServerError(errorMsg, 0, '', typeName);
+  // ✅ Obtener geomType de accordionData si no se proporciona
+  let finalGeomType = geomType;
+  if (!finalGeomType) {
+    const layerInfo = getLayerInfo(typeName);
+    if (!layerInfo || !layerInfo.geomType) {
+      const errorMsg = `No se encontró metadata (geomType) para la capa ${typeName} en accordionData.`;
+      console.error(errorMsg);
+      throw new GeoServerError(errorMsg, 0, '', typeName);
+    }
+    finalGeomType = layerInfo.geomType;
   }
 
-  const { geomType } = layerInfo;
-  const lowerGeomType = geomType.toLowerCase();
+  const lowerGeomType = finalGeomType.toLowerCase();
   const geomField = 'geom';
-  let cql_filter;
+  let spatialFilter;
 
   // --- INICIO DE CORRECCIÓN PARA 'maxFeatures=NaN' ---
-  // Validamos el 'maxFeatures' recibido. Si es un string (como "polygon"),
-  // parseInt dará NaN. Si es un número, lo usará.
   let featuresLimit = parseInt(maxFeatures, 10);
-
-  // Si el resultado es NaN (porque era "polygon" o undefined/null de forma extraña),
-  // forzamos el valor por defecto de 50.
   if (isNaN(featuresLimit)) {
     featuresLimit = 50;
   }
@@ -257,7 +258,7 @@ export const fetchFeaturesAtPoint = async (typeName, latlng, maxFeatures = 50) =
     const { lat, lng } = latlng;
 
     if (lowerGeomType === 'polygon' || lowerGeomType === 'multipolygon') {
-      cql_filter = `INTERSECTS(${geomField}, SRID=4326;POINT(${lng} ${lat}))`;
+      spatialFilter = `INTERSECTS(${geomField}, SRID=4326;POINT(${lng} ${lat}))`;
       console.log(`🔍 Consultando ${typeName} (Polígono) con INTERSECTS...`);
 
     } else if (
@@ -269,15 +270,22 @@ export const fetchFeaturesAtPoint = async (typeName, latlng, maxFeatures = 50) =
     ) {
       const tolerance = SPATIAL_QUERY_PARAMS.TOLERANCE_DEGREES_POINTS_LINES;
       const bbox = `${lng - tolerance},${lat - tolerance},${lng + tolerance},${lat + tolerance}`;
-      cql_filter = `BBOX(${geomField}, ${bbox}, 'EPSG:4326')`;
-      console.log(`🔍 Consultando ${typeName} (tipo: ${geomType}) con tolerancia: ${tolerance}`);
+      spatialFilter = `BBOX(${geomField}, ${bbox}, 'EPSG:4326')`;
+      console.log(`🔍 Consultando ${typeName} (tipo: ${finalGeomType}) con tolerancia: ${tolerance}`);
     } else {
       throw new GeoServerError(
-        `Tipo de geometría desconocido o no soportado: "${geomType}" para la capa ${typeName}`,
+        `Tipo de geometría desconocido o no soportado: "${finalGeomType}" para la capa ${typeName}`,
         0,
         '',
         typeName
       );
+    }
+
+    // ✅ COMBINAR FILTROS: espacial + quincena (si existe)
+    let finalCqlFilter = spatialFilter;
+    if (cqlFilter) {
+      finalCqlFilter = `${spatialFilter} AND ${cqlFilter}`;
+      console.log(`🎯 Aplicando filtro combinado: ${finalCqlFilter}`);
     }
 
     const params = new URLSearchParams({
@@ -287,14 +295,12 @@ export const fetchFeaturesAtPoint = async (typeName, latlng, maxFeatures = 50) =
       typeName,
       outputFormat: 'application/json',
       srsName: 'EPSG:4326',
-      // --- MODIFICADO ---
-      // Usamos nuestra variable validada 'featuresLimit' en lugar de 'maxFeatures'
       maxFeatures: Math.min(featuresLimit, 100).toString(),
-      cql_filter,
+      cql_filter: finalCqlFilter,
     });
 
     const url = `${WFS_BASE_URL}?${params.toString()}`;
-    console.log(`🔍 Consultando ${typeName} (tipo real: ${geomType})`);
+    console.log(`🔍 Consultando ${typeName} (tipo real: ${finalGeomType}) con filtro: ${finalCqlFilter}`);
 
     const response = await fetchWithTimeout(url);
 
@@ -344,7 +350,7 @@ export const fetchFeaturesAtPoint = async (typeName, latlng, maxFeatures = 50) =
 /**
 * Genera URL para descargar capa en formato Shapefile
 */
-export const getShapefileDownloadUrl = (typeName, format = 'shape-zip') => {
+export const getShapefileDownloadUrl = (typeName, format = 'shape-zip', cqlFilter = null) => {
   validateWfsParams(typeName, 'getShapefileDownloadUrl');
 
   const params = new URLSearchParams({
@@ -356,7 +362,15 @@ export const getShapefileDownloadUrl = (typeName, format = 'shape-zip') => {
     srsName: 'EPSG:4326'
   });
 
-  return `${WFS_BASE_URL}?${params.toString()}`;
+  // ✅ AGREGAR FILTRO CQL si existe
+  if (cqlFilter) {
+    params.append('cql_filter', cqlFilter);
+    console.log(`🎯 Descargando Shapefile con filtro: ${cqlFilter}`);
+  }
+
+  const url = `${WFS_BASE_URL}?${params.toString()}`;
+  console.log(`📥 URL de descarga Shapefile: ${url}`);
+  return url;
 };
 
 /**
@@ -456,5 +470,58 @@ export const checkGeoServerAvailability = async () => {
   } catch (error) {
     console.error('❌ GeoServer no disponible:', error);
     return false;
+  }
+};
+
+export const fetchUniqueValues = async (layerName, fieldName, maxFeatures = 1000) => {
+  try {
+    const params = new URLSearchParams({
+      service: 'WFS',
+      version: '1.0.0',
+      request: 'GetFeature',
+      typeName: layerName,
+      outputFormat: 'application/json',
+      srsName: 'EPSG:4326',
+      maxFeatures: Math.min(maxFeatures, 10000).toString(),
+      propertyName: fieldName  
+    });
+
+    const url = `${WFS_BASE_URL}?${params.toString()}`;
+    
+    console.log(`🔍 Obteniendo valores únicos de ${fieldName} en ${layerName}`);
+    
+    const response = await fetchWithTimeout(url);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    
+    const data = await response.json();
+    
+    if (!data.features) {
+      console.warn("⚠️ No se encontraron features para extraer valores únicos");
+      return [];
+    }
+
+    // ✅ NORMALIZAR FORMATO: Eliminar 'Z' y espacios, mantener consistencia
+    const uniqueValues = [...new Set(
+      data.features
+        .map(f => f.properties?.[fieldName])
+        .filter(Boolean)
+        .map(val => {
+          // Limpiar y normalizar el valor
+          const cleanVal = val.toString()
+            .replace('Z', '')  // Eliminar Z
+            .replace('T00:00:00.000', '') // Eliminar parte de tiempo si existe
+            .trim();
+          
+          console.log(`🔄 Normalizando: "${val}" -> "${cleanVal}"`);
+          return cleanVal;
+        })
+    )].sort();
+
+    console.log(`✅ ${uniqueValues.length} valores únicos encontrados para ${fieldName}:`, uniqueValues.slice(0, 10));
+    
+    return uniqueValues;
+  } catch (error) {
+    console.error(`❌ Error obteniendo valores únicos de ${fieldName}:`, error);
+    return [];
   }
 };

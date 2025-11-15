@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react'; // Ya no necesitamos useState aquí
 import '../styles/legend.css';
 
-const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), onVariantChange }) => {
+// Recibimos activeVariants como prop nueva 👇
+const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVariants = {}, onVariantChange }) => {
   const activeLayerNames = Object.keys(activeLayers);
-  const [variant, setVariant] = useState('prodfisica');
 
-  // Si no hay capas activas, no mostrar la leyenda
   if (activeLayerNames.length === 0) return null;
 
-  // Filtrar capas que tienen datos de leyenda
   const layersWithLegend = activeLayerNames.filter(layerName =>
     legendData[layerName] &&
     (legendData[layerName].items?.length > 0 || legendData[layerName].variants)
@@ -16,9 +14,9 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), onVariant
 
   if (layersWithLegend.length === 0) return null;
 
+  // Función wrapper para comunicar el cambio al padre
   const handleVariantChange = (layerName, value) => {
-    setVariant(value);
-    if (onVariantChange) onVariantChange(layerName, value); // avisa al mapa para actualizar estilo
+    if (onVariantChange) onVariantChange(layerName, value);
   };
 
   return (
@@ -32,12 +30,27 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), onVariant
         {layersWithLegend.map(layerName => {
           const layerLegend = legendData[layerName];
           const isLoading = loadingLayers.has(layerName);
-
-          // 🟢 Caso especial: capa con variantes
           const hasVariants = !!layerLegend.variants;
-          const currentLegend = hasVariants
-            ? layerLegend.variants[variant]
-            : layerLegend;
+
+          let currentLegend = layerLegend;
+          let selectedVariant = null;
+          let availableVariants = [];
+
+          // Lógica corregida para determinar la variante activa
+          if (hasVariants) {
+            availableVariants = Object.keys(layerLegend.variants);
+            
+            // 1. Buscamos si el padre nos mandó una variante para esta capa específica
+            // 2. Si no, usamos la primera disponible por defecto
+            selectedVariant = activeVariants[layerName] || availableVariants[0];
+
+            currentLegend = layerLegend.variants[selectedVariant];
+          }
+
+          // 🛡️ PROTECCIÓN CONTRA EL ERROR:
+          // Si por alguna razón currentLegend es undefined (ej. cambio rápido de estado),
+          // no renderizamos esta sección para evitar el crash "can't access property items".
+          if (!currentLegend) return null;
 
           return (
             <div key={layerName} className={`legend-section ${isLoading ? 'loading' : ''}`}>
@@ -51,26 +64,29 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), onVariant
                   )}
                 </h5>
 
-                {/* 🔸 Selector visible solo para capas con variantes */}
+                {/* Selector de variantes */}
                 {hasVariants && (
                   <div className="legend-variant-wrapper">
-                    <label htmlFor={`variant-${layerName}`} className="legend-variant-label">
-                    </label>
                     <select
                       id={`variant-${layerName}`}
                       className="legend-variant-select"
-                      value={variant}
+                      value={selectedVariant}
                       onChange={(e) => handleVariantChange(layerName, e.target.value)}
                     >
-                      <option value="prodfisica">Producción Física</option>
-                      <option value="prodeconomica">Producción Económica</option>
+                      {availableVariants.map(v => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 )}
               </div>
 
+              {/* Items de simbología */}
               <ul className="legend-items">
-                {currentLegend.items.map((item, index) => {
+                {/* Aquí es donde fallaba antes si currentLegend era undefined */}
+                {currentLegend.items && currentLegend.items.map((item, index) => {
                   const swatchStyle = {
                     backgroundColor: item.color || 'transparent',
                     border: item.borderColor
