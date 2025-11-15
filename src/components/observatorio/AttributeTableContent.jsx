@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import '../styles/attributeTableContent.css'
 
-const AttributeTableContent = ({ layerName }) => {
+const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar filter como prop
   const [features, setFeatures] = useState([]);
   const [headers, setHeaders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -13,20 +13,21 @@ const AttributeTableContent = ({ layerName }) => {
   const [totalFeatures, setTotalFeatures] = useState(0);
   const [fetchedCount, setFetchedCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-
-  
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
   const FEATURES_PER_PAGE = 10000;
 
-  // ... (la función fetchData se mantiene igual)
-  const fetchData = async (isInitialLoad = false) => {
+  // ✅ MODIFICADO: Aceptar filtro como parámetro
+  const fetchData = async (isInitialLoad = false, customFilter = filter) => {
     if (!layerName) return;
     setIsLoading(true);
     setError(null);
     try {
       const startIndex = isInitialLoad ? 0 : fetchedCount;
-      const data = await fetchWfsLayer(layerName, null, FEATURES_PER_PAGE, startIndex);
+      
+      // ✅ USAR EL FILTRO: pasar el filtro a fetchWfsLayer
+      const data = await fetchWfsLayer(layerName, customFilter, FEATURES_PER_PAGE, startIndex);
+      
       if (data?.features) {
         if (isInitialLoad) {
           setFeatures(data.features);
@@ -42,6 +43,14 @@ const AttributeTableContent = ({ layerName }) => {
         }
         setTotalFeatures(data.totalFeatures || 0);
         setFetchedCount(startIndex + data.features.length);
+        
+        // ✅ DEBUG: Mostrar información del filtro
+        console.log(`📊 Tabla ${layerName}:`, {
+          filtroAplicado: customFilter,
+          featuresCargados: data.features.length,
+          totalFeatures: data.totalFeatures || 0,
+          tieneFiltro: !!customFilter
+        });
       }
     } catch (err) {
       console.error(err);
@@ -51,13 +60,21 @@ const AttributeTableContent = ({ layerName }) => {
     }
   };
 
+  // ✅ MODIFICADO: Recargar datos cuando cambia el filtro
   useEffect(() => {
-    fetchData(true);
-    // NUEVO: Reiniciar el ordenamiento cuando cambia la capa
+    setFeatures([]);
+    setHeaders([]);
+    setFetchedCount(0);
+    setTotalFeatures(0);
+    setSearchTerm('');
     setSortConfig({ key: null, direction: 'ascending' });
-  }, [layerName]);
+    
+    if (layerName) {
+      fetchData(true, filter);
+    }
+  }, [layerName, filter]); // ✅ Agregar filter como dependencia
 
-  const handleLoadMore = () => fetchData(false);
+  const handleLoadMore = () => fetchData(false, filter);
 
   // MODIFICADO: Combinamos el filtrado y el ordenamiento en un solo useMemo
   const sortedAndFilteredFeatures = useMemo(() => {
@@ -126,21 +143,76 @@ const AttributeTableContent = ({ layerName }) => {
     const blob = new Blob([excelBuffer], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });
-    saveAs(blob, `${layerName.replace(':', '_')}_atributos.xlsx`);
+    
+    // ✅ MEJORADO: Incluir información del filtro en el nombre del archivo
+    const fileName = filter 
+      ? `${layerName.replace(':', '_')}_filtrado_${new Date().getTime()}.xlsx`
+      : `${layerName.replace(':', '_')}_atributos.xlsx`;
+    
+    saveAs(blob, fileName);
+  };
+
+  // ✅ NUEVO: Componente para mostrar información del filtro
+  const FilterInfo = () => {
+    if (!filter) return null;
+    
+    return (
+      <div className="filter-info mb-3" style={{
+        padding: '10px',
+        backgroundColor: '#e8f5e8',
+        border: '1px solid #4caf50',
+        borderRadius: '4px',
+        fontSize: '14px'
+      }}>
+        <strong>🎯 Filtro aplicado:</strong> 
+        <code className="ms-2" style={{ backgroundColor: '#f1f8e9', padding: '2px 6px', borderRadius: '3px' }}>
+          {filter}
+        </code>
+        <span className="ms-2 text-muted">
+          • Mostrando datos filtrados por quincena
+        </span>
+      </div>
+    );
   };
 
   if (isLoading && features.length === 0)
     return (
-      <div className="text-center my-3"><Spinner animation="border" variant="primary" /><p className="mt-2">Cargando datos...</p></div>
+      <div className="text-center my-3">
+        <Spinner animation="border" variant="primary" />
+        <p className="mt-2">
+          Cargando datos...
+          {filter && <div className="text-muted small">Aplicando filtro: {filter}</div>}
+        </p>
+      </div>
     );
 
   if (error) return <Alert variant="danger">{error}</Alert>;
+  
   if (features.length === 0 && !isLoading)
-    return <p className="text-center text-muted my-3">No se encontraron datos para mostrar en esta capa.</p>;
+    return (
+      <div className="text-center text-muted my-3">
+        <p>No se encontraron datos para mostrar en esta capa.</p>
+        {filter && (
+          <div className="filter-info mt-2 p-3" style={{
+            backgroundColor: '#fff3cd',
+            border: '1px solid #ffeaa7',
+            borderRadius: '4px'
+          }}>
+            <strong>⚠️ Con filtro aplicado:</strong> 
+            <code className="ms-2">{filter}</code>
+            <br />
+            <small>No hay datos que coincidan con este filtro.</small>
+          </div>
+        )}
+      </div>
+    );
 
   return (
     <>
       <div className="d-flex flex-column h-100">
+        {/* ✅ MOSTRAR INFORMACIÓN DEL FILTRO */}
+        <FilterInfo />
+        
         <Form.Group controlId="tableSearch" className="mb-3 d-flex gap-2">
           <Form.Control
             type="text"
@@ -207,6 +279,7 @@ const AttributeTableContent = ({ layerName }) => {
             {searchTerm
               ? `Mostrando ${sortedAndFilteredFeatures.length} resultados`
               : `Mostrando ${fetchedCount} de ${totalFeatures} elementos`}
+            {filter && !searchTerm && ' (filtrados)'}
           </small>
           {hasMoreData && !searchTerm && (
             <Button variant="primary" onClick={handleLoadMore} disabled={isLoading}>

@@ -404,9 +404,9 @@ export const accordionData = [
                 title: 'Usos Consuntivos',
                 links: [
                     {
-                        text: 'Usos Consuntivos (agrícola, abastecimiento público, industrial y termoeléctricas)',
+                        text: 'Usos Consuntivos ',
                         path: '/observatorio',
-                        layerName: 'Hidalgo:03_usoconsuntivot',
+                        layerName: 'Hidalgo:03_usoconsuntivo',
                         crs: CRS.WEB_MERCATOR,
                         geomType: GEOM_TYPES.POLYGON
                     }
@@ -492,6 +492,13 @@ export const accordionData = [
                         layerName: 'Hidalgo:04_presas',
                         crs: CRS.WGS84,
                         geomType: GEOM_TYPES.POINT
+                    },
+                    {
+                        text: 'Infraestructura de presas',
+                        path: '/observatorio',
+                        layerName: 'Hidalgo:04_infrapresas',
+                        crs: CRS.WGS84,
+                        geomType: GEOM_TYPES.POINT
                     }
                 ]
             },
@@ -502,6 +509,14 @@ export const accordionData = [
                     {
                         text: 'Atlas de riesgos municipales',
                         path: 'https://bibliotecadigitaluplaph.hidalgo.gob.mx/'
+                    },
+                    {
+                        text: 'Riesgos municipales',
+                        path: '/observatorio',
+                        layerName: 'Hidalgo:04_riesgosmunicipales',
+                        crs: CRS.WEB_MERCATOR,
+                        geomType: GEOM_TYPES.POLYGON
+                    
                     }
                 ]
             },
@@ -538,7 +553,9 @@ export const accordionData = [
                     {
                         text: 'Sequías',
                         path: '/observatorio',
-                        layerName: ''
+                         layerName: 'Hidalgo:04_sequias',
+                        crs: CRS.WEB_MERCATOR,
+                        geomType: GEOM_TYPES.POLYGON
                     },
                     {
                         text: 'Declaratorias de fenómenos hidrometeorológicos',

@@ -15,13 +15,24 @@ import {
 import "leaflet/dist/leaflet.css";
 import LayerMenu from './LayerMenu';
 import Legend from './Legend';
-import { fetchFeaturesAtPoint, getLayerInfo, fetchWfsLayer } from '../../utils/wfsService';
+import {
+  fetchFeaturesAtPoint,
+  getLayerInfo,
+  fetchWfsLayer,
+  fetchUniqueValues
+} from '../../utils/wfsService';
 import { accordionData } from '../ui/AccordionData';
 import { getLayerOptions, legendData } from '../../utils/mapStyles';
 import AttributeTableModal from './AttributeTableModal';
 import '../styles/mapView.css'
 
 const { BaseLayer } = LayersControl;
+
+// ✅ CONFIGURACIÓN CENTRALIZADA PARA SEQUÍAS
+const SEQUIA_CONFIG = {
+  layerName: 'Hidalgo:04_sequias',
+  fieldName: 'Quincena' // ✅ Mayúscula según tu confirmación
+};
 
 const MAP_CONFIG = {
   center: [20.5, -99],
@@ -65,7 +76,7 @@ const PopupContent = ({ layerName, layerInfo, features, maxFeatures }) => (
   </div>
 );
 
-function MapClickHandler({ activeLayers, setPopupData, baseLayerData }) {
+function MapClickHandler({ activeLayers, setPopupData, baseLayerData, sequiaQuincena }) {
   const map = useMapEvents({});
   const allLayersConfig = useMemo(
     () =>
@@ -102,11 +113,17 @@ function MapClickHandler({ activeLayers, setPopupData, baseLayerData }) {
             return l.layerName === layerName;
           });
 
-          // Usamos el geomType de la configuración. Si no existe, usamos 'polygon' por seguridad.
           const geomType = config?.geomType || "polygon";
 
-          // AQUÍ ESTÁ EL AJUSTE: Pasamos el geomType a la función de consulta
-          return fetchFeaturesAtPoint(layerName, e.latlng, geomType);
+          // ✅ APLICAR FILTRO POR QUINCENA PARA SEQUÍAS
+          let additionalFilter = null;
+          if (layerName === SEQUIA_CONFIG.layerName && sequiaQuincena) {
+            const normalizedQuincena = sequiaQuincena.toString().replace('Z', '').trim();
+            additionalFilter = `${SEQUIA_CONFIG.fieldName}='${normalizedQuincena}'`;
+            console.log(`🎯 Popup: Aplicando filtro de quincena para sequías: ${additionalFilter}`);
+          }
+
+          return fetchFeaturesAtPoint(layerName, e.latlng, geomType, 50, additionalFilter);
         });
 
         const results = await Promise.allSettled(promises);
@@ -158,7 +175,7 @@ function MapClickHandler({ activeLayers, setPopupData, baseLayerData }) {
 
     map.on("click", handleClick);
     return () => map.off("click", handleClick);
-  }, [map, activeLayers, baseLayerData, allLayersConfig, setPopupData]);
+  }, [map, activeLayers, baseLayerData, allLayersConfig, setPopupData, sequiaQuincena]); // ✅ Agregar sequiaQuincena como dependencia
 
   return null;
 }
@@ -222,15 +239,50 @@ function KeepPopupInView() {
   return null;
 }
 
-const GeoJsonLayers = React.memo(({ activeLayers, productionVariant }) => {
+const GeoJsonLayers = React.memo(({
+  activeLayers,
+  productionVariant,
+  usoConsuntivoVariant,
+  riesgosVariant,
+  sequiaQuincena
+}) => {
   return (
     <>
       {Object.entries(activeLayers).map(([layerName, geojsonData]) => {
         if (!geojsonData) return null;
-        const variant =
-          layerName === 'Hidalgo:03_drprodfisica' ? productionVariant : null;
+
+        let variant = null;
+        let variantKey = 'default';
+
+        if (layerName === 'Hidalgo:03_drprodfisica') {
+          variant = productionVariant;
+          variantKey = productionVariant;
+        }
+
+        if (layerName === 'Hidalgo:03_usoconsuntivo') {
+          variant = usoConsuntivoVariant;
+          variantKey = usoConsuntivoVariant;
+        }
+
+        if (layerName === 'Hidalgo:04_riesgosmunicipales') {
+          variant = riesgosVariant;
+          variantKey = riesgosVariant;
+        }
+
+
+        const uniqueKey = layerName === 'Hidalgo:04_sequias'
+          ? `${layerName}-${variantKey}-${sequiaQuincena || 'no-quincena'}`
+          : `${layerName}-${variantKey}`;
+
         const layerOptions = getLayerOptions(layerName, variant);
-        return <GeoJSON key={layerName} data={geojsonData} {...layerOptions} />;
+
+        return (
+          <GeoJSON
+            key={uniqueKey}
+            data={geojsonData}
+            {...layerOptions}
+          />
+        );
       })}
     </>
   );
@@ -252,9 +304,24 @@ const MapView = ({ initialLayer, sectionIndex }) => {
   const location = useLocation();
   const sectionId = location.state?.sectionId || null;
 
+  const [productionVariant, setProductionVariant] = useState('Productividad física (Kg/m³)');
+  const [usoConsuntivoVariant, setUsoConsuntivoVariant] = useState('Total SB (hm³)');
+  const [riesgosVariant, setRiesgosVariant] = useState('Sequía');
 
-  // Variante de simbología activa para la capa de producción agrícola
-  const [productionVariant, setProductionVariant] = useState('prodfisica');
+  const [currentFilters, setCurrentFilters] = useState({});
+
+  // ✅ Estados para línea de tiempo de sequías
+  const [sequiaQuincenaList, setSequiaQuincenaList] = useState([]);
+  const [sequiaQuincena, setSequiaQuincena] = useState(null);
+  const [timelineConfigs, setTimelineConfigs] = useState({});
+
+  // ✅ Función auxiliar para detectar si una capa es de sequías
+  const isSequiaLayer = useCallback((layerName) => {
+    if (Array.isArray(layerName)) {
+      return layerName.some(name => name === SEQUIA_CONFIG.layerName);
+    }
+    return layerName === SEQUIA_CONFIG.layerName;
+  }, []);
 
   useEffect(() => {
     const loadBaseLayer = async () => {
@@ -272,35 +339,161 @@ const MapView = ({ initialLayer, sectionIndex }) => {
     loadBaseLayer();
   }, []);
 
+
+  useEffect(() => {
+    const fetchSequiaQuincenas = async () => {
+      if (sequiaQuincenaList.length > 0) {
+        console.log('ℹ️ Quincenas ya cargadas, omitiendo...');
+        return;
+      }
+
+      try {
+        console.log(`📅 Cargando solo valores únicos de Quincena...`);
+        const uniqueQuincenas = await fetchUniqueValues(
+          SEQUIA_CONFIG.layerName,
+          SEQUIA_CONFIG.fieldName,
+          10000
+        );
+
+        // ✅ NORMALIZAR también al establecer el estado inicial
+        const normalizedQuincenas = uniqueQuincenas.map(q =>
+          q.toString()
+            .replace('Z', '')
+            .replace('T00:00:00.000', '')
+            .trim()
+        );
+
+        console.log(`📅 ${normalizedQuincenas.length} quincenas normalizadas:`, normalizedQuincenas);
+
+        setSequiaQuincenaList(normalizedQuincenas);
+
+        if (normalizedQuincenas.length > 0) {
+          const defaultQuincena = normalizedQuincenas[normalizedQuincenas.length - 1];
+          setSequiaQuincena(defaultQuincena);
+          console.log(`✅ Quincena por defecto establecida: ${defaultQuincena}`);
+        } else {
+          console.warn('⚠️ No hay quincenas disponibles');
+          setSequiaQuincena('');
+        }
+      } catch (err) {
+        console.error("❌ Error al obtener quincenas:", err);
+        setSequiaQuincenaList([]);
+        setSequiaQuincena('');
+      }
+    };
+
+    fetchSequiaQuincenas();
+  }, []);
+
+  // ✅ Actualizar configuración de timeline cuando cambien las quincenas
+  useEffect(() => {
+    if (sequiaQuincenaList.length > 0) {
+      const config = {
+        [SEQUIA_CONFIG.layerName]: {
+          timePoints: sequiaQuincenaList,
+          currentValue: sequiaQuincena || sequiaQuincenaList[sequiaQuincenaList.length - 1],
+          formatType: 'quincena',
+          type: 'discrete'
+        }
+      };
+
+      setTimelineConfigs(config);
+
+      console.log('🕐 Timeline configurada:', {
+        layer: SEQUIA_CONFIG.layerName,
+        timePoints: sequiaQuincenaList.length,
+        currentValue: sequiaQuincena
+      });
+    }
+  }, [sequiaQuincenaList, sequiaQuincena]);
+
   const activeLayerNames = useMemo(() => Object.keys(activeLayers), [activeLayers]);
+
 
   const handleLayerToggle = useCallback(async (layerConfig, isChecked) => {
     const layersToToggle = Array.isArray(layerConfig.layerName)
       ? layerConfig.layerName
       : [layerConfig.layerName];
 
+    console.log(`${isChecked ? '➕' : '➖'} Toggle capas:`, layersToToggle, {
+      tieneQuincena: !!sequiaQuincena,
+      quincenaActual: sequiaQuincena
+    });
+
     if (isChecked) {
-      console.log(`➕ Activando capas: ${layersToToggle.join(', ')}`);
       setLoadingLayers(prev => new Set([...prev, ...layersToToggle]));
+
       try {
         const results = await Promise.allSettled(
-          layersToToggle.map(name => fetchWfsLayer(name))
+          layersToToggle.map(async (name) => {
+            // ✅ ESTRATEGIA OPTIMIZADA PARA SEQUÍAS
+            if (name === SEQUIA_CONFIG.layerName) {
+              let cqlFilter = null;
+
+              // Siempre aplicar filtro por quincena si está disponible
+              if (sequiaQuincena) {
+                const normalizedQuincena = sequiaQuincena.toString().replace('Z', '').trim();
+                cqlFilter = `${SEQUIA_CONFIG.fieldName}='${normalizedQuincena}'`;
+
+                // ✅ GUARDAR FILTRO ACTUAL
+                setCurrentFilters(prev => ({
+                  ...prev,
+                  [SEQUIA_CONFIG.layerName]: cqlFilter
+                }));
+
+                console.log(`🔍 Cargando sequías CON FILTRO: ${cqlFilter}`);
+              } else if (sequiaQuincenaList.length > 0) {
+                // Si no hay quincena seleccionada pero hay disponibles, usar la primera
+                const fallbackQuincena = sequiaQuincenaList[0].replace('Z', '').trim();
+                cqlFilter = `${SEQUIA_CONFIG.fieldName}='${fallbackQuincena}'`;
+
+                // ✅ GUARDAR FILTRO ACTUAL
+                setCurrentFilters(prev => ({
+                  ...prev,
+                  [SEQUIA_CONFIG.layerName]: cqlFilter
+                }));
+
+                setSequiaQuincena(fallbackQuincena);
+                console.log(`🔄 Usando quincena fallback: ${fallbackQuincena}`);
+              } else {
+                console.warn('⚠️ Cargando sequías SIN FILTRO - no hay quincenas disponibles');
+              }
+
+              return fetchWfsLayer(name, cqlFilter, 5000);
+            }
+
+            // Para otras capas, cargar normalmente
+            return fetchWfsLayer(name);
+          })
         );
+
         const newLayersData = {};
         const failedLayers = [];
+
         layersToToggle.forEach((name, index) => {
           if (results[index].status === 'fulfilled' && results[index].value) {
             newLayersData[name] = results[index].value;
+            const featureCount = results[index].value.features?.length || 0;
+            console.log(`✅ ${name} cargada: ${featureCount} features`);
+
+            // Log detallado para sequías
+            if (name === SEQUIA_CONFIG.layerName) {
+              if (featureCount === 0) {
+                console.warn(`⚠️ Capa de sequías cargada pero SIN FEATURES. Filtro: ${sequiaQuincena}`);
+              } else {
+                console.log(`🎯 Sequías cargadas exitosamente: ${featureCount} polígonos para ${sequiaQuincena}`);
+              }
+            }
           } else {
-            console.error(`❌ Error cargando capa ${name}:`, results[index].reason);
+            console.error(`❌ Error cargando ${name}:`, results[index].reason);
             failedLayers.push(name);
           }
         });
+
         setActiveLayers(prev => ({ ...prev, ...newLayersData }));
+
         if (failedLayers.length > 0) {
-          console.warn(`⚠️ Las siguientes capas no se cargaron: ${failedLayers.join(', ')}`);
-        } else {
-          console.log(`✅ Capas cargadas: ${Object.keys(newLayersData).join(', ')}`);
+          console.warn(`⚠️ Capas no cargadas: ${failedLayers.join(', ')}`);
         }
       } catch (error) {
         console.error(`💥 Error general al cargar capas:`, error);
@@ -312,16 +505,91 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         });
       }
     } else {
-      console.log(`➖ Desactivando capas: ${layersToToggle.join(', ')}`);
+      // Desactivar capas - también limpiar filtros
       setActiveLayers(prev => {
         const newLayers = { ...prev };
         layersToToggle.forEach(name => {
           delete newLayers[name];
+          // ✅ LIMPIAR FILTRO cuando se desactiva la capa
+          setCurrentFilters(prev => {
+            const newFilters = { ...prev };
+            delete newFilters[name];
+            return newFilters;
+          });
         });
         return newLayers;
       });
     }
-  }, []);
+  }, [sequiaQuincena, sequiaQuincenaList]);
+
+
+  const handleTimelineChange = useCallback(async (layerName, newQuincena) => {
+    console.log(`🕐 Cambio de timeline: ${layerName} -> ${newQuincena}`);
+
+    if (layerName !== SEQUIA_CONFIG.layerName) return;
+
+    const cleanedQuincena = newQuincena.toString()
+      .replace('Z', '')
+      .replace('T00:00:00.000', '')
+      .trim();
+
+    console.log(`🔄 Quincena normalizada: "${newQuincena}" -> "${cleanedQuincena}"`);
+
+    // ✅ Actualizar estado inmediatamente para la UI
+    setSequiaQuincena(cleanedQuincena);
+
+    // ✅ ACTUALIZAR FILTRO ACTUAL
+    const newFilter = `${SEQUIA_CONFIG.fieldName}='${cleanedQuincena}'`;
+    setCurrentFilters(prev => ({
+      ...prev,
+      [SEQUIA_CONFIG.layerName]: newFilter
+    }));
+
+    // ✅ Actualizar configuración del timeline
+    setTimelineConfigs(prev => ({
+      ...prev,
+      [SEQUIA_CONFIG.layerName]: {
+        ...prev[SEQUIA_CONFIG.layerName],
+        currentValue: cleanedQuincena
+      }
+    }));
+
+    // ✅ Solo recargar si la capa está activa
+    if (activeLayers[SEQUIA_CONFIG.layerName]) {
+      console.log(`🔄 Recargando capa de sequías con nueva quincena: ${cleanedQuincena}`);
+
+      setLoadingLayers(prev => new Set([...prev, SEQUIA_CONFIG.layerName]));
+
+      try {
+        // ✅ Usar la versión normalizada en el filtro CQL
+        const cqlFilter = `${SEQUIA_CONFIG.fieldName}='${cleanedQuincena}'`;
+        const data = await fetchWfsLayer(SEQUIA_CONFIG.layerName, cqlFilter, 5000);
+
+        if (data && data.features) {
+          console.log(`✅ ${data.features.length} features cargados para ${cleanedQuincena}`);
+          setActiveLayers(prev => ({
+            ...prev,
+            [SEQUIA_CONFIG.layerName]: data
+          }));
+        } else {
+          console.warn(`⚠️ No se encontraron features para ${cleanedQuincena}`);
+          setActiveLayers(prev => ({
+            ...prev,
+            [SEQUIA_CONFIG.layerName]: { type: 'FeatureCollection', features: [] }
+          }));
+        }
+      } catch (error) {
+        console.error(`❌ Error al recargar sequías:`, error);
+      } finally {
+        setLoadingLayers(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(SEQUIA_CONFIG.layerName);
+          return newSet;
+        });
+      }
+    }
+  }, [activeLayers]);
+
 
   useEffect(() => {
     const loadInitialLayers = async () => {
@@ -383,7 +651,6 @@ const MapView = ({ initialLayer, sectionIndex }) => {
   const handleShowTable = (layers, displayName) => {
     let layerNamesArray = Array.isArray(layers) ? [...layers] : [layers];
 
-    // Lógica especial para 'Usos Consuntivos' que ya tenías
     if (layerNamesArray.includes('Hidalgo:03_usoconsuntivot')) {
       const secondLayer = 'Hidalgo:03_usoagua';
       if (!layerNamesArray.includes(secondLayer)) {
@@ -406,14 +673,10 @@ const MapView = ({ initialLayer, sectionIndex }) => {
       }
     }
 
-    // --- NUEVA LÓGICA PARA CREAR LOS OBJETOS DE PESTAÑA ---
     const tabsData = layerNamesArray.map(layerName => {
       const layerInfo = getLayerInfo(layerName);
-      // Por defecto, el título es el 'text' de accordionData
       let title = layerInfo?.text || layerName.split(':')[1] || layerName;
 
-      // *** AQUÍ PUEDES SOBREESCRIBIR CUALQUIER TÍTULO ***
-      // Ejemplo: Si quieres un nombre específico para la segunda pestaña
       if (layerName === 'Hidalgo:03_usoagua') {
         title = 'Usos Consuntivos Estatal';
       } else if (layerName === 'Hidalgo:03_usoconsuntivot') {
@@ -432,14 +695,14 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         title = 'Cloración estatal';
       }
 
-
       return { layerName, title };
     });
 
     setTableModalState({
       isOpen: true,
-      tabs: tabsData, // <--- Pasamos la nueva estructura
-      displayName: displayName
+      tabs: tabsData,
+      displayName: displayName,
+      filters: currentFilters
     });
   };
 
@@ -447,16 +710,89 @@ const MapView = ({ initialLayer, sectionIndex }) => {
     setTableModalState({ isOpen: false, tabs: [], displayName: null });
   };
 
-  // 🔄 Manejador que recibe la variante seleccionada desde la leyenda
   const handleVariantChange = (layerName, variant) => {
     if (layerName === 'Hidalgo:03_drprodfisica') {
       console.log(`🎨 Cambiando simbología de ${layerName} a: ${variant}`);
       setProductionVariant(variant);
     }
+
+    if (layerName === 'Hidalgo:03_usoconsuntivo') {
+      console.log(`💧 Cambiando simbología de Usos Consuntivos a: ${variant}`);
+      setUsoConsuntivoVariant(variant);
+    }
+
+    if (layerName === 'Hidalgo:04_riesgosmunicipales') {
+      console.log(`🌪️ Cambiando simbología de Riesgos a: ${variant}`);
+      setRiesgosVariant(variant);
+    }
   };
+
+  const currentVariants = useMemo(() => ({
+    'Hidalgo:03_drprodfisica': productionVariant,
+    'Hidalgo:03_usoconsuntivo': usoConsuntivoVariant,
+    'Hidalgo:04_riesgosmunicipales': riesgosVariant
+  }), [productionVariant, usoConsuntivoVariant, riesgosVariant]);
+
+
+  useEffect(() => {
+    console.log('🔍 DEBUG Sequías:', {
+      quincenaActual: sequiaQuincena,
+      totalQuincenas: sequiaQuincenaList.length,
+      timelineConfigs: timelineConfigs[SEQUIA_CONFIG.layerName],
+      capaActiva: !!activeLayers[SEQUIA_CONFIG.layerName],
+      featuresEnCapa: activeLayers[SEQUIA_CONFIG.layerName]?.features?.length || 0
+    });
+  }, [sequiaQuincena, sequiaQuincenaList, timelineConfigs, activeLayers]);
 
   return (
     <div className="map-view-container">
+      {/*<div style={{
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
+        zIndex: 1000,
+        background: 'white',
+        padding: '10px',
+        borderRadius: '5px',
+        fontSize: '12px',
+        border: '1px solid #ccc',
+        maxWidth: '300px'
+      }}>
+        <div><strong>🔍 DEBUG Sequías:</strong></div>
+        <div>Quincenas: {sequiaQuincenaList.length}</div>
+        <div>Actual: {sequiaQuincena || 'Ninguna'}</div>
+        <div>Cargada: {activeLayers[SEQUIA_CONFIG.layerName] ? '✅' : '❌'}</div>
+        <div>Features: {activeLayers[SEQUIA_CONFIG.layerName]?.features?.length || 0}</div>
+        <div style={{ marginTop: '5px', fontSize: '10px', color: '#666' }}>
+          Últimas quincenas: {sequiaQuincenaList.slice(-3).join(', ')}
+        </div>
+
+        <div style={{ marginTop: '8px', display: 'flex', gap: '5px', flexDirection: 'column' }}>
+          <button
+            onClick={() => {
+              setSequiaQuincenaList([]);
+              console.log('🔄 Forzando recarga de quincenas...');
+            }}
+            style={{ padding: '2px 5px', fontSize: '10px' }}
+          >
+            Recargar Quincenas
+          </button>
+
+          <button
+            onClick={() => {
+              console.log('🔍 Estado actual:', {
+                quincenaActual: sequiaQuincena,
+                listaQuincenas: sequiaQuincenaList,
+                capaActiva: !!activeLayers[SEQUIA_CONFIG.layerName],
+                features: activeLayers[SEQUIA_CONFIG.layerName]?.features?.length
+              });
+            }}
+            style={{ padding: '2px 5px', fontSize: '10px', background: '#e3f2fd' }}
+          >
+            Log Estado
+          </button>
+        </div>
+      </div>*/}
       <LayerMenu
         onLayerToggle={handleLayerToggle}
         activeLayers={activeLayers}
@@ -464,6 +800,10 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         sectionIndex={sectionIndex}
         sectionId={sectionId}
         onShowTable={handleShowTable}
+        sequiaQuincena={sequiaQuincena}
+        sequiaQuincenaList={sequiaQuincenaList}
+        timelineConfigs={timelineConfigs}
+        onTimelineChange={handleTimelineChange}
       />
       <div className="map-container">
         <MapContainer
@@ -517,6 +857,7 @@ const MapView = ({ initialLayer, sectionIndex }) => {
             activeLayers={activeLayers}
             setPopupData={setPopupData}
             baseLayerData={baseLayerData}
+            sequiaQuincena={sequiaQuincena}
           />
           <KeepPopupInView />
 
@@ -526,7 +867,7 @@ const MapView = ({ initialLayer, sectionIndex }) => {
               onClose={() => setPopupData(null)}
               className="custom-popup small-popup"
               maxWidth={300}
-              maxHeight={350}
+              maxHeight={550}
               autoPan={false}
             >
               <div
@@ -547,6 +888,9 @@ const MapView = ({ initialLayer, sectionIndex }) => {
           <GeoJsonLayers
             activeLayers={activeLayers}
             productionVariant={productionVariant}
+            usoConsuntivoVariant={usoConsuntivoVariant}
+            riesgosVariant={riesgosVariant}
+            sequiaQuincena={sequiaQuincena}
           />
         </MapContainer>
 
@@ -554,6 +898,7 @@ const MapView = ({ initialLayer, sectionIndex }) => {
           activeLayers={layersForLegend}
           legendData={legendData}
           loadingLayers={loadingLayers}
+          activeVariants={currentVariants}
           onVariantChange={handleVariantChange}
         />
       </div>
@@ -562,6 +907,7 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         onHide={handleCloseTable}
         tabs={tableModalState.tabs}
         displayName={tableModalState.displayName}
+        filters={tableModalState.filters || {}}
       />
     </div>
   );

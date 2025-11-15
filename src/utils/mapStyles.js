@@ -94,6 +94,12 @@ const stylePresa = {
   fillColor: '#a7d6f1ff'
 };
 
+const styleIPresa = {
+  ...basePointStyle,
+  fillColor: '#2d25a5ff'
+};
+
+
 // -- Estilos para POLÍGONOS --
 const styleOutlineRed = {
   ...outlineStyle,
@@ -151,7 +157,7 @@ const styleConsejoCuenca = {
  * Estilo para censo de municipios basado en población
  */
 const styleCensoMunicipio = (feature) => {
-  const poblacion = feature.properties.pobtotal || feature.properties.pobtot || 0;
+  const poblacion = parseFloat(feature.properties['Población total']) || 0;
   let fillColor;
 
   if (poblacion > POPULATION_RANGES.MUNICIPIO[2]) {
@@ -175,7 +181,7 @@ const styleCensoMunicipio = (feature) => {
  * Estilo para ordenamiento de acuíferos
  */
 const styleOrdenamientoAcuiferos = (feature) => {
-  const ordenamiento = feature.properties.tipordenamiento;
+  const ordenamiento = feature.properties['Tipo de Ordenamiento'];
   let fillColor;
 
   if (ordenamiento === 'Veda') {
@@ -197,7 +203,7 @@ const styleOrdenamientoAcuiferos = (feature) => {
  * Estilo para precipitación
  */
 const stylePrecipitacion = (feature) => {
-  const precip = feature.properties.anual || 0;
+  const precip = parseFloat(feature.properties['Anual (mm)']) || 0;
   let fillColor;
 
   if (precip > 850) {
@@ -235,7 +241,7 @@ const styleCuencasDisponibilidad = (feature) => {
 };
 
 const styleDisponibilidadAcuiferos = (feature) => {
-  const dispo = feature.properties.situacion;
+  const dispo = feature.properties.Situación;
   let fillColor;
 
   if (dispo === 'Con Disponibilidad') {
@@ -253,7 +259,7 @@ const styleDisponibilidadAcuiferos = (feature) => {
 
 
 const styleEficienciaCloracion = (feature) => {
-  const eficiencia = feature.properties.eficloracion;
+  const eficiencia = parseFloat(feature.properties['Eficiencia de cloración (%)']) || 0;
   let fillColor;
 
   if (eficiencia >= 95) {
@@ -276,7 +282,7 @@ const styleEficienciaCloracion = (feature) => {
 }
 
 const styleCoberturaAlcantarillado = (feature) => {
-  const cobertura = feature.properties.porc;
+  const cobertura = parseFloat(feature.properties['Cobertura (%)']) || 0;
   let fillColor;
 
   if (cobertura >= 95) {
@@ -298,7 +304,7 @@ const styleCoberturaAlcantarillado = (feature) => {
 
 
 const styleRecaudacionExtraccion = (feature) => {
-  const recaudacion = feature.properties.total;
+  const recaudacion = parseFloat(feature.properties.Total) || 0;
   let fillColor;
 
   if (recaudacion > 2) {
@@ -320,7 +326,7 @@ const styleRecaudacionExtraccion = (feature) => {
 
 
 const sytleRecaudacionCobro = (feature) => {
-  const recaudacion = feature.properties.total;
+  const recaudacion = parseFloat(feature.properties.Total) || 0;
   let fillColor;
 
   if (recaudacion > 4) {
@@ -339,20 +345,44 @@ const sytleRecaudacionCobro = (feature) => {
   };
 }
 
-const styleusos = (feature) => {
-  const uso = feature.properties.total;
+const styleusosSB = (feature) => {
+  const uso = parseFloat(feature.properties['Total SB (hm³)']) || 0;
   let fillColor;
 
-  if (uso > 70) {
+  if (uso > 9.7) {
     fillColor = '#457428';
-  } else if (uso > 20) {
+  } else if (uso > 2.6) {
     fillColor = '#638e2d';
-  } else if (uso > 6) {
+  } else if (uso > 0.5) {
     fillColor = '#81a832';
-  } else if (uso > 2) {
-    fillColor = '#9ec237';
+  } else if (uso > 0) {
+    fillColor = '#81a832';
   } else {
+    fillColor = '#ffffff';
+  }
+  return {
+    ...basePolygonStyle,
+    fillColor,
+    color: COLORS.BLACK
+  };
+}
+
+const styleusosSP = (feature) => {
+  const uso = parseFloat(feature.properties['Total SP (hm³)']) || 0;
+  let fillColor;
+
+  if (uso > 37.3) {
+    fillColor = '#457428';
+  } else if (uso > 6.8) {
+    fillColor = '#638e2d';
+  } else if (uso > 1.5) {
+    fillColor = '#81a832';
+  } else if (uso > 0.7) {
+    fillColor = '#9ec237';
+  } else if (uso > 0) {
     fillColor = '#bcdc3c';
+  } else {
+    fillColor = '#ffffff';
   }
   return {
     ...basePolygonStyle,
@@ -363,12 +393,12 @@ const styleusos = (feature) => {
 
 
 const styleCultivos = (feature) => {
-  const cultivo = feature.properties.produccion;
+  const cultivo = parseFloat(feature.properties['Producción agrícola (Toneladas)']) || 0;
   let fillColor;
 
-  if (cultivo > 1300000) {
+  if (cultivo > 994722) {
     fillColor = '#00441b';
-  } else if (cultivo > 80000) {
+  } else if (cultivo > 159951) {
     fillColor = '#7bc77c';
   } else {
     fillColor = '#f7fcf5';
@@ -382,12 +412,14 @@ const styleCultivos = (feature) => {
 };
 
 const styleVolumenes = (feature) => {
-  const cultivo = feature.properties.voldistribuido;
+  const rawVolumen = feature.properties['Volumen distribuido (hm³)'];
+  const volumen = parseFloat(String(rawVolumen).replace(',', '.')) || 0;
+
   let fillColor;
 
-  if (cultivo > 490000) {
+  if (volumen > 346) {
     fillColor = '#00441b';
-  } else if (cultivo > 20000) {
+  } else if (volumen > 32) {
     fillColor = '#7bc77c';
   } else {
     fillColor = '#f7fcf5';
@@ -401,7 +433,7 @@ const styleVolumenes = (feature) => {
 };
 
 const styleMacrorregiones = (feature) => {
-  const mregion = feature.properties.macrorregion;
+  const mregion = feature.properties.Macrorregión;
   let fillColor;
 
   if (mregion === 'Actopan') {
@@ -438,7 +470,7 @@ const styleMacrorregiones = (feature) => {
 };
 
 const styleoOperadores = (feature) => {
-  const organismo = feature.properties.tipo;
+  const organismo = feature.properties['Tipo de Prestador'];
   let fillColor;
 
   if (organismo === 'Centralizado') {
@@ -458,7 +490,7 @@ const styleoOperadores = (feature) => {
 };
 
 const styleCobPotable = (feature) => {
-  const potable = feature.properties.porc;
+  const potable = parseFloat(feature.properties['Cobertura (%)']) || 0;
   let fillColor;
 
   if (potable > 97.5) {
@@ -477,7 +509,7 @@ const styleCobPotable = (feature) => {
 };
 
 const styleptarNoMunicipales = (feature) => {
-  const ptar = feature.properties.proceso;
+  const ptar = feature.properties['Proceso de Tratamiento'];
   let fillColor;
 
   if (ptar === 'Anaerobio') {
@@ -510,7 +542,7 @@ const styleptarNoMunicipales = (feature) => {
 };
 
 const styleProduccion = (feature) => {
-  const produccion = feature.properties.prodfisica;
+  const produccion = parseFloat(feature.properties['Productividad física (Kg/m³)']) || 0;
   let fillColor;
 
   if (produccion > 5.86) {
@@ -532,7 +564,7 @@ const styleProduccion = (feature) => {
 }
 
 const styleProduccionE = (feature) => {
-  const produccion = feature.properties.prodeconomica;
+  const produccion = parseFloat(feature.properties['Productividad económica (pesos constantes de 2012/m³)']) || 0;
   let fillColor;
 
   if (produccion > 11.5) {
@@ -554,7 +586,7 @@ const styleProduccionE = (feature) => {
 }
 
 const styleHidrometeorologicos = (feature) => {
-  const uso = feature.properties.total;
+  const uso = parseFloat(feature.properties.Total) || 0;
   let fillColor;
 
   if (uso >= 7) {
@@ -573,11 +605,98 @@ const styleHidrometeorologicos = (feature) => {
   };
 }
 
+const styleRiesgoGenerico = (feature, propertyName) => {
+  const nivel = feature.properties[propertyName];
+  let fillColor;
+
+  switch (nivel) {
+    case 'Muy alto':
+      fillColor = '#e41a1c';
+      break;
+    case 'Alto':
+      fillColor = '#ff7f00';
+      break;
+    case 'Medio':
+      fillColor = '#fdff7a';
+      break;
+    case 'Bajo':
+      fillColor = '#4daf4a';
+      break;
+    case 'Muy bajo':
+      fillColor = '#a6cee3';
+      break;
+    default:
+      fillColor = '#f0f0f0';
+  }
+
+  return { ...basePolygonStyle, fillColor, color: COLORS.BLACK };
+};
+
+// Función específica para Tornado
+const styleTornado = (feature) => {
+  const nivel = feature.properties['Tornado'];
+  let fillColor;
+
+  if (nivel === 'Con tornado') {
+    fillColor = '#935200';
+  } else {
+    fillColor = '#bababa'; // 'Sin tornado'
+  }
+
+  return { ...basePolygonStyle, fillColor, color: COLORS.BLACK };
+};
+
+
+const styleSequias = (feature) => {
+  const nivel = feature.properties.Sequía;
+
+  // ✅ DEBUG: Verificar qué datos están llegando
+  console.log('🎨 Aplicando estilo sequías:', {
+    quincena: feature.properties.Quincena,
+    nivel: nivel,
+    featureId: feature.id
+  });
+
+  let fillColor;
+
+  switch (nivel) {
+    case 'Sequía Excepcional':
+      fillColor = '#730000';
+      break;
+    case 'Sequía Extrema':
+      fillColor = 'red';
+      break;
+    case 'Sequía Severa':
+      fillColor = '#e69800';
+      break;
+    case 'Sequía Moderada':
+      fillColor = '#e69800';
+      break;
+    case 'Anormalmente Seco':
+      fillColor = 'yellow';
+      break;
+    case 'Sin Sequía':
+      fillColor = '#dadaeb';
+      break;
+    default:
+      fillColor = 'gray';
+      console.warn('⚠️ Nivel de sequía desconocido:', nivel);
+  }
+
+  return {
+    ...basePolygonStyle,
+    fillColor,
+    color: COLORS.BLACK
+  };
+};
+
+
+
 /**
  * Estilo para calidad del agua
  */
 const pointCalidad = (feature, latlng) => {
-  const calidad = feature.properties.semaforo;
+  const calidad = feature.properties.Semaforo;
   let fillColor;
 
   if (calidad === 'Rojo') {
@@ -600,7 +719,7 @@ const pointCalidad = (feature, latlng) => {
  * Estilo para censo de localidades
  */
 const pointToLayerCensoLocalidad = (feature, latlng) => {
-  const poblacion = feature.properties.pobtot || 0;
+  const poblacion = parseFloat(feature.properties['Población total']) || 0;
   let fillColor;
 
   if (poblacion > POPULATION_RANGES.LOCALIDAD[2]) {
@@ -629,15 +748,24 @@ const pointToLayerDescargas = (feature, latlng) => L.circleMarker(latlng, styleP
 const pointToLayerEClimatologicas = (feature, latlng) => L.circleMarker(latlng, styleSub);
 const pointToLayerEHidrometricas = (feature, latlng) => L.circleMarker(latlng, styleSup);
 const pointToLayerPresas = (feature, latlng) => L.circleMarker(latlng, stylePresa);
+const pointToLayerIPresas = (feature, latlng) => L.circleMarker(latlng, styleIPresa);
 
 // --- FUNCIÓN PRINCIPAL DE ESTILOS ---
 export function getLayerOptions(layerName, variant = null) {
   if (layerName === 'Hidalgo:03_drprodfisica') {
-    const activeVariant = variant || 'prodfisica'; // por defecto
+    const activeVariant = variant || 'Productividad física (Kg/m³)'; // por defecto
     const styleFunction =
-      activeVariant === 'prodfisica'
+      activeVariant === 'Productividad física (Kg/m³)'
         ? styleProduccion
         : styleProduccionE; // define ambos estilos arriba
+    return { style: styleFunction };
+  }
+  if (layerName === 'Hidalgo:03_usoconsuntivo') {
+    const activeVariant = variant || 'Total SB (hm³)'; // por defecto
+    const styleFunction =
+      activeVariant === 'Total SB (hm³)'
+        ? styleusosSB
+        : styleusosSP; // define ambos estilos arriba
     return { style: styleFunction };
   }
   if (!layerName) {
@@ -729,8 +857,8 @@ export function getLayerOptions(layerName, variant = null) {
 
 
     //Uso responsable y sostenibilida del agua
-    case 'Hidalgo:03_usoconsuntivot':
-      return { ...baseOptions, style: styleusos };
+    case 'Hidalgo:03_usoconsuntivo':
+      return { ...baseOptions, style: styleusosSB };
     case 'Hidalgo:03_drcultivos':
       return { ...baseOptions, style: styleCultivos };
     case 'Hidalgo:03_drvolumenes':
@@ -747,8 +875,54 @@ export function getLayerOptions(layerName, variant = null) {
       return { ...baseOptions, pointToLayer: pointToLayerEHidrometricas };
     case 'Hidalgo:04_presas':
       return { ...baseOptions, pointToLayer: pointToLayerPresas };
+    case 'Hidalgo:04_infrapresas':
+      return { ...baseOptions, pointToLayer: pointToLayerIPresas };
     case 'Hidalgo:04_hidrometeorologicos':
       return { ...baseOptions, style: styleHidrometeorologicos };
+    case 'Hidalgo:04_riesgosmunicipales': {
+      const activeVariant = variant || 'Sequía';
+      let styleFunction;
+
+      switch (activeVariant) {
+        case 'Tornado':
+          styleFunction = styleTornado;
+          break;
+
+        case 'Sequía':
+          styleFunction = (feature) => styleRiesgoGenerico(feature, 'Sequía');
+          break;
+        case 'Onda de calor':
+          styleFunction = (feature) => styleRiesgoGenerico(feature, 'Onda de calor');
+          break;
+        case 'Bajas temperaturas':
+          styleFunction = (feature) => styleRiesgoGenerico(feature, 'Bajas temperaturas');
+          break;
+        case 'Tormenta eléctrica':
+          styleFunction = (feature) => styleRiesgoGenerico(feature, 'Tormenta eléctrica');
+          break;
+        case 'Ciclón tropical':
+          styleFunction = (feature) => styleRiesgoGenerico(feature, 'Ciclón tropical');
+          break;
+        case 'Nevada':
+          styleFunction = (feature) => styleRiesgoGenerico(feature, 'Nevada');
+          break;
+        case 'Granizada':
+          styleFunction = (feature) => styleRiesgoGenerico(feature, 'Granizada');
+          break;
+        case 'Inundación':
+          styleFunction = (feature) => styleRiesgoGenerico(feature, 'Inundación');
+          break;
+
+        default:
+          // Fallback por si acaso
+          styleFunction = (feature) => styleRiesgoGenerico(feature, 'Sequía');
+      }
+
+      return { ...baseOptions, style: styleFunction };
+    }
+
+    case 'Hidalgo:04_sequias':
+      return { ...baseOptions, style: styleSequias };
 
 
     // Gobernanza y gestión integrada del agua
@@ -972,7 +1146,7 @@ export const legendData = {
     ]
   },
   'Hidalgo:02_cobaguapotable': {
-    title: 'Cobro de Agua Potable',
+    title: 'Cobertura de Agua Potable',
     type: 'polygon',
     items: [
       { color: '#0073cb', borderColor: COLORS.BORDER_GRAY, label: 'Mayor o igual a 97.5%' },
@@ -999,33 +1173,52 @@ export const legendData = {
 
   //Uso responsable y sostenible del agua
 
-  'Hidalgo:03_usoconsuntivot': {
-    title: 'Usos Consuntivos (agrícola, abastecimiento público, industrial y termoeléctricas)',
+  'Hidalgo:03_usoconsuntivo': {
+    title: 'Usos Consuntivos ',
     type: 'polygon',
-    items: [
-      { color: '#457428', borderColor: COLORS.BORDER_GRAY, label: 'Mayor o igual a 70 Hm³' },
-      { color: '#638e2d', borderColor: COLORS.BORDER_GRAY, label: '70 - 20 Hm³' },
-      { color: '#81a832', borderColor: COLORS.BORDER_GRAY, label: '20 - 6 Hm³' },
-      { color: '#9ec237', borderColor: COLORS.BORDER_GRAY, label: '6 - 2 Hm³' },
-      { color: '#bcdc3c', borderColor: COLORS.BORDER_GRAY, label: '2 - 6 Hm³' }
-    ]
+    variants: {
+      'Total SB (hm³)': {
+        items: [
+          { color: '#457428', borderColor: COLORS.BORDER_GRAY, label: 'Mayor o igual a 9.7 Hm³' },
+          { color: '#638e2d', borderColor: COLORS.BORDER_GRAY, label: '9.7 - 2.6 Hm³' },
+          { color: '#81a832', borderColor: COLORS.BORDER_GRAY, label: '2.6 - 0.5 Hm³' },
+          { color: '#9ec237', borderColor: COLORS.BORDER_GRAY, label: 'Menor o igual a 0.5 Hm³' },
+          { color: '#ffffff', borderColor: COLORS.BORDER_GRAY, label: 'Sin uso' }
+        ],
+        note: 'Volumen total superficial y subterráneo.',
+      },
+
+      'Total SP (hm³)': {
+        items: [
+          { color: '#457428', borderColor: COLORS.BORDER_GRAY, label: 'Mayor o igual a 37.3 Hm³' },
+          { color: '#638e2d', borderColor: COLORS.BORDER_GRAY, label: '37.3 - 6.8 Hm³' },
+          { color: '#81a832', borderColor: COLORS.BORDER_GRAY, label: '6.8 - 1.5 Hm³' },
+          { color: '#9ec237', borderColor: COLORS.BORDER_GRAY, label: '1.5 - 0.7 Hm³' },
+          { color: '#bcdc3c', borderColor: COLORS.BORDER_GRAY, label: 'menor a 0.7 Hm³' },
+          { color: '#ffffff', borderColor: COLORS.BORDER_GRAY, label: 'Sin uso' }
+
+        ],
+        note: 'Volumen total superficial.',
+      },
+    },
   },
+
   'Hidalgo:03_drcultivos': {
     title: 'Producción de Cultivos',
     type: 'polygon',
     items: [
-      { color: '#00441b', borderColor: COLORS.BORDER_GRAY, label: 'Mayor o igual a 1,300,000 ' },
-      { color: '#7bc77c', borderColor: COLORS.BORDER_GRAY, label: '1300000 - 80,000 ' },
-      { color: '#f7fcf5', borderColor: COLORS.BORDER_GRAY, label: 'Menor a 80,000 ' }
+      { color: '#00441b', borderColor: COLORS.BORDER_GRAY, label: 'Mayor o igual a 994,722 ' },
+      { color: '#7bc77c', borderColor: COLORS.BORDER_GRAY, label: '994,722 - 159,951 ' },
+      { color: '#f7fcf5', borderColor: COLORS.BORDER_GRAY, label: 'Menor a 159,951 ' }
     ]
   },
   'Hidalgo:03_drvolumenes': {
     title: 'Volumen Distribuido',
     type: 'polygon',
     items: [
-      { color: '#00441b', borderColor: COLORS.BORDER_GRAY, label: 'Mayor o igual a 49,000' },
-      { color: '#7bc77c', borderColor: COLORS.BORDER_GRAY, label: '49,000 - 20,000' },
-      { color: '#f7fcf5', borderColor: COLORS.BORDER_GRAY, label: 'Menor a 20,000 ' }
+      { color: '#00441b', borderColor: COLORS.BORDER_GRAY, label: 'Mayor o igual a 346 hm³' },
+      { color: '#7bc77c', borderColor: COLORS.BORDER_GRAY, label: '346 hm³ - 32 hm³' },
+      { color: '#f7fcf5', borderColor: COLORS.BORDER_GRAY, label: 'Menor a 32 hm³' }
     ]
   },
 
@@ -1033,23 +1226,23 @@ export const legendData = {
     title: 'Producción agrícola',
     type: 'polygon',
     variants: {
-      prodfisica: {
+      'Productividad física (Kg/m³)': {
         items: [
-          { color: '#00441b', borderColor: COLORS.BORDER_GRAY, label: 'Mayor o igual a 5.86 kg/hectárea' },
-          { color: '#2a924b', borderColor: COLORS.BORDER_GRAY, label: '5.86 - 4.3 kg/hectárea' },
-          { color: '#7bc77c', borderColor: COLORS.BORDER_GRAY, label: '4.3 - 3.04 kg/hectárea' },
-          { color: '#c9eac2', borderColor: COLORS.BORDER_GRAY, label: '3.04 - 2.59 kg/hectárea' },
-          { color: '#f7fcf5', borderColor: COLORS.BORDER_GRAY, label: 'Menor a 2.59 kg/hectárea' }
+          { color: '#00441b', borderColor: COLORS.BORDER_GRAY, label: 'Mayor o igual a 5.86 kg/m³' },
+          { color: '#2a924b', borderColor: COLORS.BORDER_GRAY, label: '5.86 - 4.3 kg/m³' },
+          { color: '#7bc77c', borderColor: COLORS.BORDER_GRAY, label: '4.3 - 3.04 kg/m³' },
+          { color: '#c9eac2', borderColor: COLORS.BORDER_GRAY, label: '3.04 - 2.59 kg/m³' },
+          { color: '#f7fcf5', borderColor: COLORS.BORDER_GRAY, label: 'Menor a 2.59 kg/m³' }
         ],
-        note: 'Producción física (toneladas por hectárea)',
+        note: 'Producción física (kilo por metro cúbico)',
       },
-      prodeconomica: {
+      'Productividad económica (pesos constantes de 2012/m³)': {
         items: [
-          { color: '#ff0000', borderColor: COLORS.BORDER_GRAY, label: 'Mayor o igual a 11.5 mdp/hectárea' },
-          { color: '#ff4040', borderColor: COLORS.BORDER_GRAY, label: '11.5 - 6.5 mdp/hectárea' },
-          { color: '#ff8080', borderColor: COLORS.BORDER_GRAY, label: '6.5 - 4.5 mdp/hectárea' },
-          { color: '#ffbfbf', borderColor: COLORS.BORDER_GRAY, label: '4.5 - 4 mdp/hectárea' },
-          { color: '#ffffff', borderColor: COLORS.BORDER_GRAY, label: 'Menor a 4 mdp/hectárea' }
+          { color: '#ff0000', borderColor: COLORS.BORDER_GRAY, label: 'Mayor o igual a 11.5 pesos/m³' },
+          { color: '#ff4040', borderColor: COLORS.BORDER_GRAY, label: '11.5 - 6.5 pesos/m³' },
+          { color: '#ff8080', borderColor: COLORS.BORDER_GRAY, label: '6.5 - 4.5 pesos/m³' },
+          { color: '#ffbfbf', borderColor: COLORS.BORDER_GRAY, label: '4.5 - 4 pesos/m³' },
+          { color: '#ffffff', borderColor: COLORS.BORDER_GRAY, label: 'Menor a 4 pesos/m³' }
         ],
         note: 'Producción económica (valor de producción en pesos)',
       },
@@ -1078,6 +1271,109 @@ export const legendData = {
       { color: '#a7d6f1ff', borderColor: COLORS.BORDER_GRAY, label: 'Presas' }
     ]
   },
+  'Hidalgo:04_infrapresas': {
+    title: 'Infraestructura de Presas',
+    type: 'point',
+    items: [
+      { color: '#08306b', borderColor: COLORS.BORDER_GRAY, label: 'Presas' }
+    ]
+  },
+  'Hidalgo:04_riesgosmunicipales': {
+    title: 'Riesgos Municipales',
+    type: 'polygon',
+    variants: {
+      'Sequía': {
+        items: [
+          { color: '#e41a1c', borderColor: COLORS.BORDER_GRAY, label: 'Muy Alto' },
+          { color: '#ff7f00', borderColor: COLORS.BORDER_GRAY, label: 'Alto' },
+          { color: '#fdff7a', borderColor: COLORS.BORDER_GRAY, label: 'Medio' },
+          { color: '#4daf4a', borderColor: COLORS.BORDER_GRAY, label: 'Bajo' },
+          { color: '#a6cee3', borderColor: COLORS.BORDER_GRAY, label: 'Muy Bajo' }
+        ]
+      },
+      'Onda de calor': {
+        items: [
+          { color: '#e41a1c', borderColor: COLORS.BORDER_GRAY, label: 'Muy Alto' },
+          { color: '#ff7f00', borderColor: COLORS.BORDER_GRAY, label: 'Alto' },
+          { color: '#fdff7a', borderColor: COLORS.BORDER_GRAY, label: 'Medio' },
+          { color: '#4daf4a', borderColor: COLORS.BORDER_GRAY, label: 'Bajo' },
+          { color: '#a6cee3', borderColor: COLORS.BORDER_GRAY, label: 'Muy Bajo' }
+        ]
+      },
+      'Bajas temperaturas': {
+        items: [
+          { color: '#e41a1c', borderColor: COLORS.BORDER_GRAY, label: 'Muy Alto' },
+          { color: '#ff7f00', borderColor: COLORS.BORDER_GRAY, label: 'Alto' },
+          { color: '#fdff7a', borderColor: COLORS.BORDER_GRAY, label: 'Medio' },
+          { color: '#4daf4a', borderColor: COLORS.BORDER_GRAY, label: 'Bajo' },
+          { color: '#a6cee3', borderColor: COLORS.BORDER_GRAY, label: 'Muy Bajo' }
+        ]
+      },
+      'Tormenta eléctrica': {
+        items: [
+          { color: '#e41a1c', borderColor: COLORS.BORDER_GRAY, label: 'Muy Alto' },
+          { color: '#ff7f00', borderColor: COLORS.BORDER_GRAY, label: 'Alto' },
+          { color: '#fdff7a', borderColor: COLORS.BORDER_GRAY, label: 'Medio' },
+          { color: '#4daf4a', borderColor: COLORS.BORDER_GRAY, label: 'Bajo' },
+          { color: '#a6cee3', borderColor: COLORS.BORDER_GRAY, label: 'Muy Bajo' }
+        ]
+      },
+      'Ciclón tropical': {
+        items: [
+          { color: '#e41a1c', borderColor: COLORS.BORDER_GRAY, label: 'Muy Alto' },
+          { color: '#ff7f00', borderColor: COLORS.BORDER_GRAY, label: 'Alto' },
+          { color: '#fdff7a', borderColor: COLORS.BORDER_GRAY, label: 'Medio' },
+          { color: '#4daf4a', borderColor: COLORS.BORDER_GRAY, label: 'Bajo' },
+          { color: '#a6cee3', borderColor: COLORS.BORDER_GRAY, label: 'Muy Bajo' }
+        ]
+      },
+      'Nevada': {
+        items: [
+          { color: '#e41a1c', borderColor: COLORS.BORDER_GRAY, label: 'Muy Alto' },
+          { color: '#ff7f00', borderColor: COLORS.BORDER_GRAY, label: 'Alto' },
+          { color: '#fdff7a', borderColor: COLORS.BORDER_GRAY, label: 'Medio' },
+          { color: '#4daf4a', borderColor: COLORS.BORDER_GRAY, label: 'Bajo' },
+          { color: '#a6cee3', borderColor: COLORS.BORDER_GRAY, label: 'Muy Bajo' }
+        ]
+      },
+      'Granizada': {
+        items: [
+          { color: '#e41a1c', borderColor: COLORS.BORDER_GRAY, label: 'Muy Alto' },
+          { color: '#ff7f00', borderColor: COLORS.BORDER_GRAY, label: 'Alto' },
+          { color: '#fdff7a', borderColor: COLORS.BORDER_GRAY, label: 'Medio' },
+          { color: '#4daf4a', borderColor: COLORS.BORDER_GRAY, label: 'Bajo' },
+          { color: '#a6cee3', borderColor: COLORS.BORDER_GRAY, label: 'Muy Bajo' }
+        ]
+      },
+      'Tornado': {
+        items: [
+          { color: '#935200', borderColor: COLORS.BORDER_GRAY, label: 'Con tornado' },
+          { color: '#bababa', borderColor: COLORS.BORDER_GRAY, label: 'Sin tornado' },
+        ]
+      },
+      'Inundación': {
+        items: [
+          { color: '#e41a1c', borderColor: COLORS.BORDER_GRAY, label: 'Muy Alto' },
+          { color: '#ff7f00', borderColor: COLORS.BORDER_GRAY, label: 'Alto' },
+          { color: '#fdff7a', borderColor: COLORS.BORDER_GRAY, label: 'Medio' },
+          { color: '#4daf4a', borderColor: COLORS.BORDER_GRAY, label: 'Bajo' },
+          { color: '#a6cee3', borderColor: COLORS.BORDER_GRAY, label: 'Muy Bajo' }
+        ]
+      },
+    },
+  },
+  'Hidalgo:04_sequias': {
+    title: 'Sequías',
+    type: 'polygon',
+    items: [
+      { color: '#730000', borderColor: COLORS.BORDER_GRAY, label: 'Sequía Excepcional' },
+      { color: 'red', borderColor: COLORS.BORDER_GRAY, label: 'Sequía Extrema' },
+      { color: '#e69800', borderColor: COLORS.BORDER_GRAY, label: 'Sequía Severa' },
+      { color: '#e69800', borderColor: COLORS.BORDER_GRAY, label: 'Sequía Moderada' },
+      { color: 'yellow', borderColor: COLORS.BORDER_GRAY, label: 'Anormalmente Seco' },
+      { color: '#dadaeb', borderColor: COLORS.BORDER_GRAY, label: 'Sin sequía' }
+    ]
+  },
   'Hidalgo:04_hidrometeorologicos': {
     title: 'Fenómenos hidrometeorológicos',
     type: 'polygon',
@@ -1088,8 +1384,6 @@ export const legendData = {
       { color: '#ffffb2', borderColor: COLORS.BORDER_GRAY, label: 'Menor a 2' }
     ]
   },
-
-
 
   // Gobernanza hidrica participativa y transparente
   'Hidalgo:05_recextraccion': {
