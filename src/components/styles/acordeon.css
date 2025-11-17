@@ -1,17 +1,13 @@
 /* =========================================================
-   ESTILOS PARA ACORDEÓN + INFOCARD
-   ========================================================= */
+   ESTILOS PARA ACORDEÓN
+========================================================= */
 
-/* ---------------------------
-   CONTENEDOR PRINCIPAL
------------------------------- */
+/* Contenedor principal */
 .principal-layout {
   padding: 2.5rem 1rem;
 }
 
-/* ---------------------------
-   ACORDEÓN PERSONALIZADO
------------------------------- */
+/* Accordion personalizado */
 .custom-accordion {
   min-width: 1000px;
   margin: 0 auto;
@@ -19,6 +15,7 @@
   overflow-x: hidden;
 }
 
+/* Items */
 .accordion-item {
   border: 1px solid #dee2e6;
   border-radius: 0.75rem;
@@ -26,6 +23,7 @@
   overflow: hidden;
 }
 
+/* Botón */
 .accordion-button {
   background-color: var(--color-primary-dark, #691b31);
   color: #fff !important;
@@ -42,12 +40,6 @@
   filter: invert(1);
 }
 
-.accordion-body {
-  background-color: #fff;
-  padding: 2rem;
-  overflow: hidden;
-}
-
 .accordion-button:focus,
 .accordion-button:focus-visible {
   outline: none !important;
@@ -55,101 +47,21 @@
   border: none !important;
 }
 
-/* ---------------------------
-   TARJETAS DE INFORMACIÓN
------------------------------- */
-
-.cards-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1.5rem;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-/* Card base */
-.info-card {
-  width: 280px;
-  border: 1.5px solid rgba(138, 21, 56, 0.4);
-  border-radius: 1rem;
-  background: #fff;
+/* Body */
+.accordion-body {
+  background-color: #fff;
+  padding: 2rem;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-.info-card:hover {
-  transform: translateY(-6px);
-  border-color: var(--color-primary, #8A1538);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* Imagen */
-.card-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-}
-
-/* Cuerpo */
-.card-body-custom {
-  background: linear-gradient(145deg, #8A1538 0%, #B51B4A 100%);
-  color: #fff;
-  text-align: center;
-  padding: 1.5rem;
-}
-
-/* Título */
-.card-title-custom {
-  font-weight: 700;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-}
-
-/* Enlaces */
-.custom-link {
-  display: block;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 0.5rem;
-  color: #fff;
-  text-decoration: none;
-  padding: 0.6rem 0.8rem;
-  margin-bottom: 0.5rem;
-  transition: all 0.3s ease;
-  font-weight: 500;
-}
-
-.custom-link:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateX(4px);
-}
-
-/* ---------------------------
-   RESPONSIVE
------------------------------- */
+/* Responsive */
 @media (max-width: 768px) {
   .accordion-body {
     padding: 1rem;
   }
-
-  .info-card {
-    width: 100%;
-    max-width: 280px;
-  }
-
-  .card-title-custom {
-    font-size: 1rem;
-  }
-
-  .custom-link {
-    font-size: 0.9rem;
-  }
 }
 
-/* ---------------------------
-   MENSAJE VACÍO
------------------------------- */
+/* Mensaje vacío */
 .empty-message {
   text-align: center;
   color: #888;
@@ -157,6 +69,7 @@
   padding: 2rem;
 }
 
+/* Links dentro del accordion (si existieran) */
 .accordion-link {
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;

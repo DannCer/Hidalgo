@@ -1,0 +1,20 @@
+
+export const COLORS = {
+  WATER: '#2E86C1',
+  PROTECTED_AREA: '#239B56',
+  WETLAND: '#A9DFBF',
+  EMERGENCY: '#F1C40F',
+  DISCHARGE: '#8E44AD',
+  BLACK: '#000000',
+  RED: '#ff0000',
+  GREEN: '#106836ff',
+  LIGHT_GREEN: '#2ec16bff',
+  LIGHT_GRAY: '#f0f0f0',
+  BORDER_GRAY: '#cccccc',
+  YELLOW: '#FFFF00',
+  WHITE: '#ffffff',
+  DEFAULT: '#A02142',
+  COMISIONES_CUENCA: '#3498DB',
+  COMITES_CUENCA: '#2ECC71',
+  COTAS: '#9B59B6'
+};

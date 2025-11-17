@@ -1,0 +1,208 @@
+/* Contenedor de tarjetas */
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Card base */
+.info-card {
+  width: 280px;
+  border: 1.5px solid rgba(138, 21, 56, 0.4);
+  border-radius: 1rem;
+  background: #fff;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--color-primary, #8A1538);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Imagen */
+.card-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+/* Cuerpo */
+.card-body-custom {
+  background: linear-gradient(145deg, #8A1538 0%, #B51B4A 100%);
+  color: #fff;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+/* Título */
+.card-title-custom {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+/* Enlaces base */
+.custom-link {
+  display: block;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.5rem;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  width: 100%;
+  text-align: center;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+}
+
+.custom-link:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateX(4px);
+  color: #fff;
+  text-decoration: none;
+}
+
+.custom-link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+/* Botón desplegable */
+.custom-dropdown {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.dropdown-toggle-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+  min-height: 2.5rem;
+}
+
+.dropdown-text {
+  flex: 1;
+  margin-right: 0.5rem;
+  justify-content: center;
+}
+
+.custom-dropdown.show .dropdown-toggle-custom {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateX(4px);
+}
+
+/* Menú desplegable */
+.dropdown-menu-custom {
+  position: static !important;
+  transform: none !important;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.15);
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.1);
+  animation: expandDown 0.3s ease;
+}
+
+/* Items del menú */
+.dropdown-item-custom {
+  display: block;
+  padding: 0.6rem 0.8rem;
+  color: #fff;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 3px solid transparent;
+  margin-bottom: 0.4rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+}
+
+.dropdown-item-custom:last-child {
+  margin-bottom: 0;
+}
+
+.dropdown-item-custom:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-left-color: rgba(255, 255, 255, 0.9);
+  padding-left: 1rem;
+  transform: translateX(2px);
+  text-decoration: none;
+}
+
+.dropdown-item-custom:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: -2px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Flecha del dropdown */
+.dropdown-toggle-custom::after {
+  margin-left: auto;
+  border-top-color: #fff;
+  transition: transform 0.3s ease;
+}
+
+.custom-dropdown.show .dropdown-toggle-custom::after {
+  transform: rotate(180deg);
+}
+
+/* Animación de expansión */
+@keyframes expandDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .info-card {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .card-title-custom {
+    font-size: 1rem;
+  }
+
+  .custom-link {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.7rem;
+  }
+
+  .dropdown-menu-custom {
+    font-size: 0.9rem;
+  }
+  
+  .dropdown-item-custom {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.9rem;
+  }
+}

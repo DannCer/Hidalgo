@@ -43,14 +43,6 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
         }
         setTotalFeatures(data.totalFeatures || 0);
         setFetchedCount(startIndex + data.features.length);
-        
-        // ✅ DEBUG: Mostrar información del filtro
-        console.log(`📊 Tabla ${layerName}:`, {
-          filtroAplicado: customFilter,
-          featuresCargados: data.features.length,
-          totalFeatures: data.totalFeatures || 0,
-          tieneFiltro: !!customFilter
-        });
       }
     } catch (err) {
       console.error(err);
@@ -152,7 +144,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
     saveAs(blob, fileName);
   };
 
-  // ✅ NUEVO: Componente para mostrar información del filtro
+  //  Componente para mostrar información del filtro
   const FilterInfo = () => {
     if (!filter) return null;
     

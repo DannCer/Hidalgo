@@ -1,176 +1,325 @@
 /* =========================================================
-   ESTILOS OPTIMIZADOS PARA COMPONENTE MapView.jsx
-   ========================================================= */
+    ESTILOS OPTIMIZADOS PARA COMPONENTE MapView.jsx
+    (CONFIGURACIÓN PARA SIDEBAR MONTADO EN L.Control)
+    ========================================================= */
 
 /* ---------------------------
-   CONTENEDOR PRINCIPAL
+    CONTENEDOR PRINCIPAL
 ------------------------------ */
 .map-view-container {
-  position: relative;
-  width: 100%;
-  height: calc(100dvh - 46px); /* ✅ ocupa el espacio restante bajo el header */
-  background-color: #f5f5f5;
-  overflow: hidden;
-  font-family: 'Montserrat', sans-serif;
+    position: relative;
+    width: 100%;
+    height: calc(100dvh - 46px);
+    background-color: #f5f5f5;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
 }
 
 /* ---------------------------
-   MAPA PRINCIPAL
+    MAPA PRINCIPAL
 ------------------------------ */
 .map-container,
 .leaflet-map {
-  width: 100%;
-  height: 100%;
-  border-radius: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
 }
 
 .leaflet-container {
-  width: 100%;
-  height: 100%;
-  background: #eaeaea;
+    width: 100%;
+    height: 100%;
+    background: #eaeaea;
+    font-family: 'Montserrat', sans-serif;
 }
 
 /* ---------------------------
-   CONTROLES LEAFLET
+    CONTROLES LEAFLET
 ------------------------------ */
 .leaflet-control-zoom,
 .leaflet-control-layers,
 .leaflet-control-scale {
-  border-radius: 8px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
 }
 
 .leaflet-control-zoom a {
-  background-color: #fff !important;
-  color: #333 !important;
-  font-weight: 600;
-  transition: all 0.2s ease;
+    background-color: #fff !important;
+    color: #333 !important;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #eee !important;
 }
 
 .leaflet-control-zoom a:hover {
-  background-color: var(--color-primary, #A02142) !important;
-  color: #fff !important;
+    background-color: var(--color-primary, #A02142) !important;
+    color: #fff !important;
 }
 
+/* =========================================================
+    ESTILOS DEL SIDEBAR MONTADO EN L.Control (ControlSidebarWrapper)
+    ========================================================= */
+
+/* 1. Contenedor del Control de Leaflet (L.Control, posición topright) */
+.leaflet-control-sidebar {
+    /* El control se posiciona automáticamente topright */
+    width: 0; /* Oculto por defecto */
+    height: 0;
+    transition: all 0.3s ease;
+    opacity: 0;
+}
+
+/* 2. Estado Activo (Visible) */
+.leaflet-control-sidebar.sidebar-control-active {
+    width: 350px; 
+    max-width: 350px;
+    height: auto;
+    opacity: 1;
+    
+    /* El L.Control ya aplica su margen, pero si necesitas un ajuste fino: */
+    /* margin-right: 20px !important; 
+       margin-top: 100px !important; */
+}
+
+/* 3. El contenido del Sidebar (Reemplaza el antiguo .sidebar-popup) */
+.leaflet-control-sidebar .sidebar-popup {
+    /* Solo contenedor de estilo, no de posicionamiento absoluto */
+    position: relative; 
+    margin: 0;
+    padding: 0;
+    /* Usamos el z-index del control que es 1000, pero lo forzamos a ser visible */
+    z-index: 1001; 
+}
+
+
 /* ---------------------------
-   POPUPS PERSONALIZADOS
+    CONTENEDORES INTERNOS
 ------------------------------ */
-.custom-popup {
-  font-family: 'Montserrat';
-  font-size: 0.7rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+
+/* Contenedor del contenido (wrapper) */
+.leaflet-control-sidebar .leaflet-popup-content-wrapper {
+    position: relative; /* Ya no necesita !important, está fuera de la influencia de Leaflet */
+    border-radius: 12px;
+    background: #ffffff;
+    border: 2px solid var(--color-primary, #A02142);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-height: min(500px, 60vh);
+    overflow: hidden;
+    max-width: 350px;
+    margin: 0;
+    padding: 0;
+    /* Aquí se aplica la animación de entrada */
+    animation: popupSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.leaflet-popup-content-wrapper {
-  border-radius: 10px !important;
-  background-color: #ffffff !important;
-  border: 1px solid #ddd;
+.leaflet-control-sidebar .leaflet-popup-content {
+    margin: 0;
+    padding: 1rem;
+    max-height: min(450px, 55vh);
+    overflow-y: auto;
+    width: auto;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    background: white;
 }
 
-.leaflet-popup-content {
-  margin: 0 !important;
-  padding: 0.8rem 1rem !important;
-  max-height: 350px;
-  overflow-y: auto;
-  width: 650px !important;
+/* Botón de cerrar (se renderiza directamente en el HTML inyectado) */
+.leaflet-control-sidebar .leaflet-popup-close-button {
+    background: var(--color-primary, #A02142);
+    color: white;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    right: 8px !important;
+    top: 8px !important;
+    z-index: 1002;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Scroll en popups */
-.leaflet-popup-content::-webkit-scrollbar {
-  width: 6px;
+.leaflet-control-sidebar.sidebar-control-active {
+    width: 350px; 
+    max-width: 350px;
+    height: auto;
+    opacity: 1;
+    
+    /* 🛑 IMPORTANTE: Hacemos la posición del contenedor absoluta */
+    /* Esto permite que L.Draggable mueva el elemento libremente por el DOM */
+    position: absolute; 
+    
+    /* El L.Control de Leaflet ya da una posición inicial de 'topright', 
+       pero podemos usar las propiedades `top` y `right` para la posición inicial. */
+    top: 100px !important; 
+    right: 20px !important;
 }
-.leaflet-popup-content::-webkit-scrollbar-thumb {
-  background-color: #bbb;
-  border-radius: 4px;
+
+/* Y añade un cursor para indicar que es arrastrable */
+.leaflet-control-sidebar.sidebar-control-active {
+    cursor: grab;
+}
+
+/* Cambia el cursor cuando se arrastra */
+.leaflet-control-sidebar.leaflet-draggable-dragging {
+    cursor: grabbing;
 }
 
 /* ---------------------------
-   CABECERA DEL POPUP
+    ESTILOS COMPACTOS PARA EL CONTENIDO
 ------------------------------ */
-.popup-header {
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 0.6rem;
+.compact-popup .popup-header {
+    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.6rem;
+    padding-right: 30px; /* Espacio para botón cerrar */
 }
 
-.popup-header h4 {
-  font-size: 1.2rem;
-  color: var(--color-primary-dark, #691b31);
-  font-weight: 600;
-  margin: 0;
+.compact-popup .popup-header h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+    color: var(--color-primary-dark, #691b31);
+    font-weight: 700;
+}
+
+.compact-popup .feature-summary {
+    font-size: 0.75rem;
+    margin: 0;
+    color: #666;
+    font-style: italic;
+}
+
+.compact-popup .feature-section {
+    border-left: 3px solid var(--color-primary-light, #d14565);
+    padding-left: 0.8rem;
+    margin-bottom: 0.8rem;
+    background: #fafafa;
+    padding: 0.8rem;
+    border-radius: 6px;
+}
+
+.compact-popup .feature-section h6 {
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+    color: #444;
+    font-weight: 600;
+}
+
+.compact-popup .popup-table {
+    font-size: 0.75rem;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.compact-popup .popup-table td {
+    padding: 0.2rem 0.4rem;
+    vertical-align: top;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.compact-popup .property-name {
+    color: #333;
+    white-space: nowrap;
+    font-weight: 600;
+    width: 40%;
+}
+
+.compact-popup .property-value {
+    color: #555;
+    word-break: break-word;
+    width: 60%;
 }
 
 /* ---------------------------
-   CONTENIDO DEL POPUP
+    SCROLLBAR MEJORADO
 ------------------------------ */
-.feature-section {
-  border-left: 3px solid var(--color-primary-light, #d14565);
-  padding-left: 0.6rem;
-  margin-bottom: 0.8rem;
+.leaflet-control-sidebar .leaflet-popup-content::-webkit-scrollbar {
+    width: 8px;
 }
 
-.feature-section h6 {
-  font-size: 0.85rem;
-  color: #444;
-  font-weight: 600;
-  margin-bottom: 0.3rem;
+.leaflet-control-sidebar .leaflet-popup-content::-webkit-scrollbar-track {
+    background: #f8f8f8;
+    border-radius: 4px;
 }
 
-.popup-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.82rem;
+.leaflet-control-sidebar .leaflet-popup-content::-webkit-scrollbar-thumb {
+    background: var(--color-primary, #A02142);
+    border-radius: 4px;
 }
 
-.popup-table td {
-  padding: 0.2rem 0.4rem;
-  vertical-align: top;
-}
-
-.property-name {
-  color: #333;
-  white-space: nowrap;
-}
-
-.property-value {
-  color: #555;
-  word-break: break-word;
+.leaflet-control-sidebar .leaflet-popup-content::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-dark, #691b31);
 }
 
 /* ---------------------------
-   ELEMENTOS DE LEYENDA Y MENÚ DE CAPAS
+    ANIMACIÓN
 ------------------------------ */
-.layer-menu-container {
-  z-index: 1200;
+@keyframes popupSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
 }
 
 /* ---------------------------
-   ANIMACIONES SUAVES
------------------------------- */
-.popup-content {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ---------------------------
-   RESPONSIVE
+    RESPONSIVE
 ------------------------------ */
 @media (max-width: 768px) {
-  .map-view-container {
-    height: calc(100dvh - 60px); /* ✅ si el header es más pequeño en móvil */
-  }
+    .leaflet-control-sidebar.sidebar-control-active {
+        width: 300px;
+        margin-right: 10px;
+        margin-top: 80px;
+    }
+    
+    .leaflet-control-sidebar .leaflet-popup-content-wrapper {
+        max-width: 300px;
+        max-height: min(400px, 50vh);
+    }
+    
+    .leaflet-control-sidebar .leaflet-popup-content {
+        width: 260px;
+        max-height: min(350px, 45vh);
+    }
+}
 
-  .layer-menu-container {
-    width: 90%;
-    left: 5%;
-  }
+@media (max-height: 700px) {
+    .leaflet-control-sidebar.sidebar-control-active {
+        margin-top: 70px;
+    }
+    
+    .leaflet-control-sidebar .leaflet-popup-content-wrapper {
+        max-height: min(400px, 50vh);
+    }
+    
+    .leaflet-control-sidebar .leaflet-popup-content {
+        max-height: min(350px, 45vh);
+    }
+}
 
-  .leaflet-control-layers {
-    font-size: 0.8rem;
-  }
+/* ---------------------------
+    ESTADOS ESPECIALES
+------------------------------ */
+.loading-popup {
+    padding: 2rem 1rem !important;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    background: #f8f8f8;
+    border-radius: 6px;
+}
+
+.error-popup {
+    padding: 2rem 1rem !important;
+    text-align: center;
+    color: #d32f2f;
+    background: #ffebee;
+    border-radius: 6px;
+    font-weight: 500;
 }

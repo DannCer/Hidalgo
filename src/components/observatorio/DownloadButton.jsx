@@ -59,12 +59,7 @@ const DownloadButton = ({
 
       for (const name of layers) {
         const downloadUrl = getShapefileDownloadUrl(name, format, cqlFilter); // ✅ Pasar cqlFilter
-        const layerShortName = name.split(':')[1] || name;
-
-        console.log(`⬇️ Descargando capa: ${layerShortName}`);
-        if (cqlFilter) {
-          console.log(`🎯 Con filtro CQL: ${cqlFilter}`);
-        }
+        const layerShortName = name.split(':')[1] || name;        
 
         const blob = await fetchFileAsBlob(downloadUrl);
 
@@ -79,7 +74,6 @@ const DownloadButton = ({
       const filename = `${displayName || 'Capas'}.zip`;
 
       saveZipFile(finalZip, filename);
-      console.log(`✅ ZIP generado: ${filename}`);
     } catch (error) {
       console.error('❌ Error al crear el ZIP combinado:', error);
       alert('Error al crear el archivo ZIP combinado.');
