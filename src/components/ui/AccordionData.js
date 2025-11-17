@@ -3,6 +3,9 @@ import nacional from '../../assets/pdf/Marco legal_Nacional.pdf'
 import estatal from '../../assets/pdf/Marco legal_Estatal.pdf'
 import acta from '../../assets/pdf/Acta Consejo Técnico.pdf'
 import programa from '../../assets/pdf/Sintesis de PHE2040 de Hidalgo_Final OK_.pdf'
+import anp1 from '../../assets/pdf/Anexo_1.pdf'
+import anp2 from '../../assets/pdf/Anexo_2.pdf'
+import acta3 from '../../assets/pdf/Anexo_3.pdf'
 import capasBase from '../../assets/img/CB/1 (5).jpg';
 import poblkacion from '../../assets/img/CB/1 (7).jpg';
 import macro from '../../assets/img/CB/1 (4).jpg'
@@ -13,7 +16,7 @@ import img04 from '../../assets/img/Eje1/ESCURRIEMIENTO.jpg';
 import img05 from '../../assets/img/Eje1/TECOCOMULCO (3).jpg';
 import img06 from '../../assets/img/Eje1/TECOCOMULCO (4).jpg';
 import organismosO from '../../assets/img/Eje2/PLANTA TRATAMIENTO  (4).jpg'
-import AguaP from'../../assets/img/Eje2/AguaP.jpeg'
+import AguaP from '../../assets/img/Eje2/AguaP.jpeg'
 import Alcantarillado from '../../assets/img/Eje2/Alcantarillado.jpeg'
 import AguasR from '../../assets/img/Eje2/PLANTA TRATAMIENTO  (3).jpg'
 import Inspeccion from '../../assets/img/Eje2/InspeccionV.jpeg'
@@ -35,6 +38,7 @@ import Marco from '../../assets/img/Eje5/NormasOf.webp'
 import Centro from '../../assets/img/Eje5/Centros.jpg'
 import Proceso from '../../assets/img/Eje5/IMG_4102.jpg'
 import programaHidrico from '../../assets/img/ProgramaHidrico/programahidrico.png'
+import Lorem from '../../assets/img/Lorem_Picsum.png'
 
 
 
@@ -54,7 +58,7 @@ const GEOM_TYPES = {
 
 export const accordionData = [
     {
-        title: 'Contexto geográfico y socioeconómico',
+        title: 'Contexto geográfico y demográfico',
         id: 'contexto',
         cards: [
             {
@@ -136,8 +140,8 @@ export const accordionData = [
             {
                 image: programaHidrico,
                 title: 'Programa estatal hídrico',
-                links: [                
-                        
+                links: [
+
                     {
                         text: 'Programa estatal hídrico',
                         path: programa,
@@ -146,7 +150,7 @@ export const accordionData = [
                     ,
                 ]
             },
-                    ]
+        ]
     },
     {
         title: 'Eje 1. Conservación hídrica y salud de los ecosistemas',
@@ -214,10 +218,20 @@ export const accordionData = [
                         geomType: GEOM_TYPES.POLYGON
                     },
                     {
+                        text: 'Áreas destinadas voluntariamente a la conservación',
+                        path: anp2,
+                        target: '_blank',
+                    },
+                    {
+                        text: 'Áreas naturales protegidas estatales y municipales',
+                        path: anp1,
+                        target: '_blank',
+                    },
+                    {
                         text: 'Humedales',
                         path: '/observatorio',
                         layerName: 'Hidalgo:01_humedales',
-                        crs: CRS.LCC_6362,
+                        crs: CRS.WGS84,
                         geomType: GEOM_TYPES.POLYGON
                     },
                     {
@@ -270,9 +284,16 @@ export const accordionData = [
                 id: 'ordenamiento-acuiferos',
                 links: [
                     {
-                        text: 'Vedas, reglamentos, reservas, acuerdos',
+                        text: 'Vedas',
                         path: '/observatorio',
-                        layerName: 'Hidalgo:01_acuiferosord',
+                        layerName: 'Hidalgo:01_acuifVeda ',
+                        crs: CRS.WEB_MERCATOR,
+                        geomType: GEOM_TYPES.POLYGON
+                    },
+                    {
+                        text: 'Acuerdos',
+                        path: '/observatorio',
+                        layerName: 'Hidalgo:01_acuifOrd',
                         crs: CRS.WEB_MERCATOR,
                         geomType: GEOM_TYPES.POLYGON
                     }
@@ -367,7 +388,7 @@ export const accordionData = [
                         layerName: 'Hidalgo:02_ptarnomunicipales',
                         crs: CRS.WEB_MERCATOR,
                         geomType: GEOM_TYPES.POLYGON
-                    
+
                     }
                 ]
             },
@@ -516,7 +537,7 @@ export const accordionData = [
                         layerName: 'Hidalgo:04_riesgosmunicipales',
                         crs: CRS.WEB_MERCATOR,
                         geomType: GEOM_TYPES.POLYGON
-                    
+
                     }
                 ]
             },
@@ -553,7 +574,7 @@ export const accordionData = [
                     {
                         text: 'Sequías',
                         path: '/observatorio',
-                         layerName: 'Hidalgo:04_sequias',
+                        layerName: 'Hidalgo:04_sequias',
                         crs: CRS.WEB_MERCATOR,
                         geomType: GEOM_TYPES.POLYGON
                     },
@@ -637,14 +658,25 @@ export const accordionData = [
                         geomType: GEOM_TYPES.POLYGON
                     },
                     {
-                        text: 'Comités participación comunitaria para el cuidado del agua',
+                        text: 'Comités independientes del agua',
                         path: '/observatorio',
                         layerName: ''
                     },
                     {
                         text: 'Consejo Técnico de Sustentabilidad Hídrica',
-                        path: acta,
-                        target: '_blank',
+                        type: 'dropdown', 
+                        sublinks: [
+                            {
+                                text: 'Acta de conformación',
+                                path: acta,
+                                target: '_blank',
+                            },
+                            {
+                                text: 'Estrategía de atención',
+                                path: acta3,
+                                target: '_blank',
+                            }
+                        ]
                     }
                 ]
             },
@@ -658,7 +690,12 @@ export const accordionData = [
                         layerName: ''
                     },
                     {
-                        text: 'Espacios de Cultura del Agua (ECA´s)',
+                        text: 'Planeación y operación hídrica municipal',
+                        path: '/observatorio',
+                        layerName: ''
+                    },
+                    {
+                        text: 'Espacios de Cultura del Agua',
                         path: '/observatorio',
                         layerName: ''
                     }
@@ -681,17 +718,17 @@ export const accordionData = [
                 links: [
                     {
                         text: 'Internacional',
-                        path: internacional, 
+                        path: internacional,
                         target: '_blank',
                     },
                     {
                         text: 'Nacional',
-                        path: nacional, 
+                        path: nacional,
                         target: '_blank',
                     },
                     {
                         text: 'Estatal',
-                        path: estatal, 
+                        path: estatal,
                         target: '_blank',
                     },
 
@@ -704,6 +741,62 @@ export const accordionData = [
                     {
                         text: 'Apan, Paisaje y Resilencia',
                         path: 'https://www.apanresiliencia.org/'
+                    },
+                    {
+                        text: 'CENAPRED',
+                        path: 'http://www.atlasnacionalderiesgos.gob.mx/ '
+                    },
+                    {
+                        text: 'Sistema de Alerta Temprana de Incendios Forestales (SATIF)',
+                        path: 'https://incendios.conabio.gob.mx/'
+                    },
+                    {
+                        text: 'Geoportal del Sistema Nacional de Información sobre Biodiversidad (CONABIO)',
+                        path: 'http://geoportal.conabio.gob.mx/'
+                    },
+                    {
+                        text: 'Sistema Nacional de Información del Agua (SINA)',
+                        path: 'https://sinav30.conagua.gob.mx:8080/'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: 'Cartografía',
+        id: 'cartografia',
+        cards: [
+            {
+                image: Lorem,
+                title: 'Zonificación por acuífero',
+                links: [
+                    {
+                        text: 'Acuíferos',
+                        path: '/observatorio',
+                        layerName: 'Hidalgo:cart_zonifacuifero',
+                        crs: CRS.WEB_MERCATOR,
+                        geomType: GEOM_TYPES.POLYGON
+                    }
+                ]
+            },
+            {
+                image: Lorem,
+                title: 'Acuíferos de Hidalgo',
+                links: [
+                    {
+                        text: 'Acuíferos de Hidalgo',
+                        action: 'openVisorAcuiferos',
+                    },
+                ]
+            },
+            {
+                image: Lorem,
+                title: 'Cuerpos de agua',
+                links: [
+                    {
+                        text: 'Eficiencias en el uso del agua',
+                        path: '/observatorio',
+                        layerName: ''
                     }
                 ]
             }

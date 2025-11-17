@@ -12,9 +12,8 @@ const DownloadButton = ({ layerName, displayName, className = '' }) => {
       const downloadUrl = getShapefileDownloadUrl(layerName);
       const filename = `${displayName || layerName.replace(':', '_')}.zip`;
       
-      downloadFile(downloadUrl, filename);
-      
-      console.log(`✅ Descargando: ${filename}`);
+      downloadFile(downloadUrl, filename);      
+     
     } catch (error) {
       console.error('❌ Error al descargar:', error);
       // Opcional: mostrar mensaje de error al usuario

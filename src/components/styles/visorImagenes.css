@@ -1,0 +1,350 @@
+/* src/components/observatorio/styles/visorImagenes.css */
+.visor-imagenes-modal .modal-content {
+  border-radius: var(--border-radius-md);
+  border: none;
+  box-shadow: var(--shadow-heavy);
+  font-family: var(--font-primary);
+  overflow: hidden; /* Previene desbordamientos */
+}
+
+.visor-imagenes-header {
+  background: var(--gradient-primary);
+  color: var(--color-text-light);
+  border-bottom: none;
+  padding: 1rem 1.5rem;
+  position: relative; /* Asegura que esté por encima */
+  z-index: 1050; /* Mayor que el z-index del modal por defecto */
+}
+
+.visor-imagenes-header .modal-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.visor-imagenes-header .btn-close {
+  filter: invert(1);
+  opacity: 0.8;
+  transition: var(--transition-fast);
+}
+
+.visor-imagenes-header .btn-close:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.visor-imagenes-body {
+  padding: 0;
+  background-color: #f8f9fa;
+  position: relative;
+  overflow: hidden; /* Previene scrolls no deseados */
+}
+
+/* CAROUSEL MEJORADO - EVITA SUPERPOSICIONES */
+.visor-carousel {
+  background-color: var(--color-gray-dark);
+  position: relative;
+  z-index: 1; /* Base para el contenido */
+}
+
+.visor-carousel .image-container {
+  height: 60vh;
+  min-height: 400px; /* Altura mínima */
+  max-height: 70vh; /* Altura máxima */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-gray-dark);
+  padding: 20px; /* Espacio alrededor de la imagen */
+  position: relative;
+  overflow: hidden; /* Previene desbordamientos */
+}
+
+.visor-carousel img {
+  max-height: calc(100%); /* Considera el padding */
+  max-width: calc(100% );
+  object-fit: contain; /* Mantiene proporciones sin recortar */
+  display: block;
+  margin: 0 auto;
+}
+
+/* CAPTION MEJORADO - POSICIÓN FIJA Y SIN SUPERPOSICIÓN */
+.visor-caption {
+  background: var(--gradient-primary-transparent);
+  border-radius: var(--border-radius-sm);
+  padding: 1rem;
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 600px;
+  backdrop-filter: blur(10px);
+  z-index: 10; /* Encima de la imagen */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.visor-caption h5 {
+  color: var(--color-text-light);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.visor-caption p {
+  color: var(--color-accent-2);
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  opacity: 0.95;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.visor-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-top: 1px solid #dee2e6;
+  position: relative;
+  z-index: 5;
+}
+
+.visor-info {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.visor-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.visor-actions .btn {
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+  transition: var(--transition-fast);
+  border: 1px solid;
+}
+
+.visor-actions .btn-outline-primary {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: transparent;
+}
+
+.visor-actions .btn-outline-primary:hover {
+  background: var(--color-primary);
+  color: var(--color-text-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-light);
+}
+
+.visor-actions .btn-outline-secondary {
+  color: var(--color-gray-dark);
+  border-color: var(--color-gray);
+  background: transparent;
+}
+
+.visor-actions .btn-outline-secondary:hover {
+  background: var(--color-gray-dark);
+  color: var(--color-text-light);
+  transform: translateY(-1px);
+}
+
+.visor-imagenes-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  position: relative;
+  z-index: 5;
+}
+
+.visor-imagenes-footer small {
+  color: var(--color-text-muted);
+}
+
+.visor-imagenes-footer .btn {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-light);
+  border-radius: var(--border-radius-sm);
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  transition: var(--transition-fast);
+}
+
+.visor-imagenes-footer .btn:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-light);
+}
+
+/* INDICADORES DEL CAROUSEL - POSICIÓN CORRECTA */
+.carousel-indicators {
+  position: absolute;
+  bottom: 15px; /* Por encima del caption */
+  z-index: 15; /* Encima del caption */
+  margin-bottom: 0;
+}
+
+.carousel-indicators [data-bs-target] {
+  background-color: var(--color-gray);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin: 0 5px;
+  border: none;
+  transition: var(--transition-fast);
+  opacity: 0.7;
+}
+
+.carousel-indicators .active {
+  background-color: var(--color-primary);
+  transform: scale(1.2);
+  opacity: 1;
+}
+
+/* FLECHAS DEL CAROUSEL - POSICIÓN CORRECTA */
+.carousel-control-prev,
+.carousel-control-next {
+  width: 60px;
+  opacity: 0.8;
+  transition: var(--transition-fast);
+  z-index: 20; /* Encima de todo */
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  opacity: 1;
+}
+
+.carousel-control-prev {
+  left: 10px;
+}
+
+.carousel-control-next {
+  right: 10px;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: var(--gradient-primary-transparent);
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  background-size: 20px 20px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Loading spinner */
+.spinner-border.text-primary {
+  color: var(--color-primary) !important;
+}
+
+/* Alert styles */
+.alert-warning {
+  background: rgba(188, 149, 91, 0.1);
+  border-color: var(--color-accent-1);
+  color: var(--color-text-dark);
+  margin: 2rem;
+}
+
+/* RESPONSIVE MEJORADO */
+@media (max-width: 768px) {
+  .visor-carousel .image-container {
+    height: 50vh;
+    min-height: 300px;
+    padding: 15px;
+  }
+  
+  .visor-carousel img {
+    max-height: calc(100% - 30px);
+    max-width: calc(100% - 30px);
+  }
+  
+  .visor-caption {
+    width: 95%;
+    padding: 0.75rem;
+    bottom: 1.5rem;
+  }
+  
+  .visor-caption h5 {
+    font-size: 1rem;
+  }
+  
+  .visor-caption p {
+    font-size: 0.8rem;
+  }
+  
+  .carousel-indicators {
+    bottom: 70px;
+  }
+  
+  .visor-controls {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .visor-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .visor-imagenes-footer {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .visor-carousel .image-container {
+    height: 40vh;
+    min-height: 250px;
+    padding: 10px;
+  }
+  
+  .visor-carousel img {
+    max-height: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+  }
+  
+  .visor-imagenes-header .modal-title {
+    font-size: 1.1rem;
+  }
+  
+  .visor-caption {
+    padding: 0.5rem;
+    bottom: 1rem;
+  }
+  
+  .carousel-indicators {
+    bottom: 60px;
+  }
+  
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon {
+    width: 35px;
+    height: 35px;
+    background-size: 15px 15px;
+  }
+}
+
+/* Clase adicional para prevenir problemas de z-index */
+.modal-backdrop {
+  z-index: 1040;
+}
+
+.visor-imagenes-modal {
+  z-index: 1055;
+}
