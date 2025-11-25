@@ -1,57 +1,72 @@
-// styles/styleGenerators.js
 import L from "leaflet";
 import { COLORS } from "./colors";
 import { basePointStyle, basePolygonStyle } from "./baseStyles";
 
-/**
- * Generador para estilos con rangos numéricos (puntos y polígonos).
- */
-export function createRangedStyleFromLegend(propertyName, items, type = "polygon", transform = v => parseFloat(v) || 0) {
+// ===================================================================
+// UTILIDADES
+// ===================================================================
+
+const defaultTransform = (v) => parseFloat(v) || 0;
+
+const getStyleDefaults = (items, type) => ({
+  borderColor: items[0]?.borderColor || COLORS.BLACK,
+  defaultColor: COLORS.LIGHT_GRAY,
+  baseStyle: type === "point" ? basePointStyle : basePolygonStyle
+});
+
+// ===================================================================
+// GENERADOR PARA RANGOS NUMÉRICOS
+// ===================================================================
+
+export function createRangedStyleFromLegend(
+  propertyName, 
+  items, 
+  type = "polygon", 
+  transform = defaultTransform
+) {
+  // Pre-procesar rangos
   const ranges = items.map(item => ({
-    limit: item.value === "Infinity" || item.value === Infinity ? Infinity : transform(item.value),
+    limit: item.value === "Infinity" || item.value === Infinity 
+      ? Infinity 
+      : transform(item.value),
     color: item.color
   }));
 
-  const borderColor = items[0]?.borderColor || COLORS.BLACK;
+  const { borderColor, defaultColor, baseStyle } = getStyleDefaults(items, type);
 
   return (feature, latlng) => {
-    const featureValue = transform(feature.properties[propertyName]);
-    let fillColor = COLORS.LIGHT_GRAY;
+    const value = transform(feature.properties[propertyName]);
+    
+    // Buscar el color correspondiente
+    const fillColor = ranges.find(r => value <= r.limit)?.color || defaultColor;
 
-    for (const range of ranges) {
-      if (featureValue <= range.limit) {
-        fillColor = range.color;
-        break;
-      }
-    }
-
-    if (type === "point") {
-      return L.circleMarker(latlng, { ...basePointStyle, fillColor, fillOpacity: 0.9 });
-    }
-
-    return { ...basePolygonStyle, fillColor, color: borderColor };
+    // Retornar estilo según el tipo
+    return type === "point"
+      ? L.circleMarker(latlng, { ...baseStyle, fillColor, fillOpacity: 0.9 })
+      : { ...baseStyle, fillColor, color: borderColor };
   };
 }
 
-/**
- * Generador para estilos categóricos.
- */
-export function createCategoricalStyleFromLegend(propertyName, items, type = "polygon") {
-  const colorMapping = items.reduce((map, item) => {
-    map[item.label] = item.color;
-    return map;
-  }, {});
+// ===================================================================
+// GENERADOR PARA VALORES CATEGÓRICOS
+// ===================================================================
 
-  const borderColor = items[0]?.borderColor || COLORS.BLACK;
+export function createCategoricalStyleFromLegend(
+  propertyName, 
+  items, 
+  type = "polygon"
+) {
+  // Crear mapeo de categorías a colores
+  const colorMap = new Map(items.map(item => [item.label, item.color]));
+  
+  const { borderColor, defaultColor, baseStyle } = getStyleDefaults(items, type);
 
   return (feature, latlng) => {
     const value = feature.properties[propertyName];
-    const fillColor = colorMapping[value] || COLORS.LIGHT_GRAY;
+    const fillColor = colorMap.get(value) || defaultColor;
 
-    if (type === "point") {
-      return L.circleMarker(latlng, { ...basePointStyle, fillColor, fillOpacity: 0.9 });
-    }
-
-    return { ...basePolygonStyle, fillColor, color: borderColor };
+    return type === "point"
+      ? L.circleMarker(latlng, { ...baseStyle, fillColor, fillOpacity: 0.9 })
+      : { ...baseStyle, fillColor, color: borderColor };
   };
 }

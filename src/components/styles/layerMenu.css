@@ -77,11 +77,59 @@
   margin-bottom: 0.8rem;
   box-shadow: var(--shadow-light);
   transition: all var(--transition-normal);
+  /* ✅ MEJORA: Scroll suave y posicionamiento */
+  scroll-margin-top: 20px;
+  scroll-margin-bottom: 20px;
 }
 
 .layermenu-item:hover:not(.disabled) {
   background-color: #faf7f7;
   transform: translateY(-1px);
+}
+
+/* ===== ✅ ESTILOS PARA DROPDOWN SUBLINKS ===== */
+.dropdown-sublink {
+  margin-left: 12px;
+  border-left: 3px solid #e9ecef;
+  padding-left: 12px;
+  background-color: #fdfdfd;
+  border-color: #dee2e6;
+  transition: all var(--transition-fast);
+}
+
+.dropdown-sublink:hover {
+  border-left-color: var(--color-primary);
+  background-color: #f8f9fa;
+}
+
+.dropdown-sublink.layermenu-active {
+  border-left-color: var(--color-primary) !important;
+  background-color: #fff8f9;
+  border-color: var(--color-primary-light);
+}
+
+.dropdown-sublink-item {
+  color: #495057;
+  font-weight: 500;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-indicator {
+  color: #6c757d;
+  margin-right: 8px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  transition: color var(--transition-fast);
+}
+
+.dropdown-sublink:hover .dropdown-indicator {
+  color: var(--color-primary);
+}
+
+.dropdown-sublink.layermenu-active .dropdown-indicator {
+  color: var(--color-primary);
 }
 
 /* Estado activo */
@@ -93,33 +141,83 @@
   padding-left: 0.7rem !important;
 }
 
-/* ===== HIGHLIGHT AL NAVEGAR DESDE MENÚ PRINCIPAL ===== */
+/* ===== ✅ HIGHLIGHT MEJORADO AL NAVEGAR DESDE MENÚ PRINCIPAL ===== */
 .layermenu-highlighted {
-  animation: pulse-highlight 2.5s ease-in-out;
+  /* Animación más suave y profesional */
+  animation: pulse-highlight 2.5s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid var(--color-primary) !important;
-  box-shadow: 0 0 12px rgba(160, 33, 66, 0.4) !important;
+  box-shadow: 0 0 16px rgba(160, 33, 66, 0.5) !important;
+  /* ✅ MEJORA: Usar will-change para mejor rendimiento */
+  will-change: background-color, box-shadow;
+  /* ✅ MEJORA: Z-index para destacar sobre otros elementos */
+  position: relative;
+  z-index: 10;
 }
 
+/* ✅ Highlight específico para sublinks */
+.dropdown-sublink.layermenu-highlighted {
+  border-left-color: var(--color-primary) !important;
+  background-color: rgba(160, 33, 66, 0.08);
+}
+
+/* ✅ MEJORA: Animación más fluida y profesional */
 @keyframes pulse-highlight {
   0% {
-    background-color: rgba(160, 33, 66, 0.05);
-    box-shadow: 0 0 0 0 rgba(160, 33, 66, 0.4);
+    background-color: rgba(160, 33, 66, 0.08);
+    box-shadow: 0 0 0 0 rgba(160, 33, 66, 0.5);
+    transform: scale(1);
   }
-  25% {
-    background-color: rgba(160, 33, 66, 0.12);
-    box-shadow: 0 0 8px 4px rgba(160, 33, 66, 0.3);
+  15% {
+    background-color: rgba(160, 33, 66, 0.15);
+    box-shadow: 0 0 12px 4px rgba(160, 33, 66, 0.4);
+    transform: scale(1.01);
   }
-  50% {
-    background-color: rgba(160, 33, 66, 0.18);
-    box-shadow: 0 0 12px 8px rgba(160, 33, 66, 0.2);
+  30% {
+    background-color: rgba(160, 33, 66, 0.2);
+    box-shadow: 0 0 16px 8px rgba(160, 33, 66, 0.3);
+    transform: scale(1.015);
   }
-  75% {
-    background-color: rgba(160, 33, 66, 0.12);
-    box-shadow: 0 0 8px 4px rgba(160, 33, 66, 0.3);
+  45% {
+    background-color: rgba(160, 33, 66, 0.2);
+    box-shadow: 0 0 16px 8px rgba(160, 33, 66, 0.3);
+    transform: scale(1.015);
+  }
+  60% {
+    background-color: rgba(160, 33, 66, 0.15);
+    box-shadow: 0 0 12px 4px rgba(160, 33, 66, 0.4);
+    transform: scale(1.01);
+  }
+  80% {
+    background-color: rgba(160, 33, 66, 0.08);
+    box-shadow: 0 0 6px 2px rgba(160, 33, 66, 0.45);
+    transform: scale(1.005);
   }
   100% {
     background-color: rgba(160, 33, 66, 0.05);
-    box-shadow: 0 0 0 0 rgba(160, 33, 66, 0.4);
+    box-shadow: 0 0 0 0 rgba(160, 33, 66, 0.5);
+    transform: scale(1);
+  }
+}
+
+/* ✅ MEJORA: Reducir movimiento para usuarios con preferencias de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .layermenu-highlighted {
+    animation: pulse-highlight-reduced 2.5s ease-in-out;
+  }
+  
+  @keyframes pulse-highlight-reduced {
+    0%, 100% {
+      background-color: rgba(160, 33, 66, 0.05);
+      box-shadow: 0 0 8px rgba(160, 33, 66, 0.4);
+    }
+    50% {
+      background-color: rgba(160, 33, 66, 0.15);
+      box-shadow: 0 0 12px rgba(160, 33, 66, 0.5);
+    }
+  }
+  
+  .layermenu-item {
+    transition: none;
   }
 }
 
@@ -287,6 +385,11 @@
 
 .layermenu-container::-webkit-scrollbar-thumb:hover {
   background-color: rgba(160, 33, 66, 0.5);
+}
+
+/* ✅ MEJORA: Scroll suave nativo */
+.layermenu-container {
+  scroll-behavior: smooth;
 }
 
 /* ---------------------------------------------------------
@@ -668,6 +771,17 @@
   outline-offset: 2px;
 }
 
+/* ✅ MEJORA: Mejores indicadores de foco para teclado */
+.layermenu-item:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.layermenu-buttons button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .layermenu-container {
@@ -693,4 +807,50 @@
     padding: 0.3rem 0.6rem;
     font-size: 0.75rem;
   }
+  
+  /* ✅ MEJORA: Animación de highlight más sutil en móvil */
+  .layermenu-highlighted {
+    animation: pulse-highlight-mobile 2s ease-in-out;
+  }
+  
+  @keyframes pulse-highlight-mobile {
+    0%, 100% {
+      background-color: rgba(160, 33, 66, 0.05);
+      box-shadow: 0 0 6px rgba(160, 33, 66, 0.4);
+    }
+    50% {
+      background-color: rgba(160, 33, 66, 0.15);
+      box-shadow: 0 0 10px rgba(160, 33, 66, 0.5);
+    }
+  }
+  
+  /* ✅ Ajustes para sublinks en móvil */
+  .dropdown-sublink {
+    margin-left: 8px;
+    padding-left: 10px;
+  }
+  
+  .dropdown-indicator {
+    margin-right: 6px;
+    font-size: 0.75rem;
+  }
+}
+
+/* ===== MEJORAS DE RENDIMIENTO ===== */
+
+/* ✅ Usar transform en lugar de propiedades que causan reflow */
+.layermenu-item {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* ✅ Hardware acceleration para animaciones */
+.layermenu-highlighted {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* ✅ Optimización de repaint para accordions */
+.accordion-body {
+  contain: layout style paint;
 }

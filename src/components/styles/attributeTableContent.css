@@ -1,7 +1,6 @@
 /* ===================================================================
    Estilos para el Componente AttributeTableContent
 ====================================================================== */
-
 .btn-primary {
   background-color: var(--color-primary) !important;
   border-color: var(--color-primary) !important;
@@ -37,26 +36,20 @@
 .btn-primary.disabled {
   background-color: var(--color-primary) !important;
   border-color: var(--color-primary) !important;
-  /* La opacidad por defecto de Bootstrap se encarga de darle la apariencia de deshabilitado */
 }
 
 /* Estilos para encabezados de tabla ordenables */
 .sortable-header {
   cursor: pointer;
   -webkit-user-select: none;
-  /* Safari */
   -moz-user-select: none;
-  /* Firefox */
   -ms-user-select: none;
-  /* IE10+/Edge */
   user-select: none;
-  /* Standard */
   transition: background-color 0.2s ease;
 }
 
 .sortable-header:hover {
   background-color: rgba(0, 0, 0, 0.05);
-  /* Un sutil color de fondo al pasar el cursor */
 }
 
 /* Estilos para el nuevo indicador de ordenamiento (SVG) */
@@ -74,41 +67,156 @@
 
 .sort-arrow {
   width: 1em;
-  /* O el tamaño que prefieras, ej: 14px */
   height: 1em;
   fill: currentColor;
-  /* El ícono tomará el color del texto del encabezado */
 }
 
-/* ===================================================================
-   Estilos para el Componente AttributeTableContent
-====================================================================== */
-
-/* ... (tus estilos .btn-primary y .sortable-header se mantienen igual) ... */
-
-/* --- NUEVOS ESTILOS PARA LA TABLA CON SCROLL --- */
-
-/* 1. Contenedor de Scroll */
+/* --- ESTILOS PARA LA TABLA CON SCROLL --- */
 .table-scroll-container {
-  /* Habilita AMBOS scrolls (vertical y horizontal) 
-     en este contenedor específico */
   overflow: auto;
 }
 
-/* 2. Encabezado Fijo (Sticky) */
+/* Encabezado Fijo (Sticky) */
 .sticky-header th {
-  /* Fija el encabezado en la parte superior del .table-scroll-container */
   position: sticky;
   top: 0;
-
-  /* Asegura que el fondo sea opaco y cubra el contenido 
-     que pasa por debajo */
   background-color: var(--bs-table-bg, white);
-
-  /* Asegura que el encabezado esté por encima del 
-     contenido del tbody */
   z-index: 10;
-
-  /* Evita que el borde de la tabla se vea feo al hacer scroll */
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* ===================================================================
+   Estilos para el Componente AttributeTableModal
+====================================================================== */
+
+/* --- 1. Encabezado del Modal --- */
+.modal-content .modal-header {
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+  border-bottom: 2px solid var(--color-primary-dark);
+  cursor: move;
+}
+
+.modal-content .modal-header:active {
+  cursor: grabbing;
+}
+
+.modal-content .modal-title {
+  font-weight: 600;
+}
+
+.modal-content .modal-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* --- 2. Pestañas (Tabs) dentro del Modal --- */
+.nav-tabs {
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.nav-tabs .nav-link {
+  color: var(--color-primary);
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover,
+.nav-tabs .nav-link:focus {
+  color: var(--color-primary);
+  background-color: rgba(160, 33, 66, 0.1);
+  border-color: #dee2e6 #dee2e6 transparent;
+}
+
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+  color: var(--color-text-light) !important;
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  font-weight: 600;
+}
+
+/* ===================================================================
+   🔥 DESHABILITAR ANIMACIONES DE BOOTSTRAP EN TABS Y MODAL
+====================================================================== */
+
+/* Deshabilitar TODAS las transiciones y animaciones globalmente en el modal */
+.modal * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Deshabilitar la transición fade de Bootstrap en el contenido de las tabs */
+.tab-content > .tab-pane {
+  display: none !important;
+  transition: none !important;
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+.tab-content > .active {
+  display: block !important;
+  transition: none !important;
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* Deshabilitar animaciones en el modal-body durante cambios de tab */
+.modal-body {
+  transition: none !important;
+  animation: none !important;
+  min-height: 500px !important;
+  height: auto !important;
+}
+
+/* Prevenir cualquier animación de altura en el modal */
+.modal-content {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Asegurar que el modal-dialog no se anime al cambiar tabs */
+.modal-dialog {
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Deshabilitar backdrop fade */
+.modal.fade .modal-dialog {
+  transition: none !important;
+  transform: none !important;
+}
+
+.modal.show .modal-dialog {
+  transform: none !important;
+}
+
+/* Deshabilitar clase .fade de Bootstrap en tabs */
+.tab-pane.fade,
+.tab-pane.fade.show,
+.tab-pane.fade.active {
+  transition: none !important;
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* Forzar display inmediato sin transiciones */
+.tab-content {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Deshabilitar animación de entrada/salida de tabs */
+.tab-pane {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Prevenir cambios de altura en contenedores */
+.modal-body > div,
+.tab-content > div {
+  transition: none !important;
+  animation: none !important;
 }

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useLocation } from 'react-router-dom';
 import { MapContainer, ScaleControl, GeoJSON, ZoomControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import PropTypes from 'prop-types';
 
 // Componentes locales
 import LayerMenu from './LayerMenu';
@@ -12,26 +13,27 @@ import MapClickHandler from './MapClickHandler';
 import KeepPopupInView from './KeepPopupInView';
 import GeoJsonLayers from './GeoJsonLayers';
 import BaseLayerControls from './BaseLayerControls';
-import MapPopup from './MapPopup';
 import ControlSidebarWrapper from './ControlSidebarWrapper';
 
 // Servicios y Utilidades
 import { fetchWfsLayer, fetchUniqueValues } from '../../utils/wfsService';
-import { getLayerOptions, forceStyleUpdate } from '../../utils/layerStyleFactory'; // ✅ Añadir forceStyleUpdate
+import { getLayerOptions, forceStyleUpdate } from '../../utils/layerStyleFactory';
 import { legendData } from '../../utils/legendData';
 import { SEQUIA_CONFIG, MAP_CONFIG } from './mapConfig';
 import { useSequiaData } from './hooks/useSequiaData';
 import { useLayerManagement } from './hooks/useLayerManagement';
 import { useTableModal } from './hooks/useTableModal';
+import { useTimelineManager } from './hooks/useTimelineManager';
 import '../styles/mapView.css';
 
+// Constants
 const BASE_LAYER_NAME = 'Hidalgo:00_Estado';
+const NAVIGATION_DELAY = 100;
 
 const MapView = ({ initialLayer, sectionIndex }) => {
     // Estado base del mapa
     const [baseLayerData, setBaseLayerData] = useState(null);
     const [popupData, setPopupData] = useState(null);
-    const [styleUpdateTrigger, setStyleUpdateTrigger] = useState(0); //  Trigger para forzar actualización de estilos
 
     // Navegación
     const location = useLocation();
@@ -44,7 +46,7 @@ const MapView = ({ initialLayer, sectionIndex }) => {
     const [usoConsuntivoVariant, setUsoConsuntivoVariant] = useState('Total SB (hm³)');
     const [riesgosVariant, setRiesgosVariant] = useState('Sequía');
 
-    // Hook para manejar datos de sequías
+    // Custom hooks
     const {
         sequiaQuincenaList,
         sequiaQuincena,
@@ -53,38 +55,49 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         setTimelineConfigs
     } = useSequiaData();
 
-    // Hook para manejar capas activas
     const {
         activeLayers,
         setActiveLayers,
         loadingLayers,
         setLoadingLayers,
         currentFilters,
-        handleLayerToggle,
-        handleTimelineChange: handleTimelineChangeFromHook
+        setCurrentFilters,
+        handleLayerToggle
     } = useLayerManagement(sequiaQuincena);
 
-    // Hook para modal de tabla
     const {
         tableModalState,
         handleShowTable,
         handleCloseTable
     } = useTableModal(currentFilters);
 
-    //  Wrapper optimizado para timeline
-    const handleTimelineChange = useCallback(async (layerName, newQuincena) => {
-        
-        // 1. Normalizar la quincena
-        const cleanedQuincena = newQuincena.toString()
+    const {
+        handleTimelineChange: timelineManagerChange,
+        optimisticQuincena,
+        isUpdating
+    } = useTimelineManager(
+        activeLayers,
+        setActiveLayers,
+        setLoadingLayers,
+        setCurrentFilters
+    );
+
+    // Helper functions
+    const normalizeQuincena = useCallback((quincena) => {
+        return quincena.toString()
             .replace('Z', '')
             .replace('T00:00:00.000', '')
             .trim();
+    }, []);
 
+    // Timeline change handler
+    const handleTimelineChange = useCallback((layerName, newQuincena) => {
+        if (layerName !== SEQUIA_CONFIG.layerName) return;
 
-        // 2. Actualizar el estado en useSequiaData PRIMERO (feedback inmediato)
+        const cleanedQuincena = normalizeQuincena(newQuincena);
+
+        // Update UI state immediately
         setSequiaQuincena(cleanedQuincena);
-
-        // 3. Actualizar timeline config para feedback visual inmediato
         setTimelineConfigs(prev => ({
             ...prev,
             [SEQUIA_CONFIG.layerName]: {
@@ -93,40 +106,21 @@ const MapView = ({ initialLayer, sectionIndex }) => {
             }
         }));
 
-        // 4.  Forzar actualización de estilos ANTES de cargar datos
-        forceStyleUpdate();
-        setStyleUpdateTrigger(prev => prev + 1);
+        // Delegate data loading to timeline manager
+        timelineManagerChange(layerName, cleanedQuincena);
+    }, [setSequiaQuincena, setTimelineConfigs, timelineManagerChange, normalizeQuincena]);
 
-        try {
-            // 5. Llamar al handler para recargar datos
-            await handleTimelineChangeFromHook(layerName, cleanedQuincena);
-            
-            // 6.  Forzar actualización de estilos DESPUÉS de cargar datos
-            setTimeout(() => {
-                forceStyleUpdate();
-                setStyleUpdateTrigger(prev => prev + 1);
-            }, 200);
-            
-        } catch (error) {
-            console.error('❌ Error en handleTimelineChange:', error);
-        }
-    }, [setSequiaQuincena, setTimelineConfigs, handleTimelineChangeFromHook]);
-
-    //  Efecto para forzar actualización de estilos cuando cambian los datos de sequías
+    // Effects
     useEffect(() => {
-        if (activeLayers[SEQUIA_CONFIG.layerName] && sequiaQuincena) {
-            
-            // Pequeño delay para asegurar que el GeoJSON se ha renderizado
-            const timer = setTimeout(() => {
+        const sequiaLayer = activeLayers[SEQUIA_CONFIG.layerName];
+        if (sequiaLayer?._metadata?.lastUpdate) {
+            requestAnimationFrame(() => {
                 forceStyleUpdate();
-                setStyleUpdateTrigger(prev => prev + 1);
-            }, 100);
-            
-            return () => clearTimeout(timer);
+            });
         }
-    }, [activeLayers[SEQUIA_CONFIG.layerName]?._metadata?.lastUpdate, sequiaQuincena]);
+    }, [activeLayers[SEQUIA_CONFIG.layerName]?._metadata?.lastUpdate]);
 
-    // Cargar capa base permanente
+    // Load base layer
     useEffect(() => {
         const loadBaseLayer = async () => {
             try {
@@ -141,14 +135,12 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         loadBaseLayer();
     }, []);
 
-    // Manejar navegación desde InfoCard (activar capa)
+    // Handle navigation from InfoCard
     useEffect(() => {
         if (!navLayer || navLayerProcessed.current === navLayer) return;
         navLayerProcessed.current = navLayer;
 
         const activateLayer = async () => {
-            
-            // Asegurar que navLayer es un array para manejo uniforme
             const layerToActivate = Array.isArray(navLayer) ? navLayer : [navLayer];
             const isSequia = layerToActivate.includes(SEQUIA_CONFIG.layerName);
 
@@ -156,7 +148,6 @@ const MapView = ({ initialLayer, sectionIndex }) => {
                 let targetQuincena = null;
 
                 if (isSequia) {
-                    // Lógica para determinar la quincena más reciente si es la capa de sequía
                     if (sequiaQuincenaList.length > 0) {
                         targetQuincena = sequiaQuincena || sequiaQuincenaList[sequiaQuincenaList.length - 1];
                     } else {
@@ -165,9 +156,7 @@ const MapView = ({ initialLayer, sectionIndex }) => {
                             SEQUIA_CONFIG.fieldName,
                             10000
                         );
-                        const normalized = uniqueQuincenas.map(q =>
-                            q.toString().replace('Z', '').replace('T00:00:00.000', '').trim()
-                        );
+                        const normalized = uniqueQuincenas.map(normalizeQuincena);
 
                         if (normalized.length > 0) {
                             targetQuincena = normalized[normalized.length - 1];
@@ -176,7 +165,6 @@ const MapView = ({ initialLayer, sectionIndex }) => {
                     }
                 }
 
-                // Configuración para el toggle
                 const config = { 
                     layerName: navLayer,
                     _source: 'navigation'
@@ -186,10 +174,9 @@ const MapView = ({ initialLayer, sectionIndex }) => {
                     config.currentQuincena = targetQuincena;
                 }
 
-                // Pequeño retraso para asegurar que el MapView esté completamente montado
                 setTimeout(() => {
                     handleLayerToggle(config, true);
-                }, 100);
+                }, NAVIGATION_DELAY);
             } catch (err) {
                 console.error('❌ Error en navegación:', err);
                 navLayerProcessed.current = null;
@@ -197,85 +184,100 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         };
 
         activateLayer();
-    }, [navLayer, sequiaQuincenaList.length, sequiaQuincena, handleLayerToggle, setSequiaQuincena]);
+    }, [
+        navLayer, 
+        sequiaQuincenaList.length, 
+        sequiaQuincena, 
+        handleLayerToggle, 
+        setSequiaQuincena,
+        normalizeQuincena
+    ]);
 
-    // Cargar capas iniciales (si vienen por props)
+    // Load initial layers
     useEffect(() => {
         const loadInitialLayers = async () => {
             if (!initialLayer) return;
             
-            // Asegurar que initialLayer es un array y filtrar la capa base si está incluida.
             const layersToLoad = Array.isArray(initialLayer) ? initialLayer : [initialLayer];
             const filtered = layersToLoad.filter(n => n !== BASE_LAYER_NAME);
             if (filtered.length === 0) return;
 
             setLoadingLayers(prev => new Set([...prev, ...filtered]));
+            
             try {
-                const results = await Promise.allSettled(filtered.map(n => fetchWfsLayer(n)));
+                const results = await Promise.allSettled(
+                    filtered.map(n => fetchWfsLayer(n))
+                );
+                
                 const newData = {};
                 results.forEach((res, i) => {
                     if (res.status === 'fulfilled' && res.value) {
                         newData[filtered[i]] = res.value;
-                    } else {
-                        console.error(`❌ Error cargando ${filtered[i]}:`, res.reason);
                     }
                 });
+                
                 setActiveLayers(prev => ({ ...prev, ...newData }));
             } catch (err) {
                 console.error('❌ Error loadInitialLayers:', err);
             } finally {
                 setLoadingLayers(prev => {
-                    const s = new Set(prev);
-                    filtered.forEach(n => s.delete(n));
-                    return s;
+                    const updated = new Set(prev);
+                    filtered.forEach(n => updated.delete(n));
+                    return updated;
                 });
             }
         };
+        
         loadInitialLayers();
     }, [initialLayer, setActiveLayers, setLoadingLayers]);
 
-    // Limpiar popup cuando no hay capas activas
+    // Cleanup popup when no layers are active
     useEffect(() => {
-        if (Object.keys(activeLayers).length === 0 && !baseLayerData && popupData) {
+        const hasActiveLayers = Object.keys(activeLayers).length > 0 || baseLayerData;
+        if (!hasActiveLayers && popupData) {
             setPopupData(null);
         }
-    }, [Object.keys(activeLayers).length, baseLayerData, popupData]);
+    }, [activeLayers, baseLayerData, popupData]);
 
-    // Capas para leyenda (incluyendo la base)
+    // Memoized values
     const layersForLegend = useMemo(() => {
         const legendLayers = { ...activeLayers };
         if (baseLayerData) legendLayers[BASE_LAYER_NAME] = baseLayerData;
         return legendLayers;
     }, [activeLayers, baseLayerData]);
 
-    // Variantes actuales (usadas para controlar el estilo de las capas)
     const currentVariants = useMemo(() => ({
         'Hidalgo:03_drprodfisica': productionVariant,
         'Hidalgo:03_usoconsuntivo': usoConsuntivoVariant,
         'Hidalgo:04_riesgosmunicipales': riesgosVariant
     }), [productionVariant, usoConsuntivoVariant, riesgosVariant]);
 
-    const handleVariantChange = useCallback((layerName, variant) => {
-        if (layerName === 'Hidalgo:03_drprodfisica') setProductionVariant(variant);
-        if (layerName === 'Hidalgo:03_usoconsuntivo') setUsoConsuntivoVariant(variant);
-        if (layerName === 'Hidalgo:04_riesgosmunicipales') setRiesgosVariant(variant);
-        
-        //  Forzar actualización de estilos cuando cambia variante
-        setTimeout(() => {
-            forceStyleUpdate();
-            setStyleUpdateTrigger(prev => prev + 1);
-        }, 100);
-    }, []);
+    const effectiveSequiaQuincena = optimisticQuincena || sequiaQuincena;
 
-    //  Incluir styleUpdateTrigger en las props de GeoJsonLayers
     const geoJsonLayersProps = useMemo(() => ({
         activeLayers,
         productionVariant,
         usoConsuntivoVariant,
         riesgosVariant,
-        sequiaQuincena,
-        styleUpdateTrigger 
-    }), [activeLayers, productionVariant, usoConsuntivoVariant, riesgosVariant, sequiaQuincena, styleUpdateTrigger]);
+        sequiaQuincena: effectiveSequiaQuincena
+    }), [activeLayers, productionVariant, usoConsuntivoVariant, riesgosVariant, effectiveSequiaQuincena]);
+
+    // Event handlers
+    const handleVariantChange = useCallback((layerName, variant) => {
+        const variantSetters = {
+            'Hidalgo:03_drprodfisica': setProductionVariant,
+            'Hidalgo:03_usoconsuntivo': setUsoConsuntivoVariant,
+            'Hidalgo:04_riesgosmunicipales': setRiesgosVariant
+        };
+
+        const setter = variantSetters[layerName];
+        if (setter) {
+            setter(variant);
+            requestAnimationFrame(() => {
+                forceStyleUpdate();
+            });
+        }
+    }, []);
 
     return (
         <div className="map-view-container">
@@ -286,11 +288,12 @@ const MapView = ({ initialLayer, sectionIndex }) => {
                 sectionIndex={sectionIndex}
                 sectionId={sectionId}
                 onShowTable={handleShowTable}
-                sequiaQuincena={sequiaQuincena}
+                sequiaQuincena={effectiveSequiaQuincena}
                 sequiaQuincenaList={sequiaQuincenaList}
                 timelineConfigs={timelineConfigs}
                 onTimelineChange={handleTimelineChange}
                 highlightLayer={navLayer}
+                isTimelineUpdating={isUpdating}
             />
 
             <div className="map-container">
@@ -317,7 +320,7 @@ const MapView = ({ initialLayer, sectionIndex }) => {
                         activeLayers={activeLayers}
                         setPopupData={setPopupData}
                         baseLayerData={baseLayerData}
-                        sequiaQuincena={sequiaQuincena}
+                        sequiaQuincena={effectiveSequiaQuincena}
                     />
 
                     <KeepPopupInView />
@@ -332,7 +335,6 @@ const MapView = ({ initialLayer, sectionIndex }) => {
                         />
                     )}
                     
-                    {/*  Pasar props optimizadas */}
                     <GeoJsonLayers {...geoJsonLayersProps} />
                 </MapContainer>
 
@@ -354,6 +356,19 @@ const MapView = ({ initialLayer, sectionIndex }) => {
             />
         </div>
     );
+};
+
+MapView.propTypes = {
+    initialLayer: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.arrayOf(PropTypes.string)
+    ]),
+    sectionIndex: PropTypes.string
+};
+
+MapView.defaultProps = {
+    initialLayer: null,
+    sectionIndex: null
 };
 
 export default React.memo(MapView);

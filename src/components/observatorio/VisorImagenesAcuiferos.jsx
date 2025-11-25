@@ -33,76 +33,30 @@ const VisorImagenesAcuiferos = ({ show, onHide }) => {
   const [loading, setLoading] = useState(true);
   const [imagesLoaded, setImagesLoaded] = useState({});
 
-  const imagenesAcuiferos = [
-    {
-      src: acuifero1,     
-    },
-    {
-      src: acuifero2,     
-    },
-    {
-      src: acuifero3,      
-    },
-    {
-      src: acuifero4,      
-    },
-    {
-      src: acuifero5,     
-    },
-    {
-      src: acuifero6,     
-    },
-    {
-      src: acuifero7,     
-    },
-    {
-      src: acuifero8,     
-    },
-    {
-      src: acuifero9,     
-    },
-    {
-      src: acuifero10,     
-    },
-    {
-      src: acuifero11,     
-    },
-    {
-      src: acuifero12,     
-    },
-    {
-      src: acuifero13,     
-    },
-    {
-      src: acuifero14,     
-    },
-    {
-      src: acuifero15,     
-    },
-    {
-      src: acuifero16,     
-    },
-    {
-      src: acuifero17,     
-    },  
-    {
-      src: acuifero18,     
-    },
-    {
-      src: acuifero19,     
-    },
-    {
-      src: acuifero20,     
-    },
-    {
-      src: acuifero21,     
-    },
-    {
-      src: acuifero22,     
-    },
-    {
-      src: acuifero23,     
-    },
+   const imagenesAcuiferos = [
+    { src: acuifero1, title: 'Acaxochitlan' },
+    { src: acuifero2, title: 'Actopan Santiago de Anaya' },
+    { src: acuifero3, title: 'Ajacuba' },
+    { src: acuifero4, title: 'Alamo Tuxpan' },
+    { src: acuifero5, title: 'Amajac' },
+    { src: acuifero6, title: 'Apan' },
+    { src: acuifero7, title: 'Atlapexco Candelaria' },
+    { src: acuifero8, title: 'Atotonilco Jaltocan' },
+    { src: acuifero9, title: 'Calabozo' },
+    { src: acuifero10, title: 'Chapantongo Alfajayucan' },
+    { src: acuifero11, title: 'Cuautitlan Pachuca' },
+    { src: acuifero12, title: 'El Astillero' },
+    { src: acuifero13, title: 'Huasca Zoquital' },
+    { src: acuifero14, title: 'Huichapan Tecozautla' },
+    { src: acuifero15, title: 'Ixmiquilpan' },
+    { src: acuifero16, title: 'Metztitlan' },
+    { src: acuifero17, title: 'Orizatlan' },
+    { src: acuifero18, title: 'Tecocomulco' },
+    { src: acuifero19, title: 'Tepeji del Rio' },
+    { src: acuifero20, title: 'Valle de Tulancingo' },
+    { src: acuifero21, title: 'Valle del Mezquital' },
+    { src: acuifero22, title: 'Xochitlan Huejutla' },
+    { src: acuifero23, title: 'Zimapan' },
   ];
 
   useEffect(() => {
@@ -239,9 +193,6 @@ const VisorImagenesAcuiferos = ({ show, onHide }) => {
         <small className="text-muted">
           Fuente: Secretaría del Medio Ambiente y Recursos Naturales del Estado de Hidalgo (SEMARNATH)
         </small>
-        <Button variant="primary" onClick={onHide}>
-          Cerrar
-        </Button>
       </Modal.Footer>
     </Modal>
   );

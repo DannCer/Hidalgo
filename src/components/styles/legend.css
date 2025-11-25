@@ -19,9 +19,9 @@
     box-shadow: var(--shadow-heavy);
     font-family: var(--font-primary);
     font-size: 0.875rem;
-    
+
     /* CLAVE para la animación de colapso */
-    transition: max-height 0.3s ease-in-out, box-shadow 0.3s ease; 
+    transition: max-height 0.3s ease-in-out, box-shadow 0.3s ease;
 }
 
 /* Encabezado de la leyenda (se mantiene "sticky") */
@@ -35,7 +35,8 @@
     position: sticky;
     top: 0;
     z-index: 2;
-    cursor: pointer; /* Indica que el encabezado es interactivo */
+    cursor: pointer;
+    /* Indica que el encabezado es interactivo */
 }
 
 /* Título de la leyenda */
@@ -58,7 +59,8 @@
     justify-content: center;
     font-size: 0.7rem;
     font-weight: 600;
-    margin-right: auto; /* Empuja el botón de colapso hacia la derecha */
+    margin-right: auto;
+    /* Empuja el botón de colapso hacia la derecha */
     margin-left: 8px;
 }
 
@@ -70,9 +72,11 @@
     font-size: 1rem;
     color: var(--color-text-dark, #333);
     margin-left: 10px;
-    transition: transform 0.3s ease; /* Para animar la rotación del icono */
+    transition: transform 0.3s ease;
+    /* Para animar la rotación del icono */
     padding: 0;
-    display: flex; /* Asegura que el ícono esté centrado */
+    display: flex;
+    /* Asegura que el ícono esté centrado */
 }
 
 /* Contenido principal (área con scroll) */
@@ -88,11 +92,13 @@
 
 /* Ocultar el contenido y reducir el tamaño del contenedor principal */
 .legend-container.collapsed {
-    max-height: 48px; /* Ajustar a la altura del header para colapso visual */
+    max-height: 48px;
+    /* Ajustar a la altura del header para colapso visual */
     min-height: fit-content;
     min-width: fit-content;
     overflow: hidden;
-    box-shadow: var(--shadow-small); /* Menos sombra cuando está colapsado */
+    box-shadow: var(--shadow-small);
+    /* Menos sombra cuando está colapsado */
 }
 
 .legend-container.collapsed .legend-header {
@@ -176,14 +182,16 @@
 
 /* Estilos si el ítem está oculto */
 .legend-item.hidden-item {
-    opacity: 0.4; /* Atenuar */
+    opacity: 0.4;
+    /* Atenuar */
     text-decoration: line-through;
 }
 
 /* Ícono de visibilidad (el ojo) */
 .visibility-toggle {
     margin-right: 8px;
-    color: var(--color-primary); /* Color del icono cuando está visible */
+    color: var(--color-primary);
+    /* Color del icono cuando está visible */
     font-size: 0.9rem;
     transition: color 0.2s ease;
 }
@@ -195,7 +203,8 @@
 
 /* Ícono de visibilidad cuando el elemento está oculto (ojo tachado) */
 .legend-item.hidden-item .visibility-toggle {
-    color: #999; /* Gris para indicar desactivación */
+    color: #999;
+    /* Gris para indicar desactivación */
 }
 
 .legend-item:last-child {
@@ -241,6 +250,7 @@
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
@@ -254,6 +264,7 @@
     display: flex;
     align-items: center;
     margin-top: 4px;
+    flex-wrap: wrap;
 }
 
 .legend-variant-label {
@@ -263,8 +274,13 @@
 }
 
 .legend-variant-select {
-    flex: 1;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
     padding: 6px 10px;
+    white-space: pre-wrap; 
+    word-break: break-word;
     font-size: 0.85rem;
     border: 1px solid var(--color-border, #ccc);
     border-radius: 8px;
@@ -274,6 +290,9 @@
     transition: all 0.2s ease;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .legend-variant-select:hover {
@@ -307,3 +326,5 @@
 .legend-content::-webkit-scrollbar-thumb:hover {
     background: var(--color-primary-dark);
 }
+
+
