@@ -95,37 +95,41 @@ const validateWfsParams = (typeName, functionName) => {
     }
 };
 
-// --- FUNCIÓN getLayerInfo ---
-export const getLayerInfo = (layerNameToFind) => {
-    if (!layerNameToFind) return null;
+// Función auxiliar para verificar si el link coincide con el nombre de la capa
+const isLayerMatch = (link, layerName) => {
+  if (!link.layerName) return false;
+  return Array.isArray(link.layerName) 
+    ? link.layerName.includes(layerName) 
+    : link.layerName === layerName;
+};
 
-    for (const section of accordionData) {
-        if (!section.cards) continue;
-        for (const card of section.cards) {
-            if (!card.links) continue;
-            for (const link of card.links) {
-                const { layerName } = link;
-                if (!layerName) continue;
+export const getLayerInfo = (layerName) => {
+  if (!layerName) return null;
 
-                if (Array.isArray(layerName) && layerName.includes(layerNameToFind)) {
-                    return {
-                        ...link,
-                        sectionTitle: section.title,
-                        cardTitle: card.title
-                    };
-                }
+  for (const section of accordionData) {
+    if (!section.cards) continue;
 
-                if (typeof layerName === 'string' && layerName === layerNameToFind) {
-                    return {
-                        ...link,
-                        sectionTitle: section.title,
-                        cardTitle: card.title
-                    };
-                }
-            }
+    for (const card of section.cards) {
+      if (!card.links) continue;
+
+      for (const link of card.links) {
+        // 1. Revisar enlace directo
+        if (isLayerMatch(link, layerName)) {
+          return link;
         }
+
+        // 2. Revisar subenlaces (dropdowns)
+        if (link.sublinks) {
+          for (const sublink of link.sublinks) {
+             if (isLayerMatch(sublink, layerName)) {
+               return sublink;
+             }
+          }
+        }
+      }
     }
-    return null;
+  }
+  return null;
 };
 
 

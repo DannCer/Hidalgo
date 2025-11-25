@@ -225,7 +225,7 @@ export const accordionData = [
                                 target: '_blank',
                             },
                             {
-                                text: 'Mapa de ADVC',
+                                text: 'Áreas destinadas voluntariamente a la conservación',
                                 path: '/observatorio',
                                 layerName: 'Hidalgo:01_advc',
                                 crs: CRS.WGS84,
@@ -673,7 +673,7 @@ export const accordionData = [
                         path: '/observatorio',
                        layerName: 'Hidalgo:05_ola',
                         crs: CRS.WGS84,
-                        geomType: GEOM_TYPES.POLYGON
+                        geomType: GEOM_TYPES.POINT
                     },
                     {
                         text: 'Consejo Técnico de Sustentabilidad Hídrica',
