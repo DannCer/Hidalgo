@@ -4,164 +4,265 @@ import { COLORS } from "./colors";
 import { createRangedStyleFromLegend, createCategoricalStyleFromLegend } from "./styleGenerators";
 import { legendData } from "./legendData";
 
-const pointToLayerGeneric = (feature, latlng) =>
-  L.circleMarker(latlng, { ...basePointStyle, fillColor: COLORS.DEFAULT });
+// ===================================================================
+// CONFIGURACIÓN - Usar constantes locales para compatibilidad
+// ===================================================================
 
-//  Cache para forzar actualizaciones de estilo
-let styleCache = {};
-let cacheVersion = 0;
+const LEGEND_MAPPING = {
+  'Hidalgo:01_spsitios': 'Hidalgo:01_sitios',
+  'Hidalgo:01_sbsitios': 'Hidalgo:01_sitios',
+  'Hidalgo:01_sbcalidadagua': 'Hidalgo:01_calidadagua',
+  'Hidalgo:01_spcalidadagua': 'Hidalgo:01_calidadagua',
+};
 
+const SPECIAL_LAYERS = {
+  MUNICIPIOS: 'Hidalgo:00_Municipios',
+  ESTADO: 'Hidalgo:00_Estado',
+  SEQUIAS: 'Hidalgo:04_sequias',
+};
+
+// ===================================================================
+// GESTIÓN DE CACHÉ SIMPLIFICADA
+// ===================================================================
+
+class StyleCache {
+  constructor() {
+    this.cache = new Map();
+    this.version = 0;
+  }
+
+  get(key) {
+    return this.cache.get(key);
+  }
+
+  set(key, value) {
+    this.cache.set(key, value);
+  }
+
+  getCacheKey(layerName, variant) {
+    return `${layerName}:${variant || 'default'}:v${this.version}`;
+  }
+
+  invalidate(layerName = null) {
+    if (layerName) {
+      const prefix = `${layerName}:`;
+      for (const key of this.cache.keys()) {
+        if (key.startsWith(prefix)) this.cache.delete(key);
+      }
+    } else {
+      this.cache.clear();
+    }
+  }
+
+  incrementVersion() {
+    this.version++;
+  }
+}
+
+const cache = new StyleCache();
+
+// ===================================================================
+// UTILIDADES
+// ===================================================================
+
+const getLegendKey = (layerName) => LEGEND_MAPPING[layerName] || layerName;
+
+const getPointColor = (layerName, items) => {
+  if (items.length <= 1) return items[0]?.color || COLORS.DEFAULT;
+  const idx = layerName.includes('sp') ? 0 : layerName.includes('sb') ? 1 : 0;
+  return items[idx]?.color || COLORS.DEFAULT;
+};
+
+// ===================================================================
+// GENERADORES DE ESTILOS
+// ===================================================================
+
+const createPointLayerStyle = (legendKey, layerName, legend) => {
+  const color = getPointColor(layerName, legend.items);
+  return (feature, latlng) => L.circleMarker(latlng, { 
+    ...basePointStyle, 
+    fillColor: color 
+  });
+};
+
+const createPolygonLayerStyle = (legendKey, legend) => {
+  // Estilos especiales
+  if (legendKey === SPECIAL_LAYERS.MUNICIPIOS) {
+    return () => styleOutlineRed;
+  }
+
+  if (legendKey === SPECIAL_LAYERS.ESTADO) {
+    return () => ({
+      ...basePolygonStyle,
+      color: COLORS.BLACK,
+      weight: 5,
+      opacity: 1,
+      fillOpacity: 0,
+      dashArray: '10, 5',
+    });
+  }
+
+  // Estilo estándar
+  const { color: fillColor = COLORS.LIGHT_GRAY, borderColor = COLORS.BLACK } = legend.items[0] || {};
+  return () => ({ ...basePolygonStyle, fillColor, color: borderColor });
+};
+
+const getActiveVariant = (legend, variant) => {
+  if (!legend.variants) return null;
+  const variantKey = variant || Object.keys(legend.variants)[0];
+  return {
+    key: variantKey,
+    data: legend.variants[variantKey]
+  };
+};
+
+const createStyleFromLegend = (legendKey, layerName, legend, variant) => {
+  // Manejar variantes
+  const activeVariant = getActiveVariant(legend, variant);
+  if (activeVariant) {
+    const { key, data } = activeVariant;
+    const propertyName = data.propertyName || key;
+    
+    if (data.type === "ranged-polygon") {
+      return {
+        styleFunc: createRangedStyleFromLegend(propertyName, data.items, "polygon"),
+        isPoint: false
+      };
+    }
+    
+    if (data.type === "categorical-polygon") {
+      return {
+        styleFunc: createCategoricalStyleFromLegend(propertyName, data.items, "polygon"),
+        isPoint: false
+      };
+    }
+  }
+
+  // Estilos directos (sin variantes)
+  const { type, propertyName, items } = legend;
+
+  const styleMap = {
+    "ranged-polygon": () => ({
+      styleFunc: createRangedStyleFromLegend(propertyName, items, "polygon"),
+      isPoint: false
+    }),
+    "categorical-polygon": () => ({
+      styleFunc: createCategoricalStyleFromLegend(propertyName, items, "polygon"),
+      isPoint: false
+    }),
+    "ranged-point": () => ({
+      styleFunc: createRangedStyleFromLegend(propertyName, items, "point"),
+      isPoint: true
+    }),
+    "categorical-point": () => ({
+      styleFunc: createCategoricalStyleFromLegend(propertyName, items, "point"),
+      isPoint: true
+    }),
+    "point": () => ({
+      styleFunc: createPointLayerStyle(legendKey, layerName, legend),
+      isPoint: true
+    }),
+    "polygon": () => ({
+      styleFunc: createPolygonLayerStyle(legendKey, legend),
+      isPoint: false
+    })
+  };
+
+  return (styleMap[type] || (() => ({
+    styleFunc: () => ({ ...basePolygonStyle, fillColor: COLORS.LIGHT_GRAY }),
+    isPoint: false
+  })))();
+};
+
+// ===================================================================
+// FUNCIÓN PRINCIPAL
+// ===================================================================
+
+/**
+ * Obtiene opciones de estilo para una capa
+ * @param {string} layerName - Nombre de la capa
+ * @param {string|null} variant - Variante activa (si aplica)
+ * @param {boolean} forceUpdate - Forzar actualización del caché
+ * @returns {Object} Opciones de configuración de la capa
+ */
 export function getLayerOptions(layerName, variant = null, forceUpdate = false) {
-  
-  //  Cache busting para sequías
-  const isSequiaLayer = layerName === "Hidalgo:04_sequias";
+  const isSequiaLayer = layerName === SPECIAL_LAYERS.SEQUIAS;
+
+  // Invalidar caché para capas dinámicas
   if (isSequiaLayer && forceUpdate) {
-    cacheVersion++;
+    cache.incrementVersion();
   }
 
-  const cacheKey = `${layerName}-${variant}-${cacheVersion}`;
-  
-  //  Usar cache para evitar recreaciones innecesarias
-  if (styleCache[cacheKey] && !forceUpdate) {
-    return styleCache[cacheKey];
+  const cacheKey = cache.getCacheKey(layerName, variant);
+
+  // Retornar desde caché
+  if (!forceUpdate && cache.get(cacheKey)) {
+    return cache.get(cacheKey);
   }
 
-  const baseOptions = { 
+  // Obtener leyenda
+  const legendKey = getLegendKey(layerName);
+  const legend = legendData[legendKey];
+
+  // Sin leyenda: estilo por defecto
+  if (!legend) {
+    const result = {
+      style: { ...basePolygonStyle, fillColor: COLORS.LIGHT_GRAY }
+    };
+    cache.set(cacheKey, result);
+    return result;
+  }
+
+  // Crear estilo
+  const { styleFunc, isPoint } = createStyleFromLegend(legendKey, layerName, legend, variant);
+
+  // Construir opciones
+  const result = {
+    ...(isPoint ? { pointToLayer: styleFunc } : { style: styleFunc }),
     onEachFeature: (feature, layer) => {
-      //  Asegurar que los estilos se aplican inmediatamente
-      if (isSequiaLayer) {
+      if (isSequiaLayer && layer.setStyle) {
+        // Aplicar estilos asíncronamente para capas dinámicas
         setTimeout(() => {
-          if (layer.setStyle) {
-            const style = getStyleFunction(layerName, legend, variant);
-            if (typeof style === 'function') {
-              layer.setStyle(style(feature));
-            } else {
-              layer.setStyle(style);
-            }
-          }
+          const style = typeof styleFunc === 'function' ? styleFunc(feature) : styleFunc;
+          layer.setStyle(style);
         }, 0);
       }
     }
   };
 
-  const legend = legendData[layerName];
-
-  if (!legend) {
-    const result = { ...baseOptions, style: { ...basePolygonStyle, fillColor: COLORS.LIGHT_GRAY } };
-    styleCache[cacheKey] = result;
-    return result;
-  }
-
-  let activeLegend = legend;
-  let styleFunction;
-  let isPointLayer = false;
-
-  // Función auxiliar para obtener la función de estilo
-  const getStyleFunction = (layerName, legend, variant) => {
-    let styleFunc;
-    let isPoint = false;
-
-    // Variants
-    if (legend.variants) {
-      const activeVariantKey = variant || Object.keys(legend.variants)[0];
-      const currentLegend = legend.variants[activeVariantKey];
-      const propertyName = currentLegend.propertyName || activeVariantKey;
-
-      if (currentLegend.type === "ranged-polygon") {
-        styleFunc = createRangedStyleFromLegend(propertyName, currentLegend.items, "polygon");
-      } else if (currentLegend.type === "categorical-polygon") {
-        styleFunc = createCategoricalStyleFromLegend(propertyName, currentLegend.items, "polygon");
-      }
-    } else {
-      // No variants - código existente
-      switch (legend.type) {
-        case "ranged-polygon":
-          styleFunc = createRangedStyleFromLegend(legend.propertyName, legend.items, "polygon");
-          break;
-
-        case "categorical-polygon":
-          styleFunc = createCategoricalStyleFromLegend(legend.propertyName, legend.items, "polygon");
-          break;
-
-        case "ranged-point":
-          styleFunc = createRangedStyleFromLegend(legend.propertyName, legend.items, "point");
-          isPoint = true;
-          break;
-
-        case "categorical-point":
-          styleFunc = createCategoricalStyleFromLegend(legend.propertyName, legend.items, "point");
-          isPoint = true;
-          break;
-
-        case "point":
-          const pointColor = legend.items[0]?.color;
-          styleFunc = (feature, latlng) =>
-            L.circleMarker(latlng, { ...basePointStyle, fillColor: pointColor || COLORS.DEFAULT });
-          isPoint = true;
-          break;
-
-        case "polygon":
-          if (layerName === "Hidalgo:00_Municipios") {
-            styleFunc = () => styleOutlineRed;
-          } else if (layerName === "Hidalgo:00_Estado") {
-            styleFunc = () => ({
-              ...basePolygonStyle,
-              color: COLORS.BLACK,
-              weight: 5, 
-              opacity: 1,
-              fillOpacity: 0,
-              dashArray: '10, 5',
-            });
-          } else {
-            const polygonColor = legend.items[0]?.color;
-            const polygonBorderColor = legend.items[0]?.borderColor || COLORS.BLACK;
-            styleFunc = () => ({ ...basePolygonStyle, fillColor: polygonColor, color: polygonBorderColor });
-          }
-          break;
-
-        default:
-          styleFunc = () => ({ ...basePolygonStyle, fillColor: COLORS.LIGHT_GRAY });
-      }
-    }
-
-    return { styleFunc, isPoint };
-  };
-
-  const { styleFunc, isPoint } = getStyleFunction(layerName, activeLegend, variant);
-  styleFunction = styleFunc;
-  isPointLayer = isPoint;
-
-  const result = isPointLayer
-    ? { ...baseOptions, pointToLayer: styleFunction }
-    : { ...baseOptions, style: styleFunction };
-
-  //  Cachear el resultado
-  styleCache[cacheKey] = result;
-  
-  //  Limpiar cache periódicamente para sequías
-  if (isSequiaLayer) {
-    setTimeout(() => {
-      delete styleCache[cacheKey];
-    }, 5000);
-  }
-
+  cache.set(cacheKey, result);
   return result;
 }
 
-//  Función para forzar actualización de estilos
-export function forceStyleUpdate() {
-  cacheVersion++;
-}
+// ===================================================================
+// API PÚBLICA
+// ===================================================================
 
-//  Función para limpiar cache específico
-export function clearStyleCache(layerName = null) {
-  if (layerName) {
-    Object.keys(styleCache).forEach(key => {
-      if (key.startsWith(layerName)) {
-        delete styleCache[key];
-      }
-    });
-  } else {
-    styleCache = {};
-  }
-}
+/**
+ * Fuerza actualización de estilos incrementando la versión del caché
+ * @returns {number} Nueva versión del caché
+ */
+export const forceStyleUpdate = () => {
+  cache.incrementVersion();
+  return cache.version;
+};
+
+/**
+ * Limpia el caché de estilos
+ * @param {string|null} layerName - Nombre de capa específica o null para limpiar todo
+ * @returns {string} 'partial' o 'full' según el tipo de limpieza
+ */
+export const clearStyleCache = (layerName = null) => {
+  cache.invalidate(layerName);
+  return layerName ? 'partial' : 'full';
+};
+
+/**
+ * Obtiene información del caché (útil para debugging)
+ * @returns {Object} Info del caché
+ */
+export const getCacheInfo = () => ({
+  size: cache.cache.size,
+  version: cache.version,
+  keys: Array.from(cache.cache.keys())
+});

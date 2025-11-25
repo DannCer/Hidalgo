@@ -5,6 +5,8 @@
 /* Contenedor principal */
 .principal-layout {
   padding: 2.5rem 1rem;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Accordion personalizado */
@@ -16,66 +18,141 @@
 }
 
 /* Items */
-.accordion-item {
+.accordion-item,
+.accordion-item-custom {
   border: 1px solid #dee2e6;
-  border-radius: 0.75rem;
+  border-radius: var(--border-radius-md, 0.75rem);
   margin-bottom: 1rem;
   overflow: hidden;
+  transition: box-shadow var(--transition-normal, 0.3s ease);
 }
 
-/* Botón */
+.accordion-item:last-child,
+.accordion-item-custom:last-child {
+  margin-bottom: 0;
+}
+
+.accordion-item:hover,
+.accordion-item-custom:hover {
+  box-shadow: var(--shadow-light, 0 4px 15px rgba(138, 21, 56, 0.2));
+}
+
+/* Botón del acordeón */
 .accordion-button {
   background-color: var(--color-primary-dark, #691b31);
-  color: #fff !important;
+  color: var(--color-text-light, #fff) !important;
   font-weight: 600;
   font-size: 1.15rem;
+  font-family: var(--font-primary, 'Montserrat', sans-serif);
   padding: 1rem 1.25rem;
+  transition: background-color var(--transition-normal, 0.3s ease),
+              transform var(--transition-fast, 0.2s ease);
+  border: none;
+}
+
+.accordion-button:hover {
+  background-color: var(--color-primary, #a02142);
+  transform: translateX(2px);
 }
 
 .accordion-button:not(.collapsed) {
   background-color: var(--color-primary, #a02142) !important;
+  color: var(--color-text-light, #fff) !important;
+  box-shadow: none;
 }
 
 .accordion-button::after {
   filter: invert(1);
+  transition: transform var(--transition-normal, 0.3s ease);
+}
+
+.accordion-button:not(.collapsed)::after {
+  transform: rotate(180deg);
 }
 
 .accordion-button:focus,
 .accordion-button:focus-visible {
-  outline: none !important;
+  outline: 2px solid rgba(255, 255, 255, 0.5) !important;
+  outline-offset: -2px !important;
   box-shadow: none !important;
   border: none !important;
 }
 
-/* Body */
-.accordion-body {
-  background-color: #fff;
-  padding: 2rem;
-  overflow: hidden;
+/* Título del acordeón */
+.accordion-title {
+  flex: 1;
+  text-align: left;
+  line-height: 1.4;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .accordion-body {
-    padding: 1rem;
-  }
+/* Body del acordeón */
+.accordion-body {
+  background-color: var(--color-text-light, #fff);
+  padding: 2rem;
+  overflow: hidden;
 }
 
 /* Mensaje vacío */
 .empty-message {
   text-align: center;
-  color: #888;
+  color: var(--color-text-muted, #6c757d);
   font-style: italic;
+  font-family: var(--font-primary, 'Montserrat', sans-serif);
   padding: 2rem;
+  margin: 0;
 }
 
-/* Links dentro del accordion (si existieran) */
+/* Links dentro del accordion */
 .accordion-link {
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform var(--transition-fast, 0.2s ease), 
+              box-shadow var(--transition-fast, 0.2s ease);
+  display: inline-block;
 }
 
 .accordion-link:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .custom-accordion {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .principal-layout {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .accordion-button {
+    font-size: 1rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .accordion-body {
+    padding: 1rem;
+  }
+
+  .empty-message {
+    padding: 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .principal-layout {
+    padding: 1rem 0.5rem;
+  }
+
+  .accordion-button {
+    font-size: 0.95rem;
+    padding: 0.75rem 0.875rem;
+  }
+
+  .accordion-body {
+    padding: 0.75rem;
+  }
 }

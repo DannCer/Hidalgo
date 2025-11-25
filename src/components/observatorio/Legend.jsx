@@ -1,27 +1,41 @@
 import React, { useState, useMemo } from 'react'; 
 import '../styles/legend.css';
 
+// Mapeo de capas antiguas a nuevas claves unificadas
+const LEGEND_MAPPING = {
+  'Hidalgo:01_spsitios': 'Hidalgo:01_sitios',
+  'Hidalgo:01_sbsitios': 'Hidalgo:01_sitios',
+  'Hidalgo:01_sbcalidadagua': 'Hidalgo:01_calidadagua',
+  'Hidalgo:01_spcalidadagua': 'Hidalgo:01_calidadagua',
+};
+
 const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVariants = {}, onVariantChange }) => {
-    // 1. Estado para manejar el colapso
     const [isCollapsed, setIsCollapsed] = useState(false);
 
-    // 2. Función para alternar el estado
     const toggleCollapse = () => {
         setIsCollapsed(prev => !prev);
     };
 
     const activeLayerNames = Object.keys(activeLayers);
 
-    // 🛑 Usar useMemo para calcular layersWithLegend y evitar recálculos innecesarios
+    // Aplicar mapeo y eliminar duplicados
     const layersWithLegend = useMemo(() => {
         if (activeLayerNames.length === 0) return [];
         
-        return activeLayerNames.filter(layerName =>
+        // Mapear capas a sus claves unificadas
+        const mappedLayers = activeLayerNames.map(layerName => 
+            LEGEND_MAPPING[layerName] || layerName
+        );
+        
+        // Eliminar duplicados
+        const uniqueLayers = [...new Set(mappedLayers)];
+        
+        // Filtrar solo las que tienen leyenda
+        return uniqueLayers.filter(layerName =>
             legendData[layerName] &&
             (legendData[layerName].items?.length > 0 || legendData[layerName].variants)
         );
     }, [activeLayers, legendData, activeLayerNames.length]);
-
 
     if (layersWithLegend.length === 0) return null;
 
@@ -30,21 +44,24 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
     };
 
     return (
-        // 3. Aplicar la clase 'collapsed' al contenedor principal
         <div className={`legend-container ${isCollapsed ? 'collapsed' : ''}`}>
             <div className="legend-header" onClick={toggleCollapse}>
                 <h4 className="legend-title">Simbología</h4>
                 <span className="legend-badge">{layersWithLegend.length}</span>
-                
-               
             </div>
 
-            {/* 5. El contenido solo se muestra si NO está colapsado */}
             {!isCollapsed && (
                 <div className="legend-content">
                     {layersWithLegend.map(layerName => {
                         const layerLegend = legendData[layerName];
-                        const isLoading = loadingLayers.has(layerName);
+                        
+                        // Verificar si alguna de las capas originales está cargando
+                        const originalLayers = Object.keys(LEGEND_MAPPING).filter(
+                            key => LEGEND_MAPPING[key] === layerName
+                        );
+                        const isLoading = originalLayers.some(layer => loadingLayers.has(layer)) || 
+                                        loadingLayers.has(layerName);
+                        
                         const hasVariants = !!layerLegend.variants;
 
                         let currentLegend = layerLegend;
@@ -71,7 +88,6 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
                                         )}
                                     </h5>
 
-                                    {/* Selector de variantes */}
                                     {hasVariants && (
                                         <div className="legend-variant-wrapper">
                                             <select
@@ -90,7 +106,6 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
                                     )}
                                 </div>
 
-                                {/* Items de simbología */}
                                 <ul className="legend-items">
                                     {currentLegend.items && currentLegend.items.map((item, index) => {
                                         const swatchStyle = {
@@ -102,13 +117,13 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
                                                     : '1px solid #333',
                                             width: item.size ? `${item.size}px` : '16px',
                                             height: item.size ? `${item.size}px` : '16px',
-                                            borderRadius: layerLegend.type === 'point' ? '50%' : '0',
+                                            borderRadius: currentLegend.type === 'point' || layerLegend.type === 'point' ? '50%' : '0',
                                         };
 
                                         return (
                                             <li key={`${layerName}-${index}`} className="legend-item">
                                                 <i
-                                                    className={`legend-symbol ${layerLegend.type}`}
+                                                    className={`legend-symbol ${currentLegend.type || layerLegend.type}`}
                                                     style={swatchStyle}
                                                     aria-hidden="true"
                                                 ></i>

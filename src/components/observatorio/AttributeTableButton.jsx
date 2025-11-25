@@ -1,17 +1,41 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const AttributeTableButton = ({ onClick, layerName, displayName }) => {
+const AttributeTableButton = ({ onClick, layerName, displayName, disabled = false }) => {
+  const isDisabled = disabled || !layerName;
+  const buttonText = displayName || layerName || 'capa';
+  
   return (
     <button
       onClick={onClick}
-      disabled={!layerName}
-      className="download-btn primary" 
-      title={`Ver tabla de atributos de ${displayName || layerName}`}
-      aria-label={`Ver tabla de atributos de ${displayName || layerName}`}
+      disabled={isDisabled}
+      className={`download-btn primary ${isDisabled ? 'disabled' : ''}`}
+      title={isDisabled ? 
+        `Tabla no disponible para ${buttonText}` : 
+        `Ver tabla de atributos de ${buttonText}`
+      }
+      aria-label={isDisabled ? 
+        `Tabla no disponible para ${buttonText}` : 
+        `Ver tabla de atributos de ${buttonText}`
+      }
     >
-      <span aria-hidden="true">📊 Ver Tabla</span>
+      <span aria-hidden="true">📊</span>
+      <span>Ver Tabla</span>
     </button>
   );
+};
+
+AttributeTableButton.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  layerName: PropTypes.string,
+  displayName: PropTypes.string,
+  disabled: PropTypes.bool,
+};
+
+AttributeTableButton.defaultProps = {
+  layerName: '',
+  displayName: '',
+  disabled: false,
 };
 
 export default AttributeTableButton;

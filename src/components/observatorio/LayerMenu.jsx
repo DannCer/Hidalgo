@@ -7,9 +7,9 @@ import DownloadButton from './DownloadButton';
 import Timeline from '../observatorio/Timeline';
 import '../styles/layerMenu.css';
 
+// Constants
 const FIXED_LAYERS = ['Hidalgo:00_Estado'];
 const SEQUIA_LAYER = 'Hidalgo:04_sequias';
-
 const EXCLUDED_CARDS = [
   'Marco legal',
   'Sitios de interés',
@@ -17,6 +17,138 @@ const EXCLUDED_CARDS = [
   'Programa estatal hídrico',
   'Acuíferos de Hidalgo',
 ];
+
+// Custom hooks
+const useLayerHighlight = (highlightLayer, layerToItemMap, activeSection, setActiveSection) => {
+  const [highlightedItem, setHighlightedItem] = useState(null);
+  const highlightProcessedRef = useRef(null);
+
+  useEffect(() => {
+    if (!highlightLayer) return;
+
+    const layerKey = Array.isArray(highlightLayer) ? highlightLayer.join(',') : highlightLayer;
+    
+    // Prevent duplicate processing
+    if (highlightProcessedRef.current === layerKey) return;
+    highlightProcessedRef.current = layerKey;
+
+    // Find target layer in mapping
+    const findTarget = () => {
+      const names = Array.isArray(highlightLayer) ? highlightLayer : [highlightLayer];
+      for (const layerName of names) {
+        const match = layerToItemMap[layerName];
+        if (match) return match;
+      }
+      return null;
+    };
+
+    const target = findTarget();
+    if (!target) {
+      console.warn('⚠️ No se encontró target para capa:', highlightLayer);
+      return;
+    }
+
+    // Open section if closed
+    if (target.sectionId !== activeSection) {
+      setActiveSection(target.sectionId);
+    }
+
+    // Highlight item
+    setHighlightedItem(target.uniqueId);
+
+    // Auto-remove highlight after 3 seconds
+    const timer = setTimeout(() => {
+      setHighlightedItem(null);
+      highlightProcessedRef.current = null;
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [highlightLayer, layerToItemMap, activeSection, setActiveSection]);
+
+  return highlightedItem;
+};
+
+const useProcessedSections = () => {
+  const filterCard = useCallback((card) => {
+    return !EXCLUDED_CARDS.includes(card.title?.trim?.() || '');
+  }, []);
+
+  const filterLink = useCallback((link) => {
+    if (link.type === 'dropdown') {
+      return link.sublinks?.some(sublink => 
+        sublink.layerName && sublink.path === '/observatorio'
+      );
+    }
+    return !(link.path && (link.path.startsWith('http') || link.path.endsWith('.pdf')));
+  }, []);
+
+  return useMemo(() => {
+    return accordionData
+      .filter(section => section.id !== 'programa-hidrico')
+      .map(section => {
+        const filteredCards = (section.cards || [])
+          .filter(filterCard)
+          .map((card, cardIndex) => {
+            const allLayersAndLinks = [];
+
+            (card.links || []).forEach((link, linkIndex) => {
+              if (link.type === 'dropdown' && link.sublinks) {
+                link.sublinks
+                  .filter(sublink => sublink.layerName && sublink.path === '/observatorio')
+                  .forEach((sublink, subIdx) => {
+                    allLayersAndLinks.push({
+                      ...sublink,
+                      uniqueId: `${section.id}-${cardIndex}-${linkIndex}-${subIdx}`,
+                    });
+                  });
+              } else if (filterLink(link)) {
+                allLayersAndLinks.push({
+                  ...link,
+                  uniqueId: `${section.id}-${cardIndex}-${linkIndex}`,
+                });
+              }
+            });
+
+            return {
+              ...card,
+              filteredLinks: allLayersAndLinks,
+              originalCardIndex: cardIndex,
+            };
+          });
+
+        return {
+          ...section,
+          filteredCards,
+        };
+      });
+  }, [filterCard, filterLink]);
+};
+
+const useLayerMapping = (processedSections) => {
+  return useMemo(() => {
+    const map = {};
+
+    processedSections.forEach((section) => {
+      section.filteredCards.forEach((card) => {
+        card.filteredLinks.forEach((link) => {
+          if (!link.layerName) return;
+
+          const layers = Array.isArray(link.layerName) ? link.layerName : [link.layerName];
+          layers.forEach((layerName) => {
+            if (layerName && !map[layerName]) {
+              map[layerName] = {
+                uniqueId: link.uniqueId,
+                sectionId: section.id,
+              };
+            }
+          });
+        });
+      });
+    });
+
+    return map;
+  }, [processedSections]);
+};
 
 const LayerMenu = ({
   onLayerToggle,
@@ -33,17 +165,18 @@ const LayerMenu = ({
 }) => {
   const containerRef = useRef(null);
   const itemRefs = useRef({});
-  const highlightProcessedRef = useRef(null);
-
+  
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [localChecked, setLocalChecked] = useState({});
   const [activeSection, setActiveSection] = useState(
     sectionIndex || sectionId || accordionData[0]?.id || '0'
   );
-  const [highlightedItem, setHighlightedItem] = useState(null);
 
-  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
+  const processedSections = useProcessedSections();
+  const layerToItemMap = useLayerMapping(processedSections);
+  const highlightedItem = useLayerHighlight(highlightLayer, layerToItemMap, activeSection, setActiveSection);
 
+  // Helper functions
   const getLayersArray = useCallback(
     (layerName) => (Array.isArray(layerName) ? layerName : [layerName]),
     []
@@ -77,11 +210,8 @@ const LayerMenu = ({
         };
       }
 
-      const isSequias = text.includes('sequía') ||
-        text.includes('sequia') ||
-        text.includes('sequías') ||
-        text.includes('sequias') ||
-        layerName.includes('sequia');
+      const isSequias = text.includes('sequía') || text.includes('sequia') || 
+                       layerName.includes('sequia');
 
       if (isSequias) {
         return {
@@ -90,12 +220,15 @@ const LayerMenu = ({
         };
       }
 
-      return { layers: getLayersArray(link.layerName), displayName: link.text };
+      return { 
+        layers: getLayersArray(link.layerName), 
+        displayName: link.text 
+      };
     },
     [getLayersArray]
   );
 
-  // Sincroniza checkboxes locales con los activos
+  // Effects
   useEffect(() => {
     const updatedChecked = Object.keys(activeLayers).reduce((acc, key) => {
       acc[key] = true;
@@ -104,39 +237,28 @@ const LayerMenu = ({
     setLocalChecked(updatedChecked);
   }, [activeLayers]);
 
-  // Mantener activeSection si llega por props
   useEffect(() => {
     if (sectionId) setActiveSection(sectionId);
   }, [sectionId]);
 
-  const layerToItemKey = useMemo(() => {
-    const map = {};
-    accordionData.forEach((section) => {
-      const filteredCards = (section.cards || []).filter(
-        card => !EXCLUDED_CARDS.includes(card.title?.trim?.() || '')
-      );
+  // Scroll to highlighted item
+  useEffect(() => {
+    if (!highlightedItem) return;
 
-      filteredCards.forEach((card, cardIndex) => {
-        const filteredLinks = (card.links || []).filter(
-          link => !(link.path && (link.path.startsWith('http') || link.path.endsWith('.pdf')))
-        );
-
-        filteredLinks.forEach((link, linkIndex) => {
-          if (!link.layerName) return;
-          const layers = Array.isArray(link.layerName) ? link.layerName : [link.layerName];
-          layers.forEach((ln) => {
-            if (!ln) return;
-            const key = `${section.id}-${cardIndex}-${linkIndex}`;
-            if (!map[ln]) {
-              map[ln] = { key, sectionId: section.id };
-            }
-          });
+    const element = itemRefs.current[highlightedItem];
+    if (element) {
+      const scrollTimer = setTimeout(() => {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
         });
-      });
-    });
-    return map;
-  }, []);
+      }, 100);
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [highlightedItem]);
 
+  // UI Components
   const formatDateLabel = (dateStr, formatType = 'quincena') => {
     if (!dateStr) return "";
 
@@ -148,18 +270,20 @@ const LayerMenu = ({
     try {
       const cleanDate = dateStr.toString().replace('Z', '').trim();
 
-      if (formatType === 'quincena') {
-        const [year, month, day] = cleanDate.split("-");
-        const mes = meses[parseInt(month) - 1];
-        const quincena = parseInt(day) <= 15 ? "1ª quincena" : "2ª quincena";
-        return `${mes} · ${quincena} · ${year}`;
-      } else if (formatType === 'month') {
-        const [year, month] = cleanDate.split("-");
-        return `${meses[parseInt(month) - 1]} ${year}`;
-      } else if (formatType === 'year') {
-        return cleanDate;
+      switch (formatType) {
+        case 'quincena':
+          const [year, month, day] = cleanDate.split("-");
+          const mes = meses[parseInt(month) - 1];
+          const quincena = parseInt(day) <= 15 ? "1ª quincena" : "2ª quincena";
+          return `${mes} · ${quincena} · ${year}`;
+        case 'month':
+          const [y, m] = cleanDate.split("-");
+          return `${meses[parseInt(m) - 1]} ${y}`;
+        case 'year':
+          return cleanDate;
+        default:
+          return cleanDate;
       }
-      return cleanDate;
     } catch (error) {
       return dateStr;
     }
@@ -168,12 +292,10 @@ const LayerMenu = ({
   const renderTimeline = (layerName) => {
     const config = timelineConfigs[layerName];
 
-    if (!config || !config.timePoints || config.timePoints.length === 0) {
+    if (!config?.timePoints?.length) {
       return (
         <div className="timeline-box">
-          <div className="text-muted small">
-            Cargando línea de tiempo...
-          </div>
+          <div className="text-muted small">Cargando línea de tiempo...</div>
         </div>
       );
     }
@@ -194,103 +316,104 @@ const LayerMenu = ({
     );
   };
 
-  // ✅ MEJORADO: Manejar navegación y highlight
-  useEffect(() => {
-    if (!highlightLayer) return;
+  const renderLayerItem = (link, cardIndex, section, linkIndex) => {
+    const itemKey = link.uniqueId;
+    const { layers, displayName } = getGroupedDownloadLayers(link);
+    const fixed = isFixedLayer(link.layerName);
+    const active = isAnyLayerActive(link.layerName);
+    const isDisabled = !link.layerName || !link.crs || !link.geomType;
+    const isLoading = layers.some(l => loadingLayers.has(l));
+    const isSequiasLayer = layers.includes(SEQUIA_LAYER);
+    const hasTimeline = isSequiasLayer && timelineConfigs[SEQUIA_LAYER];
+    const isHighlighted = highlightedItem === itemKey;
 
-    const layerKey = Array.isArray(highlightLayer) 
-      ? highlightLayer.join(',') 
-      : highlightLayer;
-    
-    if (highlightProcessedRef.current === layerKey) return;
-    highlightProcessedRef.current = layerKey;
-
-
-    const findTarget = () => {
-      const names = Array.isArray(highlightLayer) ? highlightLayer : [highlightLayer];
-      
-      for (const ln of names) {
-        const match = layerToItemKey[ln];
-        if (match) {
-          return match;
-        }
-      }
-      return null;
-    };
-
-    const target = findTarget();
-    
-    if (!target) {
-      console.error('⚠️ No se encontró target para:', highlightLayer);
-      return;
-    }
-
-
-    
-
-    // Destacar el item
-    setHighlightedItem(target.key);
-
-    // ✅ Función de scroll mejorada
-    const attemptScroll = (attempts = 0) => {
-      const maxAttempts = 15;
-      const availableRefs = Object.keys(itemRefs.current);
-      
-      const el = itemRefs.current[target.key];
-      
-      if (el) {
-        
-        requestAnimationFrame(() => {
-          el.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center',
-            inline: 'nearest'
-          });
-        });
-        
-        return true;
-      } else if (attempts < maxAttempts) {
-        setTimeout(() => attemptScroll(attempts + 1), 200);
-        return false;
-      } else {
-        console.error('❌ Elemento no encontrado después de', maxAttempts, 'intentos');
-        console.error('❌ Key buscado:', target.key);
-        console.error('❌ Keys disponibles:', availableRefs);
-        return false;
+    const handleToggle = (checked) => {
+      if (!fixed && !isDisabled && !isLoading) {
+        setLocalChecked(prev => ({
+          ...prev,
+          [layers.join(',')]: checked
+        }));
+        onLayerToggle(
+          {
+            ...link,
+            layerName: layers,
+            currentQuincena: isSequiasLayer ? sequiaQuincena : null
+          },
+          checked
+        );
       }
     };
 
-    // Iniciar scroll con delay apropiado
-    const scrollDelay = target.sectionId !== activeSection ? 400 : 100;
-    setTimeout(() => {
-      attemptScroll(0);
-    }, scrollDelay);
+    return (
+      <div
+        key={linkIndex}
+        ref={el => {
+          if (el) itemRefs.current[itemKey] = el;
+        }}
+        className={`layermenu-item 
+          ${isDisabled ? 'disabled' : ''} 
+          ${active ? 'layermenu-active' : ''}
+          ${isHighlighted ? 'layermenu-highlighted' : ''}
+          ${isLoading ? 'layermenu-loading' : ''}
+        `}
+      >
+        <div className="layermenu-header-content">
+          <Form.Check
+            type="checkbox"
+            id={`layer-${itemKey}`}
+            label={
+              <span>
+                {link.text}
+                {isLoading && (
+                  <span className="ms-2 spinner-border spinner-border-sm text-primary" role="status">
+                    <span className="visually-hidden">Cargando...</span>
+                  </span>
+                )}
+              </span>
+            }
+            disabled={fixed || isDisabled || isLoading}
+            checked={fixed || active || !!localChecked[layers.join(',')]}
+            onChange={(e) => handleToggle(e.target.checked)}
+          />
+        </div>
 
-    // Quitar highlight después de 3 segundos
-    const timeoutId = setTimeout(() => {
-      setHighlightedItem(null);
-    }, 3000);
+        {!isDisabled && (
+          <div className="layermenu-buttons">
+            <AttributeTableButton
+              layerName={layers[0]}
+              displayName={displayName}
+              onClick={() => onShowTable(layers, displayName)}
+            />
+            <DownloadButton
+              layerName={layers}
+              displayName={displayName}
+              cqlFilter={isSequiasLayer && sequiaQuincena ?
+                `Quincena = '${sequiaQuincena}'` : null}
+            />
+          </div>
+        )}
 
-    return () => clearTimeout(timeoutId);
-  }, [highlightLayer, layerToItemKey, activeSection]);
+        {isSequiasLayer && active && hasTimeline && renderTimeline(SEQUIA_LAYER)}
+      </div>
+    );
+  };
 
   return (
     <Draggable handle=".layermenu-handle">
       <div
         ref={containerRef}
         className="layermenu-container"
-        style={{ 
-          fontFamily: 'Montserrat, sans-serif', 
-          overflowY: 'auto', 
-          maxHeight: '70vh', 
-          zIndex: 6000 
+        style={{
+          fontFamily: 'Montserrat, sans-serif',
+          overflowY: 'auto',
+          maxHeight: '70vh',
+          zIndex: 6000
         }}
       >
         <div className="layermenu-handle">
           <strong>Menú de Capas</strong>
-
           <button
-            onClick={toggleCollapse}
+            onClick={() => setIsCollapsed(!isCollapsed)}
             className="layermenu-collapse-btn"
             aria-label={isCollapsed ? 'Expandir menú' : 'Colapsar menú'}
           >
@@ -299,119 +422,27 @@ const LayerMenu = ({
         </div>
 
         {!isCollapsed && (
-          <Accordion 
-            activeKey={activeSection} 
+          <Accordion
+            activeKey={activeSection}
             onSelect={(key) => setActiveSection(key)}
           >
-            {accordionData
-              .filter(section => section.id !== 'programa-hidrico')
-              .map((section) => (
-                <Accordion.Item eventKey={section.id} key={section.id}>
-                  <Accordion.Header>{section.title}</Accordion.Header>
-                  <Accordion.Body>
-                    {section.cards
-                      .filter(card => !EXCLUDED_CARDS.includes(card.title?.trim?.() || ''))
-                      .map((card, cardIndex) => (
-                        <div key={cardIndex} className="layermenu-card">
-                          <strong className="layermenu-card-title">
-                            {card.title}
-                          </strong>
-
-                          {card.links
-                            .filter(link => !(link.path && (link.path.startsWith('http') || link.path.endsWith('.pdf'))))
-                            .map((link, linkIndex) => {
-                              // ✅ itemKey generado con los mismos índices que layerToItemKey
-                              const itemKey = `${section.id}-${cardIndex}-${linkIndex}`;
-                              
-                              const { layers, displayName } = getGroupedDownloadLayers(link);
-                              const fixed = isFixedLayer(link.layerName);
-                              const active = isAnyLayerActive(link.layerName);
-                              const isDisabled = !link.layerName || !link.crs || !link.geomType;
-                              const isLoading = layers.some(l => loadingLayers.has(l));
-
-                              const isSequiasLayer = layers.includes(SEQUIA_LAYER);
-                              const hasTimeline = isSequiasLayer && timelineConfigs[SEQUIA_LAYER];
-
-                              const isHighlighted = highlightedItem === itemKey;
-
-                              return (
-                                <div
-                                  key={linkIndex}
-                                  ref={el => {
-                                    if (el) {
-                                      itemRefs.current[itemKey] = el;
-                                    }
-                                  }}
-                                  className={`layermenu-item 
-                                    ${isDisabled ? 'disabled' : ''} 
-                                    ${active ? 'layermenu-active' : ''}
-                                    ${isHighlighted ? 'layermenu-highlighted' : ''}
-                                    ${isLoading ? 'layermenu-loading' : ''}
-                                  `}
-                                >
-                                  <div className="layermenu-header-content">
-                                    <Form.Check
-                                      type="checkbox"
-                                      id={`layer-${section.id}-${cardIndex}-${linkIndex}`}
-                                      label={
-                                        <span>
-                                          {link.text}
-                                          {isLoading && (
-                                            <span className="ms-2 spinner-border spinner-border-sm text-primary" role="status">
-                                              <span className="visually-hidden">Cargando...</span>
-                                            </span>
-                                          )}
-                                        </span>
-                                      }
-                                      disabled={fixed || isDisabled || isLoading}
-                                      checked={fixed || active || !!localChecked[layers.join(',')]}
-                                      onChange={(e) => {
-                                        if (!fixed && !isDisabled && !isLoading) {
-                                          const checked = e.target.checked;
-                                          setLocalChecked(prev => ({
-                                            ...prev,
-                                            [layers.join(',')]: checked
-                                          }));
-                                          onLayerToggle(
-                                            {
-                                              ...link,
-                                              layerName: layers,
-                                              currentQuincena: isSequiasLayer ? sequiaQuincena : null
-                                            },
-                                            checked
-                                          );
-                                        }
-                                      }}
-                                    />
-                                  </div>
-
-                                  {!isDisabled && (
-                                    <div className="layermenu-buttons">
-                                      <AttributeTableButton
-                                        layerName={layers[0]}
-                                        displayName={displayName}
-                                        onClick={() => onShowTable(layers, displayName)}
-                                      />
-                                      <DownloadButton
-                                        layerName={layers}
-                                        displayName={displayName}
-                                        cqlFilter={isSequiasLayer && sequiaQuincena ?
-                                          `Quincena = '${sequiaQuincena}'` : null}
-                                      />
-                                    </div>
-                                  )}
-
-                                  {isSequiasLayer && active && hasTimeline && (
-                                    renderTimeline(SEQUIA_LAYER)
-                                  )}
-                                </div>
-                              );
-                            })}
-                        </div>
-                      ))}
-                  </Accordion.Body>
-                </Accordion.Item>
-              ))}
+            {processedSections.map((section) => (
+              <Accordion.Item eventKey={section.id} key={section.id}>
+                <Accordion.Header>{section.title}</Accordion.Header>
+                <Accordion.Body>
+                  {section.filteredCards.map((card, cardIndex) => (
+                    <div key={cardIndex} className="layermenu-card">
+                      <strong className="layermenu-card-title">
+                        {card.title}
+                      </strong>
+                      {card.filteredLinks.map((link, linkIndex) => 
+                        renderLayerItem(link, cardIndex, section, linkIndex)
+                      )}
+                    </div>
+                  ))}
+                </Accordion.Body>
+              </Accordion.Item>
+            ))}
           </Accordion>
         )}
       </div>

@@ -6,6 +6,7 @@ import programa from '../../assets/pdf/Sintesis de PHE2040 de Hidalgo_Final OK_.
 import anp1 from '../../assets/pdf/Anexo_1.pdf'
 import anp2 from '../../assets/pdf/Anexo_2.pdf'
 import acta3 from '../../assets/pdf/Anexo_3.pdf'
+import proceso from '../../assets/pdf/Informe final de las dos etapas.docx.pdf'
 import capasBase from '../../assets/img/CB/1 (5).jpg';
 import poblkacion from '../../assets/img/CB/1 (7).jpg';
 import macro from '../../assets/img/CB/1 (4).jpg'
@@ -39,9 +40,6 @@ import Centro from '../../assets/img/Eje5/Centros.jpg'
 import Proceso from '../../assets/img/Eje5/IMG_4102.jpg'
 import programaHidrico from '../../assets/img/ProgramaHidrico/programahidrico.png'
 import Lorem from '../../assets/img/Lorem_Picsum.png'
-
-
-
 
 
 const CRS = {
@@ -219,8 +217,21 @@ export const accordionData = [
                     },
                     {
                         text: 'Áreas destinadas voluntariamente a la conservación',
-                        path: anp2,
-                        target: '_blank',
+                        type: 'dropdown',
+                        sublinks: [
+                            {
+                                text: 'Documento de ADVC',
+                                path: anp2,
+                                target: '_blank',
+                            },
+                            {
+                                text: 'Mapa de ADVC',
+                                path: '/observatorio',
+                                layerName: 'Hidalgo:01_advc',
+                                crs: CRS.WGS84,
+                                geomType: GEOM_TYPES.POLYGON
+                            }
+                        ]
                     },
                     {
                         text: 'Áreas naturales protegidas estatales y municipales',
@@ -286,14 +297,14 @@ export const accordionData = [
                     {
                         text: 'Vedas',
                         path: '/observatorio',
-                        layerName: 'Hidalgo:01_acuifVeda ',
+                        layerName: 'Hidalgo:01_acuifvedas',
                         crs: CRS.WEB_MERCATOR,
                         geomType: GEOM_TYPES.POLYGON
                     },
                     {
                         text: 'Acuerdos',
                         path: '/observatorio',
-                        layerName: 'Hidalgo:01_acuifOrd',
+                        layerName: 'Hidalgo:01_acuifacuerdogral',
                         crs: CRS.WEB_MERCATOR,
                         geomType: GEOM_TYPES.POLYGON
                     }
@@ -658,13 +669,15 @@ export const accordionData = [
                         geomType: GEOM_TYPES.POLYGON
                     },
                     {
-                        text: 'Comités independientes del agua',
+                        text: 'Organizaciones Locales de Agua y Saneamiento',
                         path: '/observatorio',
-                        layerName: ''
+                       layerName: 'Hidalgo:05_ola',
+                        crs: CRS.WGS84,
+                        geomType: GEOM_TYPES.POLYGON
                     },
                     {
                         text: 'Consejo Técnico de Sustentabilidad Hídrica',
-                        type: 'dropdown', 
+                        type: 'dropdown',
                         sublinks: [
                             {
                                 text: 'Acta de conformación',
@@ -707,8 +720,8 @@ export const accordionData = [
                 links: [
                     {
                         text: 'Proceso para la integración del Programa Hídrico del Estado de Hidalgo',
-                        path: '/observatorio',
-                        layerName: ''
+                        path: proceso,
+                        target: '_blank',
                     }
                 ]
             },
@@ -794,7 +807,7 @@ export const accordionData = [
                 title: 'Cuerpos de agua',
                 links: [
                     {
-                        text: 'Eficiencias en el uso del agua',
+                        text: 'Cuerpos de  agua',
                         path: '/observatorio',
                         layerName: ''
                     }
