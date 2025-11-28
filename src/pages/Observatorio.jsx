@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import MapView from '../components/observatorio/MapView'; 
+import MapView from '../components/map/MapView'; 
 
 const Observatorio = () => {
   const location = useLocation();

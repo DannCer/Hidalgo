@@ -3,7 +3,7 @@
 // Hook para manejar las variantes de visualización de capas
 // ============================================
 import { useState, useCallback, useMemo } from 'react';
-import { forceStyleUpdate } from '../../../utils/layerStyleFactory';
+import { forceStyleUpdate } from '../utils/layerStyleFactory';
 
 // Configuración de variantes por capa
 const VARIANT_CONFIG = {

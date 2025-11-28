@@ -1,9 +1,9 @@
 // src/components/observatorio/hooks/useTimelineManager.js
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { fetchWfsLayer } from '../../../utils/wfsService';
-import { SEQUIA_CONFIG } from '../../../utils/constants';
-import { normalizeQuincena, createSequiaFilter } from '../../../utils/dataUtils';
-import { logger } from '../../../config/env';
+import { fetchWfsLayer } from '../utils/wfsService';
+import { SEQUIA_CONFIG } from '../utils/constants';
+import { normalizeQuincena, createSequiaFilter } from '../utils/dataUtils';
+import { logger } from '../config/env';
 
 // Configuración de tiempos
 const DEBOUNCE_MS = 300;  // Tiempo de espera antes de hacer fetch

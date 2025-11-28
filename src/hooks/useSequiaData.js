@@ -1,8 +1,8 @@
 // src/components/observatorio/hooks/useSequiaData.js
 import { useState, useEffect, useRef } from 'react';
-import { fetchUniqueValuesCached } from '../../../utils/wfsService';
-import { SEQUIA_CONFIG } from '../../../utils/constants';
-import { sortQuincenas } from '../../../utils/dataUtils';
+import { fetchUniqueValuesCached } from '../utils/wfsService';
+import { SEQUIA_CONFIG } from '../utils/constants';
+import { sortQuincenas } from '../utils/dataUtils';
 
 /**
  * Hook optimizado para manejar datos de sequías

@@ -3,9 +3,9 @@
 // Hook para manejar la carga de capas iniciales
 // ============================================
 import { useEffect, useRef } from 'react';
-import { fetchWfsLayer } from '../../../utils/wfsService';
-import { BASE_LAYERS } from '../../../config/env';
-import { logger } from '../../../config/env';
+import { fetchWfsLayer } from '../utils/wfsService';
+import { BASE_LAYERS } from '../config/env';
+import { logger } from '../config/env';
 
 /**
  * Hook que maneja la carga de capas iniciales al montar el componente

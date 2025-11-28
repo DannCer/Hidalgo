@@ -3,11 +3,11 @@ import React, { useState, memo, useCallback, Suspense, lazy } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Card, Dropdown } from 'react-bootstrap';
-import '../styles/InfoCard.css';
+import '../../styles/InfoCard.css';
 
 // Lazy load del modal
 const VisorImagenesAcuiferos = lazy(
-  () => import('../observatorio/VisorImagenesAcuiferos')
+  () => import('../map/VisorImagenesAcuiferos')
 );
 
 // ============================================

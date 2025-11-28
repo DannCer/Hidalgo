@@ -4,9 +4,9 @@
 // ============================================
 import { useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import { fetchUniqueValues } from '../../../utils/wfsService';
-import { SEQUIA_CONFIG } from '../../../config/env';
-import { logger } from '../../../config/env';
+import { fetchUniqueValues } from '../utils/wfsService';
+import { SEQUIA_CONFIG } from '../config/env';
+import { logger } from '../config/env';
 
 // Delay para permitir que el estado se estabilice antes de activar capas
 const NAVIGATION_DELAY = 100;

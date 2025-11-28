@@ -1,7 +1,7 @@
 // src/components/observatorio/Timeline.jsx
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { normalizeQuincena } from '../../utils/dataUtils';
-import '../styles/timeline.css';
+import '../../styles/timeline.css';
 
 // Configuración
 const DEFAULT_DEBOUNCE_MS = 150;

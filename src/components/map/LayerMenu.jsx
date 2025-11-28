@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Accordion, Form } from 'react-bootstrap';
 import Draggable from 'react-draggable';
-import { accordionData } from '../ui/AccordionData';
-import AttributeTableButton from './AttributeTableButton';
-import DownloadButton from './DownloadButton';
-import DiccionarioButton from './DiccionarioButton';
-import Timeline from '../observatorio/Timeline';
+import { accordionData } from '../../data/AccordionData';
+import AttributeTableButton from '../common/AttributeTableButton';
+import DownloadButton from '../common/DownloadButton';
+import DiccionarioButton from '../common/DiccionarioButton';
+import Timeline from './Timeline';
 import DiccionarioDatosModal from './DiccionarioDatosModal';
-import '../styles/layerMenu.css';
-import '../styles/diccionarioDatos.css';
+import '../../styles/layerMenu.css';
+import '../../styles/diccionarioDatos.css';
 
 // Constants
 const FIXED_LAYERS = ['Hidalgo:00_Estado'];

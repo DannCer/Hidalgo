@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react'; 
-import HelpButton from './HelpButton';
-import PdfViewerModal from './PdfViewerModal';
-import '../styles/legend.css';
-import '../styles/pdfViewer.css';
+import HelpButton from '../common/HelpButton';
+import PdfViewerModal from '../common/PdfViewerModal';
+import '../../styles/legend.css';
+import '../../styles/pdfViewer.css';
 
 // Mapeo de capas antiguas a nuevas claves unificadas
 const LEGEND_MAPPING = {

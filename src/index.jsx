@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client'; // Nota el cambio: '/client'
-import './components/styles/variables.css';
-import './components/styles/global.css';
+import './styles/variables.css';
+import './styles/global.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
 

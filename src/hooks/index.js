@@ -1,6 +1,6 @@
-// src/components/observatorio/hooks/index.js
+// src/hooks/index.js
 // ============================================
-// Exportación centralizada de hooks del observatorio
+// Exportación centralizada de hooks
 // ============================================
 
 // Hooks existentes

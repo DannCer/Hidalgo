@@ -1,7 +1,7 @@
 // src/components/observatorio/VisorImagenesAcuiferos.jsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Modal, Spinner, Alert, Button, Form } from 'react-bootstrap';
-import '../styles/visorImagenes.css';
+import '../../styles/visorImagenes.css';
 
 const ACUIFEROS_DATA = [
   { file: 'acuifero acaxochitlan.jpg', title: 'Acaxochitlan' },

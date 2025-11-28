@@ -1,10 +1,10 @@
 // src/components/observatorio/hooks/useLayerManagement.js
 // ============================================
 import { useState, useCallback, useRef } from 'react';
-import { fetchWfsLayer } from '../../../utils/wfsService';
-import { SEQUIA_CONFIG } from '../../../utils/constants';
-import { logger } from '../../../config/env';
-import { normalizeQuincena, createSequiaFilter } from '../../../utils/dataUtils';
+import { fetchWfsLayer } from '../utils/wfsService';
+import { SEQUIA_CONFIG } from '../utils/constants';
+import { logger } from '../config/env';
+import { normalizeQuincena, createSequiaFilter } from '../utils/dataUtils';
 
 /**
  * Hook para gestionar capas activas del mapa

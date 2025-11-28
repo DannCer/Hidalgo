@@ -1,6 +1,6 @@
 import React from 'react';
 // BORRAMOS IMPORTS DE IMÁGENES
-import '../styles/footer.css';
+import '../../styles/footer.css';
 
 const contactInfoLines = [
   'SECRETARÍA DE MEDIO AMBIENTE Y RECURSOS NATURALES',
