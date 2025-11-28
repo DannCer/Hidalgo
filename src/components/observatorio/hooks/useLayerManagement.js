@@ -1,13 +1,25 @@
 // src/components/observatorio/hooks/useLayerManagement.js
-import { useState, useCallback } from 'react';
+// ============================================
+import { useState, useCallback, useRef } from 'react';
 import { fetchWfsLayer } from '../../../utils/wfsService';
-import { SEQUIA_CONFIG } from '../mapConfig';
+import { SEQUIA_CONFIG } from '../../../utils/constants';
+import { logger } from '../../../config/env';
+import { normalizeQuincena, createSequiaFilter } from '../../../utils/dataUtils';
 
+/**
+ * Hook para gestionar capas activas del mapa
+ */
 export const useLayerManagement = (sequiaQuincena) => {
   const [activeLayers, setActiveLayers] = useState({});
   const [loadingLayers, setLoadingLayers] = useState(new Set());
   const [currentFilters, setCurrentFilters] = useState({});
+  
+  // Ref para tracking de última quincena usada
+  const lastUsedQuincenaRef = useRef(null);
 
+  /**
+   * Activa o desactiva una capa
+   */
   const handleLayerToggle = useCallback(async (layerConfig, isChecked) => {
     const layersToToggle = Array.isArray(layerConfig.layerName)
       ? layerConfig.layerName
@@ -16,44 +28,93 @@ export const useLayerManagement = (sequiaQuincena) => {
     const overrideQuincena = layerConfig.currentQuincena ?? null;
     
     if (isChecked) {
+      // =====================================================
+      // ACTIVAR CAPAS
+      // =====================================================
       setLoadingLayers(prev => new Set([...prev, ...layersToToggle]));
 
       try {
         const results = await Promise.allSettled(
           layersToToggle.map(async (name) => {
+            // =====================================================
+            // CASO ESPECIAL: CAPA DE SEQUÍAS
+            // =====================================================
             if (name === SEQUIA_CONFIG.layerName) {
-              let cqlFilter = null;
               const effectiveQuincena = overrideQuincena || sequiaQuincena;
               
-              if (effectiveQuincena) {
-                const norm = effectiveQuincena.toString().replace('Z', '').trim();
-                cqlFilter = `${SEQUIA_CONFIG.fieldName}='${norm}'`;
-                setCurrentFilters(prev => ({ ...prev, [SEQUIA_CONFIG.layerName]: cqlFilter }));
-              } else {
-                console.warn('⚠️ No hay quincena disponible para sequías');
+              // ⚠️ VALIDACIÓN CRÍTICA: No activar sin quincena
+              if (!effectiveQuincena) {
+                logger.error('No se puede activar capa de sequías sin quincena');
+                throw new Error('Quincena requerida para capa de sequías');
               }
 
-              return fetchWfsLayer(name, cqlFilter, 5000);
+              // Normalizar y crear filtro
+              const normalized = normalizeQuincena(effectiveQuincena);
+              const cqlFilter = createSequiaFilter(normalized);
+              
+              // ⚠️ VALIDACIÓN CRÍTICA: No hacer fetch sin filtro
+              if (!cqlFilter) {
+                logger.error('No se pudo crear filtro CQL para sequías');
+                throw new Error('Filtro CQL requerido para capa de sequías');
+              }
+
+              logger.debug(`Activando sequías con filtro: ${cqlFilter}`);
+              
+              // Guardar filtro
+              setCurrentFilters(prev => ({ 
+                ...prev, 
+                [SEQUIA_CONFIG.layerName]: cqlFilter 
+              }));
+              
+              // Guardar última quincena usada
+              lastUsedQuincenaRef.current = normalized;
+
+              // Fetch CON FILTRO (nunca sin filtro)
+              const data = await fetchWfsLayer(
+                name, 
+                cqlFilter, 
+                SEQUIA_CONFIG.maxFeatures || 5000
+              );
+
+              // Agregar metadata
+              return {
+                ...data,
+                _metadata: {
+                  quincena: normalized,
+                  filter: cqlFilter,
+                  featureCount: data?.features?.length || 0,
+                  lastUpdate: Date.now()
+                }
+              };
             }
 
+            // =====================================================
+            // OTRAS CAPAS (sin filtro especial)
+            // =====================================================
             return fetchWfsLayer(name);
           })
         );
 
+        // Procesar resultados
         const newLayersData = {};
         layersToToggle.forEach((name, index) => {
-          if (results[index].status === 'fulfilled' && results[index].value) {
-            newLayersData[name] = results[index].value;
-            const count = results[index].value.features?.length || 0;
+          const result = results[index];
+          
+          if (result.status === 'fulfilled' && result.value) {
+            newLayersData[name] = result.value;
+            logger.debug(`Capa ${name}: ${result.value.features?.length || 0} features`);
           } else {
-            console.error(`❌ Error cargando ${name}:`, results[index].reason);
+            logger.error(`Error cargando ${name}:`, result.reason);
           }
         });
 
-        setActiveLayers(prev => ({ ...prev, ...newLayersData }));
+        // Solo actualizar si hay datos válidos
+        if (Object.keys(newLayersData).length > 0) {
+          setActiveLayers(prev => ({ ...prev, ...newLayersData }));
+        }
 
       } catch (error) {
-        console.error('❌ Error general cargando capas:', error);
+        logger.error('Error general cargando capas:', error);
       } finally {
         setLoadingLayers(prev => {
           const newSet = new Set(prev);
@@ -61,8 +122,11 @@ export const useLayerManagement = (sequiaQuincena) => {
           return newSet;
         });
       }
+      
     } else {
-      // Desactivar capas
+      // =====================================================
+      // DESACTIVAR CAPAS
+      // =====================================================
       setActiveLayers(prev => {
         const newLayers = { ...prev };
         layersToToggle.forEach(name => {
@@ -78,23 +142,41 @@ export const useLayerManagement = (sequiaQuincena) => {
         });
         return newFilters;
       });
+      
+      // Limpiar ref si se desactiva sequía
+      if (layersToToggle.includes(SEQUIA_CONFIG.layerName)) {
+        lastUsedQuincenaRef.current = null;
+      }
     }
-  }, [sequiaQuincena]);
+  }, [sequiaQuincena]); // Solo sequiaQuincena como dependencia
 
-  const handleTimelineChange = useCallback(async (layerName, newQuincena) => {    
-    
+  /**
+   * Cambia la quincena de la capa de sequías
+   * NOTA: Este método es legacy, preferir usar useTimelineManager
+   */
+  const handleTimelineChange = useCallback(async (layerName, newQuincena) => {
     if (layerName !== SEQUIA_CONFIG.layerName) {
-      console.warn('⚠️ Timeline change para capa diferente a sequías:', layerName);
+      logger.warn('Timeline change para capa diferente a sequías:', layerName);
       return;
     }
     
-    // Normalizar la nueva quincena
-    const cleanedQuincena = newQuincena.toString()
-      .replace('Z', '')
-      .replace('T00:00:00.000', '')
-      .trim();
+    // Normalizar quincena
+    const normalized = normalizeQuincena(newQuincena);
     
-    const newFilter = `${SEQUIA_CONFIG.fieldName}='${cleanedQuincena}'`;
+    // ⚠️ VALIDACIÓN: No proceder sin quincena válida
+    if (!normalized) {
+      logger.error('Quincena inválida:', newQuincena);
+      return;
+    }
+
+    // Crear filtro
+    const newFilter = createSequiaFilter(normalized);
+    
+    // ⚠️ VALIDACIÓN: No proceder sin filtro válido
+    if (!newFilter) {
+      logger.error('No se pudo crear filtro para:', normalized);
+      return;
+    }
     
     // Actualizar filtro
     setCurrentFilters(prev => ({ 
@@ -102,28 +184,54 @@ export const useLayerManagement = (sequiaQuincena) => {
       [SEQUIA_CONFIG.layerName]: newFilter 
     }));
 
-        // Recargar datos con el nuevo filtro
+    // Recargar datos con el nuevo filtro
     setLoadingLayers(prev => new Set([...prev, SEQUIA_CONFIG.layerName]));
     
     try {
-      const data = await fetchWfsLayer(SEQUIA_CONFIG.layerName, newFilter, 5000);
+      logger.debug(`Timeline change: ${normalized}, filtro: ${newFilter}`);
+      
+      const data = await fetchWfsLayer(
+        SEQUIA_CONFIG.layerName, 
+        newFilter, 
+        SEQUIA_CONFIG.maxFeatures || 5000
+      );
       
       if (data && data.features) {
-        const count = data.features.length;
+        logger.debug(`Sequía ${normalized}: ${data.features.length} features`);
         
         setActiveLayers(prev => ({ 
           ...prev, 
-          [SEQUIA_CONFIG.layerName]: data 
+          [SEQUIA_CONFIG.layerName]: {
+            ...data,
+            _metadata: {
+              quincena: normalized,
+              filter: newFilter,
+              featureCount: data.features.length,
+              lastUpdate: Date.now()
+            }
+          }
         }));
+        
+        lastUsedQuincenaRef.current = normalized;
       } else {
-        console.warn('⚠️ No se obtuvieron features para la quincena:', cleanedQuincena);
+        logger.warn('No se obtuvieron features para:', normalized);
         setActiveLayers(prev => ({ 
           ...prev, 
-          [SEQUIA_CONFIG.layerName]: { type: 'FeatureCollection', features: [] } 
+          [SEQUIA_CONFIG.layerName]: { 
+            type: 'FeatureCollection', 
+            features: [],
+            _metadata: {
+              quincena: normalized,
+              filter: newFilter,
+              featureCount: 0,
+              lastUpdate: Date.now(),
+              isEmpty: true
+            }
+          } 
         }));
       }
     } catch (error) {
-      console.error('❌ Error recargando sequías:', error);
+      logger.error('Error recargando sequías:', error);
     } finally {
       setLoadingLayers(prev => {
         const newSet = new Set(prev);
@@ -131,16 +239,39 @@ export const useLayerManagement = (sequiaQuincena) => {
         return newSet;
       });
     }
+  }, []); // Sin dependencias innecesarias
+
+  /**
+   * Verifica si la capa de sequías está activa
+   */
+  const isSequiaActive = useCallback(() => {
+    return SEQUIA_CONFIG.layerName in activeLayers;
   }, [activeLayers]);
 
+  /**
+   * Obtiene la última quincena usada
+   */
+  const getLastUsedQuincena = useCallback(() => {
+    return lastUsedQuincenaRef.current;
+  }, []);
+
   return {
+    // Estados
     activeLayers,
     setActiveLayers,
     loadingLayers,
     setLoadingLayers,
     currentFilters,
     setCurrentFilters,
+    
+    // Handlers
     handleLayerToggle,
-    handleTimelineChange
+    handleTimelineChange,
+    
+    // Helpers
+    isSequiaActive,
+    getLastUsedQuincena
   };
 };
+
+export default useLayerManagement;

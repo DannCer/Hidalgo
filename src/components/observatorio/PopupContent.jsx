@@ -5,14 +5,39 @@ import PropTypes from 'prop-types';
 const EXCLUDED_PROPERTIES = ['geom', 'geometry'];
 const DEFAULT_MAX_FEATURES = 15;
 
+// Campos que NO deben formatearse como número aunque sean numéricos
+const EXCLUDE_FROM_NUMBER_FORMAT = [
+  'clave de la cuenca',
+  'clave_cuenca',
+  'clave cuenca',
+  'clave',
+  'codigo',
+  'código',
+  'id',
+  'cve',
+  'cve_mun',
+  'cve_ent',
+  'cve_loc',
+  'año',
+  'ano',
+  'year',
+  'Año',
+];
+
 // Utility functions
-const formatPropertyValue = (value) => {
+const formatPropertyValue = (value, propertyName = '') => {
   if (value == null) return '';
   
   const stringValue = String(value).trim();
+  const lowerPropertyName = propertyName.toLowerCase();
   
-  // Format numbers with commas
-  if (!isNaN(value) && stringValue !== '') {
+  // Verificar si el campo debe excluirse del formato numérico
+  const shouldExcludeFromNumberFormat = EXCLUDE_FROM_NUMBER_FORMAT.some(
+    excluded => lowerPropertyName.includes(excluded)
+  );
+  
+  // Format numbers with commas (solo si no está excluido)
+  if (!shouldExcludeFromNumberFormat && !isNaN(value) && stringValue !== '') {
     return Number(value).toLocaleString();
   }
   
@@ -41,7 +66,8 @@ const PopupContent = ({
   features = [], 
   maxFeatures = DEFAULT_MAX_FEATURES,
   className = '',
-  showFeatureCount = true
+  showFeatureCount = true,
+  isLast = false
 }) => {
   // Early return for empty features
   if (!features || features.length === 0) {
@@ -85,6 +111,11 @@ const PopupContent = ({
           <em>... y {hiddenFeaturesCount} elemento(s) más</em>
         </div>
       )}
+
+      {/* Separator between layers */}
+      {!isLast && (
+        <hr className="layer-separator" />
+      )}
     </div>
   );
 };
@@ -111,7 +142,7 @@ const FeatureItem = ({ feature, index }) => {
                   <strong>{key}:</strong>
                 </td>
                 <td className="property-value">
-                  {formatPropertyValue(value)}
+                  {formatPropertyValue(value, key)}
                 </td>
               </tr>
             ))}
@@ -136,7 +167,8 @@ PopupContent.propTypes = {
   ),
   maxFeatures: PropTypes.number,
   className: PropTypes.string,
-  showFeatureCount: PropTypes.bool
+  showFeatureCount: PropTypes.bool,
+  isLast: PropTypes.bool
 };
 
 PopupContent.defaultProps = {
@@ -144,7 +176,8 @@ PopupContent.defaultProps = {
   features: [],
   maxFeatures: DEFAULT_MAX_FEATURES,
   className: '',
-  showFeatureCount: true
+  showFeatureCount: true,
+  isLast: false
 };
 
 FeatureItem.propTypes = {

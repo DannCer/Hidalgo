@@ -1,7 +1,6 @@
 import React from 'react';
-import logo from '../../assets/img/LOGO MEDIO AMBIENTE VECTOR_COLOR.png';
-import escudo from '../../assets/img/escudo_blanco.png';
-import '../styles/footer.css'
+// BORRAMOS IMPORTS DE IMÁGENES
+import '../styles/footer.css';
 
 const contactInfoLines = [
   'SECRETARÍA DE MEDIO AMBIENTE Y RECURSOS NATURALES',
@@ -15,17 +14,16 @@ const contactInfoLines = [
   'Pachuca de Soto, Hidalgo, México',
 ];
 
-
 const Footer = () => {
-
   return (
     <footer className="footer">
       <div className="container">
         <div className="row align-items-center">
           <div className="col-md-4 mb-4 mb-md-0">
             <div className="widget text-center text-md-start">
+              {/* RUTA DIRECTA A PUBLIC */}
               <img
-                src={logo}
+                src="/assets/img/LOGO MEDIO AMBIENTE VECTOR_COLOR.png"
                 alt="Logo Gobierno Hidalgo"
                 className="footer-logo img-fluid"
               />
@@ -33,8 +31,9 @@ const Footer = () => {
           </div>
           <div className="col-md-4 mb-4 mb-md-0">
             <div className="widget text-center">
+              {/* RUTA DIRECTA A PUBLIC */}
               <img
-                src={escudo}
+                src="/assets/img/escudo_blanco.png"
                 alt="Escudo del Estado de Hidalgo"
                 className="footer-escudo img-fluid mb-3"
               />

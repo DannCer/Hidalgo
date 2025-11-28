@@ -13,10 +13,18 @@
 
 # misc
 .DS_Store
+
+# environment variables (NUNCA subir a Git)
+.env
 .env.local
+.env.development
+.env.production
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Mantener el ejemplo como referencia
+!.env.example
 
 npm-debug.log*
 yarn-debug.log*

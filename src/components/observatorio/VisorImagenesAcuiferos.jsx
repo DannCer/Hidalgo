@@ -1,110 +1,162 @@
 // src/components/observatorio/VisorImagenesAcuiferos.jsx
-import React, { useState, useEffect } from 'react';
-import { Modal, Carousel, Spinner, Alert, Button } from 'react-bootstrap';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Modal, Spinner, Alert, Button, Form } from 'react-bootstrap';
 import '../styles/visorImagenes.css';
 
-// Importar imágenes
-import acuifero1 from '../../assets/img/acuiferos/acuifero acaxochitlan.jpg';
-import acuifero2 from '../../assets/img/acuiferos/acuifero Actopan-Santiago de Anaya.jpg';
-import acuifero3 from '../../assets/img/acuiferos/acuifero Ajacuba.jpg';
-import acuifero4 from '../../assets/img/acuiferos/acuifero alamo tuxpan.jpg';
-import acuifero5 from '../../assets/img/acuiferos/acuifero amajac.jpg';
-import acuifero6 from '../../assets/img/acuiferos/acuifero apan.jpg';
-import acuifero7 from '../../assets/img/acuiferos/acuifero atlapexco candelaria.jpg';
-import acuifero8 from '../../assets/img/acuiferos/acuifero atotonilco jaltocan.jpg';
-import acuifero9 from '../../assets/img/acuiferos/acuifero calabozo.jpg';
-import acuifero10 from '../../assets/img/acuiferos/acuifero chapantongo alfajayucan.jpg';
-import acuifero11 from '../../assets/img/acuiferos/acuifero cuautitlan pachuca.jpg';
-import acuifero12 from '../../assets/img/acuiferos/acuifero el astillero.jpg';
-import acuifero13 from '../../assets/img/acuiferos/acuifero huasca zoquital.jpg';
-import acuifero14 from '../../assets/img/acuiferos/acuifero huichapan-tecozautla.jpg';
-import acuifero15 from '../../assets/img/acuiferos/acuifero Ixmiquilpan.jpg';
-import acuifero16 from '../../assets/img/acuiferos/acuifero metztitlan.jpg';
-import acuifero17 from '../../assets/img/acuiferos/acuifero orizatlan.jpg';
-import acuifero18 from '../../assets/img/acuiferos/acuifero tecocomulco.jpg';
-import acuifero19 from '../../assets/img/acuiferos/acuifero Tepeji del Rio.jpg';
-import acuifero20 from '../../assets/img/acuiferos/acuifero valle de tulancingo.jpg';
-import acuifero21 from '../../assets/img/acuiferos/acuifero valle del mezquital.jpg';
-import acuifero22 from '../../assets/img/acuiferos/acuifero xochitlan - huejutla.jpg';
-import acuifero23 from '../../assets/img/acuiferos/acuifero Zimapan.jpg';
+const ACUIFEROS_DATA = [
+  { file: 'acuifero acaxochitlan.jpg', title: 'Acaxochitlan' },
+  { file: 'acuifero Actopan-Santiago de Anaya.jpg', title: 'Actopan Santiago de Anaya' },
+  { file: 'acuifero Ajacuba.jpg', title: 'Ajacuba' },
+  { file: 'acuifero alamo tuxpan.jpg', title: 'Alamo Tuxpan' },
+  { file: 'acuifero amajac.jpg', title: 'Amajac' },
+  { file: 'acuifero apan.jpg', title: 'Apan' },
+  { file: 'acuifero atlapexco candelaria.jpg', title: 'Atlapexco Candelaria' },
+  { file: 'acuifero atotonilco jaltocan.jpg', title: 'Atotonilco Jaltocan' },
+  { file: 'acuifero calabozo.jpg', title: 'Calabozo' },
+  { file: 'acuifero chapantongo alfajayucan.jpg', title: 'Chapantongo Alfajayucan' },
+  { file: 'acuifero cuautitlan pachuca.jpg', title: 'Cuautitlan Pachuca' },
+  { file: 'acuifero el astillero.jpg', title: 'El Astillero' },
+  { file: 'acuifero huasca zoquital.jpg', title: 'Huasca Zoquital' },
+  { file: 'acuifero huichapan-tecozautla.jpg', title: 'Huichapan Tecozautla' },
+  { file: 'acuifero Ixmiquilpan.jpg', title: 'Ixmiquilpan' },
+  { file: 'acuifero metztitlan.jpg', title: 'Metztitlan' },
+  { file: 'acuifero orizatlan.jpg', title: 'Orizatlan' },
+  { file: 'acuifero tecocomulco.jpg', title: 'Tecocomulco' },
+  { file: 'acuifero Tepeji del Rio.jpg', title: 'Tepeji del Rio' },
+  { file: 'acuifero valle de tulancingo.jpg', title: 'Valle de Tulancingo' },
+  { file: 'acuifero valle del mezquital.jpg', title: 'Valle del Mezquital' },
+  { file: 'acuifero xochitlan - huejutla.jpg', title: 'Xochitlan Huejutla' },
+  { file: 'acuifero Zimapan.jpg', title: 'Zimapan' },
+];
+
+const BASE_PATH = '/assets/img/acuiferos/';
 
 const VisorImagenesAcuiferos = ({ show, onHide }) => {
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [imagesLoaded, setImagesLoaded] = useState({});
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showThumbnails, setShowThumbnails] = useState(false);
 
-   const imagenesAcuiferos = [
-    { src: acuifero1, title: 'Acaxochitlan' },
-    { src: acuifero2, title: 'Actopan Santiago de Anaya' },
-    { src: acuifero3, title: 'Ajacuba' },
-    { src: acuifero4, title: 'Alamo Tuxpan' },
-    { src: acuifero5, title: 'Amajac' },
-    { src: acuifero6, title: 'Apan' },
-    { src: acuifero7, title: 'Atlapexco Candelaria' },
-    { src: acuifero8, title: 'Atotonilco Jaltocan' },
-    { src: acuifero9, title: 'Calabozo' },
-    { src: acuifero10, title: 'Chapantongo Alfajayucan' },
-    { src: acuifero11, title: 'Cuautitlan Pachuca' },
-    { src: acuifero12, title: 'El Astillero' },
-    { src: acuifero13, title: 'Huasca Zoquital' },
-    { src: acuifero14, title: 'Huichapan Tecozautla' },
-    { src: acuifero15, title: 'Ixmiquilpan' },
-    { src: acuifero16, title: 'Metztitlan' },
-    { src: acuifero17, title: 'Orizatlan' },
-    { src: acuifero18, title: 'Tecocomulco' },
-    { src: acuifero19, title: 'Tepeji del Rio' },
-    { src: acuifero20, title: 'Valle de Tulancingo' },
-    { src: acuifero21, title: 'Valle del Mezquital' },
-    { src: acuifero22, title: 'Xochitlan Huejutla' },
-    { src: acuifero23, title: 'Zimapan' },
-  ];
+  const imagenesAcuiferos = useMemo(() => 
+    ACUIFEROS_DATA.map(item => ({
+      src: `${BASE_PATH}${item.file}`,
+      title: item.title
+    })),
+  []);
 
+  // Precargar imágenes iniciales
   useEffect(() => {
-    if (show) {
-      setLoading(true);
-      // Preload images
-      const loadImages = async () => {
-        const loaded = {};
-        await Promise.all(
-          imagenesAcuiferos.map((img, idx) => {
-            return new Promise((resolve) => {
-              const image = new Image();
-              image.src = img.src;
-              image.onload = () => {
-                loaded[idx] = true;
-                resolve();
-              };
-              image.onerror = () => {
-                loaded[idx] = false;
-                resolve();
-              };
-            });
-          })
-        );
-        setImagesLoaded(loaded);
-        setLoading(false);
-      };
+    if (!show) return;
+    
+    setLoading(true);
+    setIndex(0);
+    
+    const preloadInitial = async () => {
+      const initialImages = imagenesAcuiferos.slice(0, 3);
+      const loaded = {};
       
-      loadImages();
-    }
-  }, [show]);
+      await Promise.all(
+        initialImages.map((img, idx) => 
+          new Promise(resolve => {
+            const image = new Image();
+            image.src = img.src;
+            image.onload = () => { loaded[idx] = true; resolve(); };
+            image.onerror = () => { loaded[idx] = false; resolve(); };
+          })
+        )
+      );
+      
+      setImagesLoaded(loaded);
+      setLoading(false);
+    };
+    
+    preloadInitial();
+  }, [show, imagenesAcuiferos]);
 
-  const handleSelect = (selectedIndex) => {
-    setIndex(selectedIndex);
-  };
+  // Precargar imágenes adyacentes
+  useEffect(() => {
+    if (!show || loading) return;
+    
+    const indicesToPreload = [index - 1, index + 1, index + 2].filter(
+      i => i >= 0 && i < imagenesAcuiferos.length && !imagesLoaded[i]
+    );
+    
+    indicesToPreload.forEach(idx => {
+      const image = new Image();
+      image.src = imagenesAcuiferos[idx].src;
+      image.onload = () => {
+        setImagesLoaded(prev => ({ ...prev, [idx]: true }));
+      };
+    });
+  }, [index, show, loading, imagenesAcuiferos, imagesLoaded]);
 
-  const handleDownload = (imageSrc, imageTitle) => {
+  // Navegación con teclado
+  useEffect(() => {
+    if (!show) return;
+    
+    const handleKeyDown = (e) => {
+      switch(e.key) {
+        case 'ArrowLeft':
+          setIndex(prev => (prev > 0 ? prev - 1 : imagenesAcuiferos.length - 1));
+          break;
+        case 'ArrowRight':
+          setIndex(prev => (prev < imagenesAcuiferos.length - 1 ? prev + 1 : 0));
+          break;
+        case 'Escape':
+          if (isFullscreen) {
+            setIsFullscreen(false);
+          } else {
+            onHide();
+          }
+          break;
+        case 'f':
+        case 'F':
+          setIsFullscreen(prev => !prev);
+          break;
+        case 'Home':
+          setIndex(0);
+          break;
+        case 'End':
+          setIndex(imagenesAcuiferos.length - 1);
+          break;
+        default:
+          break;
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [show, onHide, imagenesAcuiferos.length, isFullscreen]);
+
+  const handleThumbnailClick = useCallback((idx) => {
+    setIndex(idx);
+  }, []);
+
+  const handleImageLoad = useCallback((idx) => {
+    setImagesLoaded(prev => prev[idx] ? prev : { ...prev, [idx]: true });
+  }, []);
+
+  const handleDownload = useCallback(() => {
+    const current = imagenesAcuiferos[index];
+    if (!current) return;
+    
     const link = document.createElement('a');
-    link.href = imageSrc;
-    link.download = `acuifero-${imageTitle.toLowerCase().replace(/\s+/g, '-')}.jpg`;
-    document.body.appendChild(link);
+    link.href = current.src;
+    link.download = `acuifero-${current.title.toLowerCase().replace(/\s+/g, '-')}.jpg`;
     link.click();
-    document.body.removeChild(link);
-  };
+  }, [index, imagenesAcuiferos]);
 
-  const handleImageLoad = (idx) => {
-    setImagesLoaded(prev => ({ ...prev, [idx]: true }));
-  };
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen(prev => !prev);
+  }, []);
+
+  const goToFirst = useCallback(() => setIndex(0), []);
+  const goToLast = useCallback(() => setIndex(imagenesAcuiferos.length - 1), [imagenesAcuiferos.length]);
+  const goToPrev = useCallback(() => setIndex(prev => (prev > 0 ? prev - 1 : imagenesAcuiferos.length - 1)), [imagenesAcuiferos.length]);
+  const goToNext = useCallback(() => setIndex(prev => (prev < imagenesAcuiferos.length - 1 ? prev + 1 : 0)), [imagenesAcuiferos.length]);
+
+  const currentImage = imagenesAcuiferos[index];
 
   if (!show) return null;
 
@@ -114,88 +166,157 @@ const VisorImagenesAcuiferos = ({ show, onHide }) => {
       onHide={onHide} 
       size="xl" 
       centered 
-      className="visor-imagenes-modal"
+      className={`visor-imagenes-modal ${isFullscreen ? 'visor-fullscreen' : ''}`}
       backdrop="static"
+      fullscreen={isFullscreen}
     >
       <Modal.Header closeButton className="visor-imagenes-header">
         <Modal.Title>
-          Acuíferos de Hidalgo
+          {loading ? 'Acuíferos de Hidalgo' : currentImage?.title || 'Acuíferos de Hidalgo'}
         </Modal.Title>
+        <div className="header-actions">
+          <Button 
+            variant="link" 
+            className="header-btn"
+            onClick={toggleFullscreen}
+            title={isFullscreen ? 'Salir de pantalla completa (F)' : 'Pantalla completa (F)'}
+          >
+            {isFullscreen ? '⊡' : '⛶'}
+          </Button>
+        </div>
       </Modal.Header>
       
       <Modal.Body className="visor-imagenes-body">
         {loading ? (
-          <div className="text-center py-5">
+          <div className="loading-container">
             <Spinner animation="border" variant="primary" />
-            <p className="mt-3">Cargando imágenes de acuíferos...</p>
+            <p>Cargando imágenes...</p>
           </div>
         ) : imagenesAcuiferos.length === 0 ? (
           <Alert variant="warning" className="text-center m-3">
-            No hay imágenes disponibles en este momento.
+            No hay imágenes disponibles.
           </Alert>
         ) : (
-          <>
-            <Carousel 
-              activeIndex={index} 
-              onSelect={handleSelect}
-              interval={null}
-              indicators={true}
-              className="visor-carousel"
-              prevIcon={<span aria-hidden="true">‹</span>}
-              nextIcon={<span aria-hidden="true">›</span>}
-            >
-              {imagenesAcuiferos.map((image, idx) => (
-                <Carousel.Item key={idx}>
-                  <div className="image-container">
-                    {!imagesLoaded[idx] && (
-                      <div className="d-flex justify-content-center align-items-center h-100">
-                        <Spinner animation="border" variant="light" />
-                      </div>
-                    )}
-                    <img
-                      className={`d-block ${imagesLoaded[idx] ? 'loaded' : 'd-none'}`}
-                      src={image.src}
-                      alt={image.title}
-                      onLoad={() => handleImageLoad(idx)}
-                      style={{ 
-                        opacity: imagesLoaded[idx] ? 1 : 0,
-                        transition: 'opacity 0.3s ease-in-out'
-                      }}
-                    />
-                  </div>  
-                </Carousel.Item>
-              ))}
-            </Carousel>
-
-            <div className="visor-controls">
-              <div className="visor-info">
-                <small className="text-muted">
-                  Imagen {index + 1} de {imagenesAcuiferos.length}
-                </small>
+          <div className="visor-content">
+            <div className="visor-main">
+              <button className="nav-btn nav-prev" onClick={goToPrev} title="Anterior (←)">
+                ‹
+              </button>
+              
+              <div className="image-wrapper">
+                {!imagesLoaded[index] && (
+                  <div className="image-loading">
+                    <Spinner animation="border" variant="light" />
+                  </div>
+                )}
+                <img
+                  className={imagesLoaded[index] ? 'loaded' : 'loading'}
+                  src={currentImage?.src}
+                  alt={currentImage?.title}
+                  onLoad={() => handleImageLoad(index)}
+                  onClick={toggleFullscreen}
+                  title="Clic para pantalla completa"
+                />
               </div>
               
-              <div className="visor-actions">
+              <button className="nav-btn nav-next" onClick={goToNext} title="Siguiente (→)">
+                ›
+              </button>
+            </div>
+
+            <div className="progress-bar-container">
+              <div 
+                className="progress-bar-fill" 
+                style={{ width: `${((index + 1) / imagenesAcuiferos.length) * 100}%` }}
+              />
+            </div>
+
+            <div className="visor-controls">
+              <div className="controls-left">
+                <Button variant="link" size="sm" onClick={goToFirst} disabled={index === 0} title="Primera (Home)">
+                  ⏮
+                </Button>
+                <Button variant="link" size="sm" onClick={goToPrev} title="Anterior (←)">
+                  ◀
+                </Button>
+                
+                <Form.Select 
+                  size="sm" 
+                  value={index} 
+                  onChange={(e) => setIndex(Number(e.target.value))}
+                  className="image-selector"
+                >
+                  {imagenesAcuiferos.map((img, idx) => (
+                    <option key={idx} value={idx}>
+                      {img.title}
+                    </option>
+                  ))}
+                </Form.Select>
+                
+                <Button variant="link" size="sm" onClick={goToNext} title="Siguiente (→)">
+                  ▶
+                </Button>
+                <Button variant="link" size="sm" onClick={goToLast} disabled={index === imagenesAcuiferos.length - 1} title="Última (End)">
+                  ⏭
+                </Button>
+              </div>
+
+              <div className="controls-center">
+                <span className="counter">
+                  {index + 1} / {imagenesAcuiferos.length}
+                </span>
+              </div>
+              
+              <div className="controls-right">
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={() => setShowThumbnails(prev => !prev)}
+                  className={showThumbnails ? 'active' : ''}
+                  title="Mostrar/ocultar miniaturas"
+                >
+                  ▦
+                </Button>
                 <Button
                   variant="outline-primary"
                   size="sm"
-                  onClick={() => handleDownload(imagenesAcuiferos[index]?.src, imagenesAcuiferos[index]?.title)}
+                  onClick={handleDownload}
                   disabled={!imagesLoaded[index]}
+                  title="Descargar imagen"
                 >
-                  📥 Descargar
+                  ⬇ Descargar
                 </Button>
               </div>
             </div>
-          </>
+
+            {showThumbnails && (
+              <div className="thumbnails-container">
+                <div className="thumbnails-scroll">
+                  {imagenesAcuiferos.map((img, idx) => (
+                    <button
+                      key={idx}
+                      className={`thumbnail ${idx === index ? 'active' : ''} ${imagesLoaded[idx] ? 'loaded' : ''}`}
+                      onClick={() => handleThumbnailClick(idx)}
+                      title={img.title}
+                    >
+                      <img src={img.src} alt={img.title} loading="lazy" />
+                      <span className="thumbnail-index">{idx + 1}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </Modal.Body>
       
       <Modal.Footer className="visor-imagenes-footer">
         <small className="text-muted">
-          Fuente: Secretaría del Medio Ambiente y Recursos Naturales del Estado de Hidalgo (SEMARNATH)
+          Fuente: SEMARNATH | ← → navegar | F pantalla completa
         </small>
       </Modal.Footer>
     </Modal>
   );
 };
 
-export default VisorImagenesAcuiferos;
+export default React.memo(VisorImagenesAcuiferos);

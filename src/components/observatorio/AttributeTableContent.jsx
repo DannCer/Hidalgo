@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Table, Spinner, Alert, Button, Form } from 'react-bootstrap';
 import { fetchWfsLayer } from '../../utils/wfsService';
-import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import '../styles/attributeTableContent.css'
 
@@ -24,10 +23,10 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
     setError(null);
     try {
       const startIndex = isInitialLoad ? 0 : fetchedCount;
-      
+
       // ✅ USAR EL FILTRO: pasar el filtro a fetchWfsLayer
       const data = await fetchWfsLayer(layerName, customFilter, FEATURES_PER_PAGE, startIndex);
-      
+
       if (data?.features) {
         if (isInitialLoad) {
           setFeatures(data.features);
@@ -60,7 +59,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
     setTotalFeatures(0);
     setSearchTerm('');
     setSortConfig({ key: null, direction: 'ascending' });
-    
+
     if (layerName) {
       fetchData(true, filter);
     }
@@ -121,33 +120,40 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
   const hasMoreData = totalFeatures > fetchedCount;
 
   // ... (la función exportToExcel se mantiene igual, pero ahora usará los datos ordenados)
-  const exportToExcel = () => {
+  const exportToExcel = async () => { // 1. Agregamos 'async'
     if (!sortedAndFilteredFeatures.length) return;
-    const dataToExport = sortedAndFilteredFeatures.map(f => {
-      const row = {};
-      headers.forEach(h => (row[h] = f.properties[h]));
-      return row;
-    });
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos');
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    });
-    
-    // ✅ MEJORADO: Incluir información del filtro en el nombre del archivo
-    const fileName = filter 
-      ? `${layerName.replace(':', '_')}_filtrado_${new Date().getTime()}.xlsx`
-      : `${layerName.replace(':', '_')}_atributos.xlsx`;
-    
-    saveAs(blob, fileName);
+
+    try {
+      // 2. Importación dinámica: Vite dividirá esto en un archivo separado
+      const XLSX = await import('xlsx');
+
+      const dataToExport = sortedAndFilteredFeatures.map(feature => {
+        const row = {};
+        headers.forEach(header => {
+          row[header] = feature.properties[header];
+        });
+        return row;
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos');
+
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+      // Usamos layerName para el nombre del archivo
+      saveAs(data, `${layerName || 'export'}.xlsx`);
+
+    } catch (error) {
+      console.error("Error cargando el módulo de Excel:", error);
+    }
   };
 
   //  Componente para mostrar información del filtro
   const FilterInfo = () => {
     if (!filter) return null;
-    
+
     return (
       <div className="filter-info mb-3" style={{
         padding: '10px',
@@ -156,7 +162,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
         borderRadius: '4px',
         fontSize: '14px'
       }}>
-        <strong>🎯 Filtro aplicado:</strong> 
+        <strong>🎯 Filtro aplicado:</strong>
         <code className="ms-2" style={{ backgroundColor: '#f1f8e9', padding: '2px 6px', borderRadius: '3px' }}>
           {filter}
         </code>
@@ -179,7 +185,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
     );
 
   if (error) return <Alert variant="danger">{error}</Alert>;
-  
+
   if (features.length === 0 && !isLoading)
     return (
       <div className="text-center text-muted my-3">
@@ -190,7 +196,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
             border: '1px solid #ffeaa7',
             borderRadius: '4px'
           }}>
-            <strong>⚠️ Con filtro aplicado:</strong> 
+            <strong>⚠️ Con filtro aplicado:</strong>
             <code className="ms-2">{filter}</code>
             <br />
             <small>No hay datos que coincidan con este filtro.</small>
@@ -204,7 +210,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
       <div className="d-flex flex-column h-100">
         {/* ✅ MOSTRAR INFORMACIÓN DEL FILTRO */}
         <FilterInfo />
-        
+
         <Form.Group controlId="tableSearch" className="mb-3 d-flex gap-2">
           <Form.Control
             type="text"

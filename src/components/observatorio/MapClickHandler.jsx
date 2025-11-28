@@ -1,16 +1,22 @@
-import { useEffect, useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useMapEvents } from 'react-leaflet';
 import ReactDOMServer from 'react-dom/server';
 import PopupContent from './PopupContent';
 import { fetchFeaturesAtPoint, getLayerInfo } from '../../utils/wfsService';
 import { accordionData } from '../ui/AccordionData';
-import { SEQUIA_CONFIG } from './mapConfig';
+import { SEQUIA_CONFIG } from '../../utils/constants';
 
 // Constants
 const MAX_FEATURES_PER_LAYER = 15;
 const CLICK_TOLERANCE = 50;
 
-function MapClickHandler({ activeLayers, setPopupData, baseLayerData, sequiaQuincena }) {
+function MapClickHandler({ 
+  activeLayers, 
+  setPopupData, 
+  setHighlightData,
+  baseLayerData, 
+  sequiaQuincena 
+}) {
   const map = useMapEvents({});
 
   const allLayersConfig = useMemo(
@@ -33,91 +39,94 @@ function MapClickHandler({ activeLayers, setPopupData, baseLayerData, sequiaQuin
     return null;
   }, [sequiaQuincena]);
 
-  // ✅ FUNCIÓN CORREGIDA: Maneja layerInfo null de forma segura
-  const buildPopupContent = useCallback((results, activeLayerNames) => {
-    let totalFeaturesFound = 0;
-    const featuresContent = [];
-
-    results.forEach((result, index) => {
-      const layerName = activeLayerNames[index];
-      
-      if (result.status === "fulfilled" && result.value?.features?.length > 0) {
-        const data = result.value;
-        
-        // ✅ CORRECCIÓN: Obtener layerInfo de forma segura
-        let layerInfo = null;
-        try {
-          layerInfo = getLayerInfo(layerName);
-        } catch (error) {
-          console.warn(`No se pudo obtener info para capa ${layerName}:`, error);
-          layerInfo = null;
-        }
-
-        totalFeaturesFound += data.features.length;
-
-        const content = ReactDOMServer.renderToString(
-          <PopupContent
-            layerName={layerName}
-            layerInfo={layerInfo} // ✅ Puede ser null, pero PopupContent lo maneja
-            features={data.features}
-            maxFeatures={MAX_FEATURES_PER_LAYER}
-          />
-        );
-        featuresContent.push(content);
-      } else if (result.status === "rejected") {
-        console.error(`Error en capa ${layerName}:`, result.reason);
-      }
+  const showLoadingPopup = useCallback((position) => {
+    setPopupData({
+      position,
+      content: '<div class="p-3 text-center"><strong>Buscando información...</strong><br/><small>Por favor espere</small></div>',
+      isSidebar: true
     });
+    if (setHighlightData) setHighlightData([]);
+  }, [setPopupData, setHighlightData]);
 
-    if (totalFeaturesFound === 0) {
-      return null;
-    }
+  const showErrorPopup = useCallback((error) => {
+    console.error("Error al obtener datos:", error);
+    setPopupData({
+      position: getFixedPopupPosition(),
+      content: '<div class="p-3 text-danger">Error al consultar el servicio de mapas.</div>',
+      isSidebar: true
+    });
+    if (setHighlightData) setHighlightData([]);
+  }, [setPopupData, getFixedPopupPosition, setHighlightData]);
 
-    const headerContent = ReactDOMServer.renderToString(
-      <div className="popup-header">
-        <h4>Información en el punto</h4>
-        <p className="feature-summary">
-          {totalFeaturesFound} elemento(s) encontrado(s)
-        </p>
+  const buildPopupContent = useCallback((results, activeLayerNames) => {
+    // Filtrar y mapear resultados válidos manteniendo el índice original
+    const validResultsWithIndex = results
+      .map((r, originalIndex) => ({ result: r, originalIndex }))
+      .filter((item) => item.result.status === 'fulfilled' && item.result.value && item.result.value.features?.length > 0);
+
+    if (validResultsWithIndex.length === 0) return null;
+
+    const contentHtml = ReactDOMServer.renderToString(
+      <div className="popup-content-wrapper">
+        {validResultsWithIndex.map((item, displayIndex) => {
+          const layerData = item.result.value;
+          const layerName = activeLayerNames[item.originalIndex] || layerData.layerName;
+          const layerInfo = getLayerInfo(layerName);
+          const isLast = displayIndex === validResultsWithIndex.length - 1;
+          
+          return (
+            <PopupContent
+              key={`${layerName}-${item.originalIndex}`}
+              layerName={layerName}
+              layerInfo={layerInfo}
+              features={layerData.features}
+              isLast={isLast}
+            />
+          );
+        })}
       </div>
     );
 
-    return headerContent + featuresContent.join('');
+    return contentHtml;
   }, []);
 
-  const showLoadingPopup = useCallback(() => {
-    const popupPosition = getFixedPopupPosition();
-    setPopupData({
-      position: [popupPosition.lat, popupPosition.lng],
-      content: '<div class="loading-popup">Consultando información...</div>',
-      isSidebar: true
-    });
-  }, [getFixedPopupPosition, setPopupData]);
+  /**
+   * Extrae todos los features de todas las capas que tuvieron resultados
+   * @param {Array} results - Resultados de Promise.allSettled
+   * @param {Array} activeLayerNames - Nombres de las capas activas
+   * @returns {Array} Array de objetos { feature, layerName }
+   */
+  const extractAllFeatures = useCallback((results, activeLayerNames) => {
+    const allFeatures = [];
 
-  const showErrorPopup = useCallback((error) => {
-    console.error("Error fatal en peticiones WFS:", error);
-    const popupPosition = getFixedPopupPosition();
-    setPopupData({
-      position: [popupPosition.lat, popupPosition.lng],
-      content: '<div class="error-popup">Error al consultar la información</div>',
-      isSidebar: true
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled' && result.value?.features?.length > 0) {
+        const layerName = activeLayerNames[index];
+        
+        // Agregar todos los features de esta capa (limitado a MAX_FEATURES_PER_LAYER)
+        result.value.features.slice(0, MAX_FEATURES_PER_LAYER).forEach(feature => {
+          allFeatures.push({
+            feature,
+            layerName
+          });
+        });
+      }
     });
-  }, [getFixedPopupPosition, setPopupData]);
+
+    return allFeatures;
+  }, []);
 
   const handleMapClick = useCallback(async (e) => {
-    const layersToQuery = { ...activeLayers };
-    if (baseLayerData) {
-      layersToQuery["Hidalgo:00_Estado"] = baseLayerData;
-    }
-
-    const activeLayerNames = Object.keys(layersToQuery);
+    const activeLayerNames = Object.keys(activeLayers).filter((name) => !!activeLayers[name]);
 
     if (activeLayerNames.length === 0) {
-      setPopupData(null);
-      return;
+        setPopupData(null);
+        if (setHighlightData) setHighlightData([]);
+        return;
     }
 
-    showLoadingPopup();
+    const popupPosition = getFixedPopupPosition();
+    showLoadingPopup([popupPosition.lat, popupPosition.lng]);
 
     try {
       const promises = activeLayerNames.map((layerName) => {
@@ -141,41 +150,47 @@ function MapClickHandler({ activeLayers, setPopupData, baseLayerData, sequiaQuin
       });
 
       const results = await Promise.allSettled(promises);
-      const popupPosition = getFixedPopupPosition();
       const content = buildPopupContent(results, activeLayerNames);
 
-      if (content) {
+      // Extraer TODOS los features de TODAS las capas con resultados
+      const allFeaturesToHighlight = extractAllFeatures(results, activeLayerNames);
+      
+      if (content && allFeaturesToHighlight.length > 0) {
+        // A. Abrir Sidebar/Popup
         setPopupData({
           position: [popupPosition.lat, popupPosition.lng],
           content,
           isSidebar: true
         });
+
+        // B. Establecer Highlight para TODOS los features
+        if (setHighlightData) {
+          setHighlightData(allFeaturesToHighlight);
+        }
       } else {
+        // C. Limpiar
         setPopupData(null);
+        if (setHighlightData) setHighlightData([]);
       }
     } catch (error) {
       showErrorPopup(error);
     }
   }, [
     activeLayers, 
-    baseLayerData, 
     allLayersConfig, 
     setPopupData, 
+    setHighlightData, 
     showLoadingPopup, 
     showErrorPopup, 
     getFixedPopupPosition, 
     buildPopupContent, 
-    getSequiaFilter
+    getSequiaFilter,
+    extractAllFeatures
   ]);
 
-  useEffect(() => {
-    if (!map) return;
-
-    map.on("click", handleMapClick);
-    return () => {
-      map.off("click", handleMapClick);
-    };
-  }, [map, handleMapClick]);
+  useMapEvents({
+    click: handleMapClick
+  });
 
   return null;
 }

@@ -156,3 +156,37 @@
     padding: 0.75rem;
   }
 }
+
+.titulo-principal {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--color-gray-dark, #6F7271);
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  font-size: 2.5rem;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .titulo-principal {
+    font-size: 1.25rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .titulo-principal .logo {
+    height: 60px !important;
+    margin-right: 0 !important;
+    margin-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .titulo-principal {
+    font-size: 1.1rem;
+  }
+  
+  .titulo-principal .logo {
+    height: 50px !important;
+  }
+}

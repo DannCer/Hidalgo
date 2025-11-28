@@ -20,7 +20,7 @@ const AttributeTableButton = ({ onClick, layerName, displayName, disabled = fals
       }
     >
       <span aria-hidden="true">📊</span>
-      <span>Ver Tabla</span>
+      <span>Tabla</span>
     </button>
   );
 };
