@@ -1,10 +1,9 @@
 // src/utils/wfsService.js
-import { accordionData } from '../components/ui/AccordionData';
+import { accordionData } from '../data/AccordionData';
 import proj4 from 'proj4';
 import { config, logger } from '../config/env';
 
 // --- CONSTANTES DE CONFIGURACIÓN ---
-// Ahora se leen desde variables de entorno (ver src/config/env.js)
 
 const WFS_BASE_URL = config.geoserver.wfsUrl;
 const WMS_BASE_URL = config.geoserver.wmsUrl;
@@ -46,7 +45,6 @@ class NetworkError extends Error {
 
 /**
 * Función de fetch con timeout y manejo de errores mejorado
-* ✅ MEJORADO: Ahora soporta AbortController externo
 */
 const fetchWithTimeout = async (url, options = {}, timeout = REQUEST_TIMEOUT) => {
     // ✅ Si ya viene un signal externo, usarlo; si no, crear uno nuevo

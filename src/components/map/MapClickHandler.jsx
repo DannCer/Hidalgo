@@ -3,7 +3,7 @@ import { useMapEvents } from 'react-leaflet';
 import ReactDOMServer from 'react-dom/server';
 import PopupContent from './PopupContent';
 import { fetchFeaturesAtPoint, getLayerInfo } from '../../utils/wfsService';
-import { accordionData } from '../ui/AccordionData';
+import { accordionData } from '../../data/AccordionData';
 import { SEQUIA_CONFIG } from '../../utils/constants';
 
 // Constants

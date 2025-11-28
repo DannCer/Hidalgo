@@ -27,7 +27,7 @@ import {
     useNavigation,
     usePopupManager,
     useInitialLayers
-} from './hooks';
+} from '../../hooks';
 
 // Configuración y utilidades
 import { SEQUIA_CONFIG, BASE_LAYERS } from '../../config/env';
@@ -36,7 +36,7 @@ import { legendData } from '../../utils/legendData';
 import { forceStyleUpdate } from '../../utils/layerStyleFactory';
 
 // Estilos
-import '../styles/mapView.css';
+import '../../styles/mapView.css';
 
 // ============================================
 // COMPONENTE DE LOADING

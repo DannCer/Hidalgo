@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { getLayerInfo } from '../../../utils/wfsService'; // ✅ Importación correcta
+import { getLayerInfo } from '../utils/wfsService'; // ✅ Importación correcta
 
 export const useTableModal = (currentFilters) => {
   const [tableModalState, setTableModalState] = useState({

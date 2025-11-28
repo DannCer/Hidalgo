@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 import DraggableModalDialog from './DraggableModalDialog';
-import '../styles/pdfViewer.css';
+import '../../styles/pdfViewer.css';
 
 /**
  * Modal para visualizar archivos PDF

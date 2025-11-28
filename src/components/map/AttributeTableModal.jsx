@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Tabs, Tab } from 'react-bootstrap';
 import AttributeTableContent from './AttributeTableContent';
-import DraggableModalDialog from './DraggableModalDialog'; 
-import '../styles/attributeTableModal.css';
+import DraggableModalDialog from '../common/DraggableModalDialog'; 
+import '../../styles/attributeTableModal.css';
 
 const AttributeTableModal = ({ 
   show, 

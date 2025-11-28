@@ -3,9 +3,9 @@
 // Hook para manejar la carga de la capa base del mapa
 // ============================================
 import { useState, useEffect } from 'react';
-import { fetchWfsLayer } from '../../../utils/wfsService';
-import { logger } from '../../../config/env';
-import { BASE_LAYERS } from '../../../config/env';
+import { fetchWfsLayer } from '../utils/wfsService';
+import { logger } from '../config/env';
+import { BASE_LAYERS } from '../config/env';
 
 /**
  * Hook que maneja la carga de la capa base del estado

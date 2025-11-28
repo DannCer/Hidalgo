@@ -1,10 +1,10 @@
 // src/components/observatorio/DiccionarioDatosModal.jsx
 import React, { useState } from 'react';
 import { Modal, Tabs, Tab, Table } from 'react-bootstrap';
-import DraggableModalDialog from './DraggableModalDialog';
-import parametrosSuperficiales from './hooks/parametrosSuperficiales.js';
-import parametrosSubterraneos from './hooks/parametrosSubterraneos.js';
-import '../styles/diccionarioDatos.css';
+import DraggableModalDialog from '../common/DraggableModalDialog';
+import parametrosSuperficiales from '../../data/parametrosSuperficiales.js';
+import parametrosSubterraneos from '../../data/parametrosSubterraneos.js';
+import '../../styles/diccionarioDatos.css';
 
 /**
  * Modal que muestra el diccionario de datos con parámetros 
@@ -53,9 +53,11 @@ const DiccionarioDatosModal = ({ show, onHide }) => {
       show={show}
       onHide={onHide}
       size="lg"
-      centered
       dialogAs={DraggableModalDialog}
       className="diccionario-modal"
+      backdrop={false}
+      enforceFocus={false}
+      autoFocus={false}
     >
       <Modal.Header closeButton className="diccionario-header">
         <Modal.Title>

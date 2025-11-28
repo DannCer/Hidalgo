@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Table, Spinner, Alert, Button, Form } from 'react-bootstrap';
 import { fetchWfsLayer } from '../../utils/wfsService';
 import { saveAs } from 'file-saver';
-import '../styles/attributeTableContent.css'
+import '../../styles/attributeTableContent.css'
 
 const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar filter como prop
   const [features, setFeatures] = useState([]);

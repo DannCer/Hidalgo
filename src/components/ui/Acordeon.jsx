@@ -2,9 +2,9 @@
 import React, { memo, useState, useCallback, useMemo } from 'react';
 import { Accordion, Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import { accordionData as defaultData } from './AccordionData';
+import { accordionData as defaultData } from '../../data/AccordionData';
 import InfoCard from './InfoCard';
-import '../styles/acordeon.css';
+import '../../styles/acordeon.css';
 
 const Acordeon = memo(({ 
   data: externalData,

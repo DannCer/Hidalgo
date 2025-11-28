@@ -1,22 +1,12 @@
 # 🌊 Observatorio del Agua de Hidalgo - Geovisor
 
-<p align="center">
-  <strong>Visor geográfico interactivo para la gestión y monitoreo de recursos hídricos del estado de Hidalgo, México</strong>
-</p>
-
-<p align="center">
-  <a href="#-características">Características</a> •
-  <a href="#-instalación">Instalación</a> •
-  <a href="#-configuración">Configuración</a> •
-  <a href="#-uso">Uso</a> •
-  <a href="#-despliegue">Despliegue</a>
-</p>
+Visor geográfico interactivo para la gestión y monitoreo de recursos hídricos del estado de Hidalgo, México.
 
 ---
 
 ## 📋 Descripción
 
-El **Observatorio del Agua de Hidalgo (OGA)** es una aplicación web que permite visualizar, analizar y descargar información geoespacial relacionada con los recursos hídricos del estado de Hidalgo. El geovisor se conecta a un servidor GeoServer para obtener capas WFS/WMS y presenta la información de manera interactiva sobre un mapa base.
+El **Observatorio del Agua de Hidalgo (OAH)** es una aplicación web que permite visualizar, analizar y descargar información geoespacial relacionada con los recursos hídricos del estado de Hidalgo. El geovisor se conecta a un servidor GeoServer para obtener capas WFS/WMS y presenta la información de manera interactiva sobre un mapa base.
 
 ### Temáticas disponibles
 
@@ -38,6 +28,7 @@ El **Observatorio del Agua de Hidalgo (OGA)** es una aplicación web que permite
 - 📱 **Diseño responsive** para escritorio y móviles
 - 🖱️ **Popups informativos** al hacer clic en features
 - 🔍 **Múltiples capas base** (satélite, calles, topográfico)
+- 📖 **Diccionario de datos** para parámetros de calidad del agua
 
 ---
 
@@ -47,7 +38,7 @@ El **Observatorio del Agua de Hidalgo (OGA)** es una aplicación web que permite
 |-----------|------------|
 | **Frontend** | React 18, Vite 5 |
 | **Mapas** | Leaflet, React-Leaflet |
-| **UI** | Bootstrap 5, React-Bootstrap, Framer Motion |
+| **UI** | Bootstrap 5, React-Bootstrap |
 | **Geoespacial** | Turf.js, Proj4 |
 | **Servidor de mapas** | GeoServer (WFS/WMS) |
 | **Exportación** | SheetJS (xlsx), JSZip, FileSaver |
@@ -64,20 +55,13 @@ El **Observatorio del Agua de Hidalgo (OGA)** es una aplicación web que permite
 
 ## 🚀 Instalación
 
-### 1. Clonar el repositorio
-
-```bash
-git clone https://github.com/tu-usuario/geovisor-hidalgo.git
-cd geovisor-hidalgo
-```
-
-### 2. Instalar dependencias
+### 1. Instalar dependencias
 
 ```bash
 npm install
 ```
 
-### 3. Configurar variables de entorno
+### 2. Configurar variables de entorno
 
 ```bash
 # Copiar el archivo de ejemplo
@@ -87,7 +71,7 @@ cp .env.example .env.development
 nano .env.development
 ```
 
-### 4. Iniciar en modo desarrollo
+### 3. Iniciar en modo desarrollo
 
 ```bash
 npm run dev
@@ -150,21 +134,34 @@ El proyecto espera las siguientes capas en el workspace `Hidalgo`:
 geovisor/
 ├── public/
 │   └── assets/
-│       └── img/              # Imágenes estáticas
+│       ├── fonts/            # Fuentes tipográficas
+│       ├── images/           # Imágenes estáticas
+│       └── pdf/              # Documentos PDF
 ├── src/
 │   ├── components/
+│   │   ├── common/           # Componentes reutilizables (botones, modales)
 │   │   ├── layout/           # Header, Footer, Layouts
-│   │   ├── observatorio/     # Componentes del mapa
-│   │   │   ├── hooks/        # Hooks personalizados
-│   │   │   ├── MapView.jsx   # Componente principal del mapa
+│   │   ├── map/              # Componentes del mapa
+│   │   │   ├── MapView.jsx   # Componente principal
 │   │   │   ├── LayerMenu.jsx # Menú de capas
 │   │   │   ├── Legend.jsx    # Leyenda dinámica
+│   │   │   ├── Timeline.jsx  # Línea de tiempo
 │   │   │   └── ...
-│   │   ├── styles/           # Archivos CSS
-│   │   └── ui/               # Componentes UI reutilizables
+│   │   └── ui/               # Componentes UI (InfoCard, Acordeon)
 │   ├── config/
 │   │   └── env.js            # Configuración centralizada
+│   ├── data/                 # Datos estáticos
+│   │   ├── AccordionData.js  # Estructura del menú de capas
+│   │   └── parametros*.js    # Diccionario de parámetros
+│   ├── hooks/                # Hooks personalizados
+│   │   ├── useLayerManagement.js
+│   │   ├── useTimelineManager.js
+│   │   └── ...
 │   ├── pages/                # Páginas/rutas
+│   ├── styles/               # Estilos CSS
+│   │   ├── variables.css     # Variables globales
+│   │   ├── global.css        # Estilos globales
+│   │   └── *.css             # Estilos por componente
 │   ├── utils/                # Utilidades y servicios
 │   │   ├── wfsService.js     # Servicio WFS/WMS
 │   │   ├── layerStyleFactory.js
@@ -172,8 +169,8 @@ geovisor/
 │   ├── App.jsx
 │   └── index.jsx
 ├── .env.example              # Plantilla de variables
-├── .env.development          # Config desarrollo (no commitear)
-├── .env.production           # Config producción (no commitear)
+├── .env.development          # Config desarrollo
+├── .env.production           # Config producción
 ├── package.json
 ├── vite.config.js
 └── README.md
@@ -211,11 +208,7 @@ ls -la dist/
 
 ### Despliegue en servidor web
 
-Los archivos de `/dist` pueden desplegarse en cualquier servidor web estático:
-
-- **Apache/Nginx**: Copiar contenido de `/dist` al directorio web
-- **Vercel/Netlify**: Conectar repositorio y configurar build command
-- **Docker**: Ver sección siguiente
+Los archivos de `/dist` pueden desplegarse en cualquier servidor web estático (Apache, Nginx, etc.).
 
 ### Configuración de Apache
 
@@ -238,25 +231,6 @@ Los archivos de `/dist` pueden desplegarse en cualquier servidor web estático:
         RewriteRule . /index.html [L]
     </Directory>
 </VirtualHost>
-```
-
-### Dockerfile (opcional)
-
-```dockerfile
-# Build stage
-FROM node:18-alpine as build
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-# Production stage
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
 ```
 
 ---
@@ -284,30 +258,6 @@ rm package-lock.json
 npm install
 npm run build
 ```
-
----
-
-## 🤝 Contribución
-
-1. Fork del repositorio
-2. Crear rama feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit cambios (`git commit -m 'Agrega nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abrir Pull Request
-
-### Convenciones de código
-
-- Usar **ES6+** y functional components
-- Nombres de componentes en **PascalCase**
-- Nombres de funciones en **camelCase**
-- CSS modular por componente
-- Comentarios en español
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
 
 ---
 
