@@ -1,0 +1,223 @@
+/* src/components/styles/diccionarioDatos.css */
+
+/* ============================================
+   ESTILOS PARA MODAL DICCIONARIO DE DATOS
+   Usa colores de variables.css
+   ============================================ */
+
+.diccionario-modal .modal-content {
+  border-radius: var(--border-radius-md);
+  border: none;
+  box-shadow: var(--shadow-medium);
+}
+
+.diccionario-header {
+  background: var(--gradient-primary);
+  color: var(--color-text-light);
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+  padding: 16px 20px;
+}
+
+.diccionario-header .modal-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-primary);
+}
+
+.diccionario-header .btn-close {
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+}
+
+.diccionario-header .btn-close:hover {
+  opacity: 1;
+}
+
+.diccionario-body {
+  padding: 20px;
+  max-height: 65vh;
+  overflow-y: auto;
+  font-family: var(--font-primary);
+}
+
+.diccionario-subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-accent-2);
+}
+
+/* ============================================
+   TABS
+   ============================================ */
+
+.diccionario-tabs .nav-link {
+  color: var(--color-primary);
+  font-weight: 500;
+  padding: 12px 20px;
+  border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
+  transition: var(--transition-fast);
+  font-family: var(--font-primary);
+}
+
+.diccionario-tabs .nav-link:hover {
+  background-color: var(--color-accent-2);
+  color: var(--color-primary-dark);
+}
+
+.diccionario-tabs .nav-link.active {
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+  border-color: var(--color-primary);
+}
+
+.diccionario-tabs .nav-link i {
+  font-size: 1rem;
+}
+
+/* ============================================
+   TABLA
+   ============================================ */
+
+.diccionario-table-container {
+  max-height: 50vh;
+  overflow-y: auto;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid #dee2e6;
+}
+
+.diccionario-table {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  font-family: var(--font-primary);
+}
+
+.diccionario-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.diccionario-table thead th {
+  background: #f8f9fa;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--color-primary);
+  white-space: nowrap;
+}
+
+.diccionario-table .col-parametro {
+  width: 30%;
+  min-width: 180px;
+}
+
+.diccionario-table .col-descripcion {
+  width: 70%;
+}
+
+.diccionario-table tbody tr {
+  transition: var(--transition-fast);
+}
+
+.diccionario-table tbody tr:hover {
+  background-color: var(--color-accent-2) !important;
+}
+
+.parametro-cell {
+  vertical-align: middle;
+  padding: 10px 16px;
+}
+
+.parametro-cell code {
+  background-color: #f8f9fa;
+  color: var(--color-primary-dark);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  word-break: break-word;
+  border: 1px solid var(--color-accent-2);
+}
+
+.descripcion-cell {
+  vertical-align: middle;
+  padding: 10px 16px;
+  color: var(--color-text-dark);
+  line-height: 1.5;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.diccionario-footer {
+  background-color: #f8f9fa;
+  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+  padding: 12px 20px;
+  justify-content: flex-start;
+  border-top: 1px solid var(--color-accent-2);
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADO
+   ============================================ */
+
+.diccionario-table-container::-webkit-scrollbar,
+.diccionario-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.diccionario-table-container::-webkit-scrollbar-track,
+.diccionario-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.diccionario-table-container::-webkit-scrollbar-thumb,
+.diccionario-body::-webkit-scrollbar-thumb {
+  background: var(--color-gray);
+  border-radius: 4px;
+}
+
+.diccionario-table-container::-webkit-scrollbar-thumb:hover,
+.diccionario-body::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-dark);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .diccionario-body {
+    padding: 15px;
+    max-height: 70vh;
+  }
+
+  .diccionario-tabs .nav-link {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+
+  .diccionario-tabs .nav-link i {
+    display: none;
+  }
+
+  .diccionario-table {
+    font-size: 0.85rem;
+  }
+
+  .diccionario-table .col-parametro {
+    width: 35%;
+    min-width: 120px;
+  }
+
+  .parametro-cell code {
+    font-size: 0.8rem;
+    padding: 2px 6px;
+  }
+}

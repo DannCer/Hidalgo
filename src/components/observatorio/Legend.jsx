@@ -1,5 +1,8 @@
 import React, { useState, useMemo } from 'react'; 
+import HelpButton from './HelpButton';
+import PdfViewerModal from './PdfViewerModal';
 import '../styles/legend.css';
+import '../styles/pdfViewer.css';
 
 // Mapeo de capas antiguas a nuevas claves unificadas
 const LEGEND_MAPPING = {
@@ -9,8 +12,20 @@ const LEGEND_MAPPING = {
   'Hidalgo:01_spcalidadagua': 'Hidalgo:01_calidadagua',
 };
 
+// Función auxiliar para determinar si es punto
+const isPointType = (legendType, variantType) => {
+  const type = variantType || legendType;
+  return type && (
+    type === 'point' || 
+    type === 'categorical-point' || 
+    type === 'ranged-point' ||
+    type.includes('point')
+  );
+};
+
 const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVariants = {}, onVariantChange }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [showPdfModal, setShowPdfModal] = useState(false);
 
     const toggleCollapse = () => {
         setIsCollapsed(prev => !prev);
@@ -55,7 +70,6 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
                     {layersWithLegend.map(layerName => {
                         const layerLegend = legendData[layerName];
                         
-                        // Verificar si alguna de las capas originales está cargando
                         const originalLayers = Object.keys(LEGEND_MAPPING).filter(
                             key => LEGEND_MAPPING[key] === layerName
                         );
@@ -67,11 +81,13 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
                         let currentLegend = layerLegend;
                         let selectedVariant = null;
                         let availableVariants = [];
+                        let isPointLayer = isPointType(layerLegend.type);
 
                         if (hasVariants) {
                             availableVariants = Object.keys(layerLegend.variants);
                             selectedVariant = activeVariants[layerName] || availableVariants[0];
                             currentLegend = layerLegend.variants[selectedVariant];
+                            isPointLayer = isPointType(layerLegend.type, currentLegend.type);
                         }
 
                         if (!currentLegend) return null;
@@ -81,6 +97,12 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
                                 <div className="legend-section-header">
                                     <h5 className="legend-layer-title">
                                         {layerLegend.title || layerName.split(':')[1] || layerName}
+                                        {layerName.includes('calidadagua') && (
+                                            <HelpButton 
+                                                onClick={() => setShowPdfModal(true)}
+                                                title="Ver información sobre calidad del agua"
+                                            />
+                                        )}
                                         {isLoading && (
                                             <span className="legend-loading-indicator" title="Cargando...">
                                                 <span className="loading-spinner"></span>
@@ -108,6 +130,8 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
 
                                 <ul className="legend-items">
                                     {currentLegend.items && currentLegend.items.map((item, index) => {
+                                        const shouldShowAsPoint = isPointLayer;
+
                                         const swatchStyle = {
                                             backgroundColor: item.color || 'transparent',
                                             border: item.borderColor
@@ -117,13 +141,13 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
                                                     : '1px solid #333',
                                             width: item.size ? `${item.size}px` : '16px',
                                             height: item.size ? `${item.size}px` : '16px',
-                                            borderRadius: currentLegend.type === 'point' || layerLegend.type === 'point' ? '50%' : '0',
+                                            borderRadius: shouldShowAsPoint ? '50%' : '0',
                                         };
 
                                         return (
                                             <li key={`${layerName}-${index}`} className="legend-item">
                                                 <i
-                                                    className={`legend-symbol ${currentLegend.type || layerLegend.type}`}
+                                                    className={`legend-symbol ${shouldShowAsPoint ? 'point' : 'polygon'}`}
                                                     style={swatchStyle}
                                                     aria-hidden="true"
                                                 ></i>
@@ -143,6 +167,14 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
                     })}
                 </div>
             )}
+
+            {/* Modal del PDF de Calidad del Agua */}
+            <PdfViewerModal
+                show={showPdfModal}
+                onHide={() => setShowPdfModal(false)}
+                pdfUrl="/assets/pdf/calidadAgua.pdf"
+                title="Calidad del Agua - Información"
+            />
         </div>
     );
 };

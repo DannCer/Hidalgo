@@ -1,83 +1,144 @@
 // src/components/observatorio/Timeline.jsx
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { normalizeQuincena } from '../../utils/dataUtils';
 import '../styles/timeline.css';
 
-/**
- * Timeline component optimizado para cambios rápidos
- * ✅ CORREGIDO: Todos los hooks se llaman incondicionalmente
- */
+// Configuración
+const DEFAULT_DEBOUNCE_MS = 150;
+const RAPID_CHANGE_THRESHOLD = 50; // ms entre cambios para considerar "rápido"
+
 const Timeline = ({
   timePoints,
   currentTime,
   onTimeChange,
   formatLabel,
   type = 'discrete',
-  debounceMs = 0,
-  isUpdating = false
+  debounceMs = DEFAULT_DEBOUNCE_MS,
+  isUpdating = false,
+  disabled = false
 }) => {
-  // ✅ HOOKS SIEMPRE PRIMERO - ANTES DE CUALQUIER RETURN
+  // ===================================================================
+  // ESTADOS
+  // ===================================================================
   const [localIndex, setLocalIndex] = useState(0);
-  const debounceTimerRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [pendingValue, setPendingValue] = useState(null);
 
-  // ✅ useMemo para normalización (siempre se ejecuta)
-  const normalizedTimePoints = React.useMemo(() => {
+  // ===================================================================
+  // REFS
+  // ===================================================================
+  const debounceTimerRef = useRef(null);
+  const lastChangeTimeRef = useRef(0);
+  const lastEmittedValueRef = useRef(null);
+  const changeCountRef = useRef(0);
+
+  // ===================================================================
+  // NORMALIZAR TIME POINTS
+  // ===================================================================
+  const normalizedTimePoints = useMemo(() => {
     if (!timePoints || timePoints.length === 0) return [];
-    
-    return timePoints.map(tp => 
-      tp?.toString().replace('Z', '').replace('T00:00:00.000', '').trim()
-    );
+    return timePoints.map(tp => normalizeQuincena(tp)).filter(Boolean);
   }, [timePoints]);
 
-  // ✅ Efecto para sincronizar con currentTime externo
+  // ===================================================================
+  // SINCRONIZAR CON CURRENTTIME EXTERNO
+  // ===================================================================
   useEffect(() => {
     if (!timePoints || timePoints.length === 0) return;
-    
-    const normalizedCurrent = currentTime?.toString()
-      .replace('Z', '')
-      .replace('T00:00:00.000', '')
-      .trim();
-    
+    if (isDragging) return; // No sincronizar mientras se arrastra
+
+    const normalizedCurrent = normalizeQuincena(currentTime);
+    if (!normalizedCurrent) return;
+
     const index = normalizedTimePoints.indexOf(normalizedCurrent);
     
     if (index !== -1 && index !== localIndex) {
       setLocalIndex(index);
-    } else if (index === -1 && localIndex !== timePoints.length - 1) {
+      lastEmittedValueRef.current = normalizedCurrent;
+    } else if (index === -1 && normalizedTimePoints.length > 0) {
       // Fallback al último si no se encuentra
-      console.warn('⚠️ Timeline: currentTime no encontrado, usando último', {
-        currentTime: normalizedCurrent,
-        available: normalizedTimePoints.slice(-3)
-      });
-      setLocalIndex(timePoints.length - 1);
+      const lastIndex = timePoints.length - 1;
+      if (localIndex !== lastIndex) {
+        setLocalIndex(lastIndex);
+      }
     }
-  }, [currentTime, normalizedTimePoints, timePoints, localIndex]);
+  }, [currentTime, normalizedTimePoints, timePoints, isDragging]);
 
-  // ✅ Handler con debouncing opcional
+  // ===================================================================
+  // HANDLER DE CAMBIO CON DEBOUNCE INTELIGENTE
+  // ===================================================================
   const handleChange = useCallback((e) => {
     const newIndex = parseInt(e.target.value, 10);
+    const now = Date.now();
+    const timeSinceLastChange = now - lastChangeTimeRef.current;
     
     // Actualizar UI inmediatamente
     setLocalIndex(newIndex);
+    lastChangeTimeRef.current = now;
+    changeCountRef.current++;
 
     // Limpiar timer anterior
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
-    const executeChange = () => {
-      if (timePoints && timePoints[newIndex]) {
-        onTimeChange(timePoints[newIndex]);
-      }
-    };
+    // Obtener valor a emitir
+    const valueToEmit = timePoints?.[newIndex];
+    if (!valueToEmit) return;
 
-    // Aplicar debounce solo si está configurado
-    if (debounceMs > 0) {
-      debounceTimerRef.current = setTimeout(executeChange, debounceMs);
-    } else {
-      executeChange();
+    const normalizedValue = normalizeQuincena(valueToEmit);
+    
+    // Evitar emitir el mismo valor dos veces
+    if (normalizedValue === lastEmittedValueRef.current) {
+      return;
     }
+
+    setPendingValue(normalizedValue);
+
+    // Calcular delay dinámico basado en velocidad de cambio
+    const isRapidChange = timeSinceLastChange < RAPID_CHANGE_THRESHOLD;
+    const dynamicDelay = isRapidChange ? debounceMs : debounceMs / 2;
+
+    // Programar emisión del cambio
+    debounceTimerRef.current = setTimeout(() => {
+      if (onTimeChange && valueToEmit) {
+        lastEmittedValueRef.current = normalizedValue;
+        setPendingValue(null);
+        onTimeChange(valueToEmit);
+      }
+    }, dynamicDelay);
+
   }, [timePoints, onTimeChange, debounceMs]);
 
-  // ✅ Limpiar timer al desmontar
+  // ===================================================================
+  // HANDLERS DE DRAG
+  // ===================================================================
+  const handleMouseDown = useCallback(() => {
+    setIsDragging(true);
+    changeCountRef.current = 0;
+  }, []);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+    
+    // Si hubo muchos cambios rápidos, forzar emisión del último valor
+    if (changeCountRef.current > 5 && pendingValue) {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      
+      const valueToEmit = timePoints?.[localIndex];
+      if (valueToEmit && onTimeChange) {
+        lastEmittedValueRef.current = normalizeQuincena(valueToEmit);
+        setPendingValue(null);
+        onTimeChange(valueToEmit);
+      }
+    }
+  }, [localIndex, timePoints, onTimeChange, pendingValue]);
+
+  // ===================================================================
+  // LIMPIAR AL DESMONTAR
+  // ===================================================================
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) {
@@ -86,19 +147,33 @@ const Timeline = ({
     };
   }, []);
 
-  // ✅ AHORA SÍ - VALIDACIONES Y EARLY RETURNS DESPUÉS DE LOS HOOKS
+  // ===================================================================
+  // EARLY RETURN SI NO HAY DATOS
+  // ===================================================================
   if (!timePoints || timePoints.length === 0) {
-    console.warn('⚠️ Timeline: No hay timePoints disponibles');
     return null;
   }
 
-  // Calcular progreso para el estilo
+  // ===================================================================
+  // CALCULAR ESTADO VISUAL
+  // ===================================================================
   const progress = timePoints.length > 1 
     ? (localIndex / (timePoints.length - 1)) * 100 
     : 0;
 
+  const isWaiting = isUpdating || pendingValue !== null;
+  const currentValue = timePoints[localIndex];
+  const displayLabel = formatLabel 
+    ? formatLabel(currentValue) 
+    : currentValue;
+
+  // ===================================================================
+  // RENDER
+  // ===================================================================
   return (
-    <div className={`timeline-container ${isUpdating ? 'timeline-updating' : ''}`}>
+    <div 
+      className={`timeline-container ${isWaiting ? 'timeline-updating' : ''} ${isDragging ? 'timeline-dragging' : ''}`}
+    >
       {/* Slider */}
       <input
         type="range"
@@ -106,8 +181,12 @@ const Timeline = ({
         max={timePoints.length - 1}
         value={localIndex}
         onChange={handleChange}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onTouchStart={handleMouseDown}
+        onTouchEnd={handleMouseUp}
         className="timeline-slider"
-        disabled={isUpdating}
+        disabled={disabled}
         style={{
           '--slider-progress': `${progress}%`
         }}
@@ -115,17 +194,33 @@ const Timeline = ({
       
       {/* Etiqueta actual */}
       <div className="timeline-current-label">
-        {formatLabel ? formatLabel(timePoints[localIndex]) : timePoints[localIndex]}
-        {isUpdating && <span className="timeline-spinner"> ⏳</span>}
+        <span className="timeline-label-text">
+          {displayLabel}
+        </span>
+        
+        {/* Indicador de estado */}
+        {isWaiting && (
+          <span className="timeline-status-indicator">
+            <span className="timeline-spinner">⏳</span>
+          </span>
+        )}
       </div>
       
-      {/* Debug info (solo en desarrollo) */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="timeline-debug-info">
-          {localIndex + 1} / {timePoints.length}
-          {debounceMs > 0 && ` (debounce: ${debounceMs}ms)`}
-        </div>
-      )}
+      {/* Barra de progreso visual (opcional) */}
+      <div className="timeline-progress-bar">
+        <div 
+          className="timeline-progress-fill"
+          style={{ width: `${progress}%` }}
+        />
+        {isWaiting && (
+          <div className="timeline-progress-pending" />
+        )}
+      </div>
+      
+      {/* Info de posición */}
+      <div className="timeline-position-info">
+        {localIndex + 1} / {timePoints.length}
+      </div>
     </div>
   );
 };

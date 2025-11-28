@@ -1,47 +1,6 @@
-import internacional from '../../assets/pdf/Marco legal_Internacional.pdf'
-import nacional from '../../assets/pdf/Marco legal_Nacional.pdf'
-import estatal from '../../assets/pdf/Marco legal_Estatal.pdf'
-import acta from '../../assets/pdf/Acta Consejo Técnico.pdf'
-import programa from '../../assets/pdf/Sintesis de PHE2040 de Hidalgo_Final OK_.pdf'
-import anp1 from '../../assets/pdf/Anexo_1.pdf'
-import anp2 from '../../assets/pdf/Anexo_2.pdf'
-import acta3 from '../../assets/pdf/Anexo_3.pdf'
-import proceso from '../../assets/pdf/Informe final de las dos etapas.docx.pdf'
-import capasBase from '../../assets/img/CB/1 (5).jpg';
-import poblkacion from '../../assets/img/CB/1 (7).jpg';
-import macro from '../../assets/img/CB/1 (4).jpg'
-import img01 from '../../assets/img/Eje1/TECOCOMULCO (2).jpg';
-import img02 from '../../assets/img/Eje1/TECOCOMULCO (1).jpg';
-import img03 from '../../assets/img/Eje1/TECOCOMULCO (5).jpg';
-import img04 from '../../assets/img/Eje1/ESCURRIEMIENTO.jpg';
-import img05 from '../../assets/img/Eje1/TECOCOMULCO (3).jpg';
-import img06 from '../../assets/img/Eje1/TECOCOMULCO (4).jpg';
-import organismosO from '../../assets/img/Eje2/PLANTA TRATAMIENTO  (4).jpg'
-import AguaP from '../../assets/img/Eje2/AguaP.jpeg'
-import Alcantarillado from '../../assets/img/Eje2/Alcantarillado.jpeg'
-import AguasR from '../../assets/img/Eje2/PLANTA TRATAMIENTO  (3).jpg'
-import Inspeccion from '../../assets/img/Eje2/InspeccionV.jpeg'
-import Reuso from '../../assets/img/Eje2/PLANTA TRATAMIENTO  (5).jpg'
-import Usos from '../../assets/img/Eje3/UsosAgua2.webp'
-import Distritos from '../../assets/img/Eje3/unidadesriego.jpeg'
-import Eficiencias from '../../assets/img/Eje3/crae.jpeg'
-import climatologica from '../../assets/img/Eje4/SMN.jfif'
-import Hidormetricas from '../../assets/img/Eje4/Estaciones_Hidrom.jpg'
-import Presas from '../../assets/img/Eje4/PRESA  (1).jpg'
-import Atlas from '../../assets/img/Eje4/EFECTOS INUNDACION  (1).jpeg'
-import Ordenamiento from '../../assets/img/Eje4/PRESA  (3).jpg'
-import Infraestructura from '../../assets/img/Eje4/EFECTOS INUNDACION  (2).jpg'
-import fenomenos from '../../assets/img/Eje4/EFECTOS INUNDACION  (1).jpg'
-import Recaudacion from '../../assets/img/Eje5/IMG_4675.jpg'
-import Presupuesto from '../../assets/img/Eje5/IMG_4673.jpg'
-import Centros from '../../assets/img/Eje5/IMG_4099.jpg'
-import Marco from '../../assets/img/Eje5/NormasOf.webp'
-import Centro from '../../assets/img/Eje5/Centros.jpg'
-import Proceso from '../../assets/img/Eje5/IMG_4102.jpg'
-import programaHidrico from '../../assets/img/ProgramaHidrico/programahidrico.png'
-import Lorem from '../../assets/img/Lorem_Picsum.png'
+// src/ui/AccordionData.js
 
-
+// Definición de sistemas de coordenadas y tipos de geometría
 const CRS = {
     WGS84: 'EPSG:4326',
     WEB_MERCATOR: 'EPSG:3857',
@@ -60,7 +19,7 @@ export const accordionData = [
         id: 'contexto',
         cards: [
             {
-                image: capasBase,
+                image: '/assets/img/CB/1 (5).jpg',
                 title: 'Capas Base',
                 id: 'capas-base',
                 links: [
@@ -88,7 +47,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: poblkacion,
+                image: '/assets/img/CB/1 (7).jpg',
                 title: 'Población',
                 id: 'poblacion',
                 links: [
@@ -116,7 +75,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: macro,
+                image: '/assets/img/CB/1 (4).jpg',
                 title: 'Regiones',
                 id: 'regiones',
                 links: [
@@ -136,16 +95,14 @@ export const accordionData = [
         id: 'programa-hidrico',
         cards: [
             {
-                image: programaHidrico,
+                image: '/assets/img/ProgramaHidrico/programahidrico.png',
                 title: 'Programa estatal hídrico',
                 links: [
-
                     {
                         text: 'Programa estatal hídrico',
-                        path: programa,
+                        path: '/assets/pdf/Sintesis de PHE2040 de Hidalgo_Final OK_.pdf',
                         target: '_blank',
-                    }
-                    ,
+                    },
                 ]
             },
         ]
@@ -155,7 +112,7 @@ export const accordionData = [
         id: 'eje1',
         cards: [
             {
-                image: img01,
+                image: '/assets/img/Eje1/TECOCOMULCO (2).jpg',
                 title: 'Cantidad del recurso hídrico',
                 id: 'cantidad-recurso',
                 links: [
@@ -183,7 +140,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: img02,
+                image: '/assets/img/Eje1/TECOCOMULCO (1).jpg',
                 title: 'Calidad del recurso hídrico',
                 id: 'calidad-recurso',
                 links: [
@@ -204,7 +161,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: img03,
+                image: '/assets/img/Eje1/TECOCOMULCO (5).jpg',
                 title: 'Conservación de ecosistemas',
                 id: 'conservacion-ecosistemas',
                 links: [
@@ -221,7 +178,7 @@ export const accordionData = [
                         sublinks: [
                             {
                                 text: 'Documento de ADVC',
-                                path: anp2,
+                                path: '/assets/pdf/Anexo_2.pdf',
                                 target: '_blank',
                             },
                             {
@@ -235,7 +192,7 @@ export const accordionData = [
                     },
                     {
                         text: 'Áreas naturales protegidas estatales y municipales',
-                        path: anp1,
+                        path: '/assets/pdf/Anexo_1.pdf',
                         target: '_blank',
                     },
                     {
@@ -255,7 +212,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: img04,
+                image: '/assets/img/Eje1/ESCURRIEMIENTO.jpg',
                 title: 'Descargas de aguas residuales',
                 id: 'descargas-aguas',
                 links: [
@@ -269,7 +226,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: img05,
+                image: '/assets/img/Eje1/TECOCOMULCO (3).jpg',
                 title: 'Ordenamiento de cuencas',
                 id: 'ordenamiento-cuencas',
                 links: [
@@ -290,7 +247,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: img06,
+                image: '/assets/img/Eje1/TECOCOMULCO (4).jpg',
                 title: 'Ordenamiento de acuíferos',
                 id: 'ordenamiento-acuiferos',
                 links: [
@@ -317,7 +274,7 @@ export const accordionData = [
         id: 'eje2',
         cards: [
             {
-                image: organismosO,
+                image: '/assets/img/Eje2/PLANTA TRATAMIENTO  (4).jpg',
                 title: 'Organismos operadores',
                 links: [
                     {
@@ -330,7 +287,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: AguaP,
+                image: '/assets/img/Eje2/AguaP.jpeg',
                 title: 'Cobertura de agua potable',
                 links: [
                     {
@@ -370,7 +327,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: Alcantarillado,
+                image: '/assets/img/Eje2/Alcantarillado.jpeg',
                 title: 'Cobertura de alcantarillado',
                 links: [
                     {
@@ -383,7 +340,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: AguasR,
+                image: '/assets/img/Eje2/PLANTA TRATAMIENTO  (3).jpg',
                 title: 'Cobertura de saneamiento de aguas residuales',
                 links: [
                     {
@@ -404,18 +361,18 @@ export const accordionData = [
                 ]
             },
             {
-                image: Inspeccion,
+                image: '/assets/img/Eje2/InspeccionV.jpeg',
                 title: 'Inspección y vigilancia',
                 links: [
                     {
                         text: 'Inspección y vigilancia',
-                        path: '/observatorio',
-                        layerName: ''
+                        path: '/assets/pdf/Datos de inspección y vigilancia.pdf',
+                        target: '_blank',
                     }
                 ]
             },
             {
-                image: Reuso,
+                image: '/assets/img/Eje2/PLANTA TRATAMIENTO  (5).jpg',
                 title: 'Reúso de agua',
                 links: [
                     {
@@ -432,7 +389,7 @@ export const accordionData = [
         id: 'eje3',
         cards: [
             {
-                image: Usos,
+                image: '/assets/img/Eje3/UsosAgua2.webp',
                 title: 'Usos Consuntivos',
                 links: [
                     {
@@ -445,7 +402,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: Distritos,
+                image: '/assets/img/Eje3/unidadesriego.jpeg',
                 title: 'Distritos y unidades de riego',
                 links: [
                     {
@@ -472,7 +429,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: Eficiencias,
+                image: '/assets/img/Eje3/crae.jpeg',
                 title: 'Eficiencias en el uso del agua',
                 links: [
                     {
@@ -489,33 +446,35 @@ export const accordionData = [
         id: 'eje4',
         cards: [
             {
-                image: climatologica,
-                title: 'Estaciones climatológicas',
+                image: '/assets/img/Eje4/EFECTOS INUNDACION  (1).jpeg',
+                title: 'Atlas de riesgos municipales',
                 links: [
                     {
-                        text: 'Estaciones climatológicas',
-                        path: '/observatorio',
-                        layerName: 'Hidalgo:04_climatologicas',
-                        crs: CRS.WGS84,
-                        geomType: GEOM_TYPES.POINT
-                    }
-                ]
-            },
-            {
-                image: Hidormetricas,
-                title: 'Estaciones hidrométricas',
-                links: [
+                        text: 'Atlas de riesgos municipales',
+                        path: 'https://bibliotecadigitaluplaph.hidalgo.gob.mx/'
+                    },
                     {
-                        text: 'Estaciones hidrométricas',
+                        text: 'Riesgos municipales',
                         path: '/observatorio',
-                        layerName: 'Hidalgo:04_hidrometricas',
+                        layerName: 'Hidalgo:04_riesgosmunicipales',
                         crs: CRS.WEB_MERCATOR,
-                        geomType: GEOM_TYPES.POINT
+                        geomType: GEOM_TYPES.POLYGON
+
                     }
                 ]
             },
             {
-                image: Presas,
+                image: '/assets/img/Eje4/PRESA  (3).jpg',
+                title: 'Programas de ordenamiento ecológico territorial',
+                links: [
+                    {
+                        text: 'Programas de ordenamiento ecológico territorial',
+                        path: 'https://bitacora.semarnath.gob.mx/ordenamientos.html'
+                    }
+                ]
+            },
+            {
+                image: '/assets/img/Eje4/PRESA  (1).jpg',
                 title: 'Presas de almacenamiento',
                 links: [
                     {
@@ -535,35 +494,33 @@ export const accordionData = [
                 ]
             },
             {
-                image: Atlas,
-                title: 'Atlas de riesgos municipales',
+                image: '/assets/img/Eje4/SMN.jfif',
+                title: 'Estaciones climatológicas',
                 links: [
                     {
-                        text: 'Atlas de riesgos municipales',
-                        path: 'https://bibliotecadigitaluplaph.hidalgo.gob.mx/'
-                    },
-                    {
-                        text: 'Riesgos municipales',
+                        text: 'Estaciones climatológicas',
                         path: '/observatorio',
-                        layerName: 'Hidalgo:04_riesgosmunicipales',
-                        crs: CRS.WEB_MERCATOR,
-                        geomType: GEOM_TYPES.POLYGON
-
+                        layerName: 'Hidalgo:04_climatologicas',
+                        crs: CRS.WGS84,
+                        geomType: GEOM_TYPES.POINT
                     }
                 ]
             },
             {
-                image: Ordenamiento,
-                title: 'Programas de ordenamiento ecológico territorial',
+                image: '/assets/img/Eje4/Estaciones_Hidrom.jpg',
+                title: 'Estaciones hidrométricas',
                 links: [
                     {
-                        text: 'Programas de ordenamiento ecológico territorial',
-                        path: 'https://bitacora.semarnath.gob.mx/ordenamientos.html'
+                        text: 'Estaciones hidrométricas',
+                        path: '/observatorio',
+                        layerName: 'Hidalgo:04_hidrometricas',
+                        crs: CRS.WEB_MERCATOR,
+                        geomType: GEOM_TYPES.POINT
                     }
                 ]
             },
             {
-                image: Infraestructura,
+                image: '/assets/img/Eje4/EFECTOS INUNDACION  (2).jpg',
                 title: 'Infraestructura hidráulica de protección y pluvial',
                 links: [
                     {
@@ -574,7 +531,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: fenomenos,
+                image: '/assets/img/Eje4/EFECTOS INUNDACION  (1).jpg',
                 title: 'Fenómenos hidrometeorológicos extremos',
                 links: [
                     {
@@ -605,38 +562,39 @@ export const accordionData = [
         id: 'eje5',
         cards: [
             {
-                image: Recaudacion,
-                title: 'Recaudación',
+                image: '/assets/img/Eje5/Centros.jpg',
+                title: 'Gestión hídrica municipal',
                 links: [
                     {
-                        text: 'Recaudación por extracción',
-                        path: '/observatorio',
-                        layerName: 'Hidalgo:05_recextraccion',
-                        crs: CRS.WEB_MERCATOR,
-                        geomType: GEOM_TYPES.POLYGON
-                    },
-                    {
-                        text: 'Recaudación por cobro',
-                        path: '/observatorio',
-                        layerName: 'Hidalgo:05_recobro',
-                        crs: CRS.WEB_MERCATOR,
-                        geomType: GEOM_TYPES.POLYGON
-                    }
-                ]
-            },
-            {
-                image: Presupuesto,
-                title: 'Presupuesto para la gestión del agua',
-                links: [
-                    {
-                        text: 'Presupuesto para la gestión del agua',
+                        text: 'Agenda común',
                         path: '/observatorio',
                         layerName: ''
+                    },
+                    {
+                        text: 'Planeación y operación hídrica municipal',
+                        path: '/observatorio',
+                        layerName: ''
+                    },
+                    {
+                        text: 'Espacios de Cultura del Agua',
+                        path: '/assets/pdf/Cultura del Agua Hidalgo.pdf',
+                        target: '_blank',
                     }
                 ]
             },
             {
-                image: Centros,
+                image: '/assets/img/Eje5/proceso.jpeg',
+                title: 'Proceso para la integración del Programa Hídrico del Estado de Hidalgo',
+                links: [
+                    {
+                        text: 'Proceso para la integración del Programa Hídrico del Estado de Hidalgo',
+                        path: '/assets/pdf/Proceso de Integración PEH 2040.pdf',
+                        target: '_blank',
+                    }
+                ]
+            },
+            {
+                image: '/assets/img/Eje5/IMG_4099.jpg',
                 title: 'Participación sectorial',
                 links: [
                     {
@@ -671,7 +629,7 @@ export const accordionData = [
                     {
                         text: 'Organizaciones Locales de Agua y Saneamiento',
                         path: '/observatorio',
-                       layerName: 'Hidalgo:05_ola',
+                        layerName: 'Hidalgo:05_ola',
                         crs: CRS.WGS84,
                         geomType: GEOM_TYPES.POINT
                     },
@@ -680,75 +638,74 @@ export const accordionData = [
                         type: 'dropdown',
                         sublinks: [
                             {
-                                text: 'Acta de conformación',
-                                path: acta,
+                                text: 'Estrategía de atención',
+                                path: '/assets/pdf/Anexo_3.pdf',
                                 target: '_blank',
                             },
                             {
-                                text: 'Estrategía de atención',
-                                path: acta3,
+                                text: 'Acta de conformación',
+                                path: '/assets/pdf/Acta Consejo Técnico.pdf',
                                 target: '_blank',
-                            }
+                            },
                         ]
                     }
                 ]
             },
             {
-                image: Centro,
-                title: 'Gestión hídrica municipal',
+                image: '/assets/img/Eje5/IMG_4675.jpg',
+                title: 'Recaudación',
                 links: [
                     {
-                        text: 'Agenda común',
+                        text: 'Recaudación por extracción',
                         path: '/observatorio',
-                        layerName: ''
+                        layerName: 'Hidalgo:05_recextraccion',
+                        crs: CRS.WEB_MERCATOR,
+                        geomType: GEOM_TYPES.POLYGON
                     },
                     {
-                        text: 'Planeación y operación hídrica municipal',
+                        text: 'Recaudación por cobro',
                         path: '/observatorio',
-                        layerName: ''
-                    },
+                        layerName: 'Hidalgo:05_recobro',
+                        crs: CRS.WEB_MERCATOR,
+                        geomType: GEOM_TYPES.POLYGON
+                    }
+                ]
+            },
+            {
+                image: '/assets/img/Eje5/IMG_4673.jpg',
+                title: 'Presupuesto para la gestión del agua',
+                links: [
                     {
-                        text: 'Espacios de Cultura del Agua',
+                        text: 'Presupuesto para la gestión del agua',
                         path: '/observatorio',
                         layerName: ''
                     }
                 ]
             },
             {
-                image: Proceso,
-                title: 'Proceso para la integración del Programa Hídrico del Estado de Hidalgo',
-                links: [
-                    {
-                        text: 'Proceso para la integración del Programa Hídrico del Estado de Hidalgo',
-                        path: proceso,
-                        target: '_blank',
-                    }
-                ]
-            },
-            {
-                image: Marco,
+                image: '/assets/img/Eje5/NormasOf.webp',
                 title: 'Marco legal',
                 links: [
                     {
                         text: 'Internacional',
-                        path: internacional,
+                        path: '/assets/pdf/Marco legal_Internacional.pdf',
                         target: '_blank',
                     },
                     {
                         text: 'Nacional',
-                        path: nacional,
+                        path: '/assets/pdf/Marco legal_Nacional.pdf',
                         target: '_blank',
                     },
                     {
                         text: 'Estatal',
-                        path: estatal,
+                        path: '/assets/pdf/Marco legal_Estatal.pdf',
                         target: '_blank',
                     },
 
                 ]
             },
             {
-                image: img06,
+                image: '/assets/img/Eje1/TECOCOMULCO (4).jpg',
                 title: 'Sitios de interés',
                 links: [
                     {
@@ -780,11 +737,11 @@ export const accordionData = [
         id: 'cartografia',
         cards: [
             {
-                image: Lorem,
-                title: 'Zonificación por acuífero',
+                image: '/assets/img/Lorem_Picsum.png',
+                title: 'Regionalización por acuífero',
                 links: [
                     {
-                        text: 'Acuíferos',
+                        text: 'Regionalización por acuífero',
                         path: '/observatorio',
                         layerName: 'Hidalgo:cart_zonifacuifero',
                         crs: CRS.WEB_MERCATOR,
@@ -793,7 +750,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: Lorem,
+                image: '/assets/img/Lorem_Picsum.png',
                 title: 'Acuíferos de Hidalgo',
                 links: [
                     {
@@ -803,7 +760,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: Lorem,
+                image: '/assets/img/Lorem_Picsum.png',
                 title: 'Cuerpos de agua',
                 links: [
                     {

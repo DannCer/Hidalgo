@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import JSZip from 'jszip';
 import { getShapefileDownloadUrl } from '../../utils/wfsService';
+import { logger } from '../../config/env';
 
 const fetchFileAsBlob = async (url) => {
   const response = await fetch(url);
@@ -64,9 +65,7 @@ const DownloadButton = ({
       saveZipFile(finalZip, filename);
 
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('❌ Error al crear el ZIP:', error);
-      }
+      logger.error('Error al crear el ZIP:', error);
       alert('Error al crear el archivo ZIP combinado.');
     } finally {
       setIsDownloading(false);

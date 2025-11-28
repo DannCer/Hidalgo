@@ -1,11 +1,5 @@
-/* =========================================================
-    ESTILOS OPTIMIZADOS PARA COMPONENTE MapView.jsx
-    (CONFIGURACIÓN PARA SIDEBAR MONTADO EN L.Control)
-    ========================================================= */
+/* ESTILOS PARA MapView.jsx */
 
-/* ---------------------------
-    CONTENEDOR PRINCIPAL
------------------------------- */
 .map-view-container {
     position: relative;
     width: 100%;
@@ -15,9 +9,6 @@
     font-family: 'Montserrat', sans-serif;
 }
 
-/* ---------------------------
-    MAPA PRINCIPAL
------------------------------- */
 .map-container,
 .leaflet-map {
     width: 100%;
@@ -32,9 +23,6 @@
     font-family: 'Montserrat', sans-serif;
 }
 
-/* ---------------------------
-    CONTROLES LEAFLET
------------------------------- */
 .leaflet-control-zoom,
 .leaflet-control-layers,
 .leaflet-control-scale {
@@ -56,186 +44,82 @@
     color: #fff !important;
 }
 
-/* =========================================================
-    ESTILOS DEL SIDEBAR MONTADO EN L.Control (ControlSidebarWrapper)
-    ========================================================= */
-
-/* 1. Contenedor del Control de Leaflet (L.Control, posición topright) */
+/* SIDEBAR / POPUP */
 .leaflet-control-sidebar {
-    /* El control se posiciona automáticamente topright */
-    width: 0; /* Oculto por defecto */
+    width: 0;
     height: 0;
     transition: all 0.3s ease;
     opacity: 0;
 }
 
-/* 2. Estado Activo (Visible) */
 .leaflet-control-sidebar.sidebar-control-active {
-    width: 350px; 
-    max-width: 350px;
+    width: 420px;
+    max-width: 500px;
     height: auto;
     opacity: 1;
-    
-    /* El L.Control ya aplica su margen, pero si necesitas un ajuste fino: */
-    /* margin-right: 20px !important; 
-       margin-top: 100px !important; */
+    position: absolute;
+    top: 125px !important;
+    right: 20px !important;
+    cursor: grab;
 }
 
-/* 3. El contenido del Sidebar (Reemplaza el antiguo .sidebar-popup) */
+.leaflet-control-sidebar.leaflet-draggable-dragging {
+    cursor: grabbing;
+}
+
 .leaflet-control-sidebar .sidebar-popup {
-    /* Solo contenedor de estilo, no de posicionamiento absoluto */
-    position: relative; 
+    position: relative;
     margin: 0;
     padding: 0;
-    /* Usamos el z-index del control que es 1000, pero lo forzamos a ser visible */
-    z-index: 1001; 
+    z-index: 1001;
 }
 
-
-/* ---------------------------
-    CONTENEDORES INTERNOS
------------------------------- */
-
-/* Contenedor del contenido (wrapper) */
 .leaflet-control-sidebar .leaflet-popup-content-wrapper {
-    position: relative; /* Ya no necesita !important, está fuera de la influencia de Leaflet */
+    position: relative;
     border-radius: 12px;
     background: #ffffff;
     border: 2px solid var(--color-primary, #A02142);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    max-height: min(500px, 60vh);
+    width: 420px;
+    max-width: 500px;
+    height: auto;
+    max-height: min(600px, 70vh);
     overflow: hidden;
-    max-width: 350px;
     margin: 0;
     padding: 0;
-    /* Aquí se aplica la animación de entrada */
     animation: popupSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .leaflet-control-sidebar .leaflet-popup-content {
     margin: 0;
     padding: 1rem;
-    max-height: min(450px, 55vh);
+    height: auto;
+    max-height: min(550px, 65vh);
     overflow-y: auto;
     width: auto;
-    font-size: 0.75rem;
-    line-height: 1.4;
+    font-size: 0.8rem;
+    line-height: 1.5;
     background: white;
 }
 
-/* Botón de cerrar (se renderiza directamente en el HTML inyectado) */
 .leaflet-control-sidebar .leaflet-popup-close-button {
     background: var(--color-primary, #A02142);
     color: white;
     border-radius: 50%;
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
     font-weight: bold;
-    right: 8px !important;
-    top: 8px !important;
+    right: 10px !important;
+    top: 10px !important;
     z-index: 1002;
     border: 2px solid white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.leaflet-control-sidebar.sidebar-control-active {
-    width: 350px; 
-    max-width: 350px;
-    height: auto;
-    opacity: 1;
-    
-    /* 🛑 IMPORTANTE: Hacemos la posición del contenedor absoluta */
-    /* Esto permite que L.Draggable mueva el elemento libremente por el DOM */
-    position: absolute; 
-    
-    /* El L.Control de Leaflet ya da una posición inicial de 'topright', 
-       pero podemos usar las propiedades `top` y `right` para la posición inicial. */
-    top: 100px !important; 
-    right: 20px !important;
-}
-
-/* Y añade un cursor para indicar que es arrastrable */
-.leaflet-control-sidebar.sidebar-control-active {
-    cursor: grab;
-}
-
-/* Cambia el cursor cuando se arrastra */
-.leaflet-control-sidebar.leaflet-draggable-dragging {
-    cursor: grabbing;
-}
-
-/* ---------------------------
-    ESTILOS COMPACTOS PARA EL CONTENIDO
------------------------------- */
-.compact-popup .popup-header {
-    border-bottom: 2px solid #e0e0e0;
-    margin-bottom: 0.8rem;
-    padding-bottom: 0.6rem;
-    padding-right: 30px; /* Espacio para botón cerrar */
-}
-
-.compact-popup .popup-header h4 {
-    font-size: 1.1rem;
-    margin-bottom: 0.3rem;
-    color: var(--color-primary-dark, #691b31);
-    font-weight: 700;
-}
-
-.compact-popup .feature-summary {
-    font-size: 0.75rem;
-    margin: 0;
-    color: #666;
-    font-style: italic;
-}
-
-.compact-popup .feature-section {
-    border-left: 3px solid var(--color-primary-light, #d14565);
-    padding-left: 0.8rem;
-    margin-bottom: 0.8rem;
-    background: #fafafa;
-    padding: 0.8rem;
-    border-radius: 6px;
-}
-
-.compact-popup .feature-section h6 {
-    font-size: 0.85rem;
-    margin-bottom: 0.4rem;
-    color: #444;
-    font-weight: 600;
-}
-
-.compact-popup .popup-table {
-    font-size: 0.75rem;
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.compact-popup .popup-table td {
-    padding: 0.2rem 0.4rem;
-    vertical-align: top;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.compact-popup .property-name {
-    color: #333;
-    white-space: nowrap;
-    font-weight: 600;
-    width: 40%;
-}
-
-.compact-popup .property-value {
-    color: #555;
-    word-break: break-word;
-    width: 60%;
-}
-
-/* ---------------------------
-    SCROLLBAR MEJORADO
------------------------------- */
 .leaflet-control-sidebar .leaflet-popup-content::-webkit-scrollbar {
     width: 8px;
 }
@@ -254,9 +138,6 @@
     background: var(--color-primary-dark, #691b31);
 }
 
-/* ---------------------------
-    ANIMACIÓN
------------------------------- */
 @keyframes popupSlideIn {
     from {
         opacity: 0;
@@ -268,44 +149,39 @@
     }
 }
 
-/* ---------------------------
-    RESPONSIVE
------------------------------- */
 @media (max-width: 768px) {
     .leaflet-control-sidebar.sidebar-control-active {
-        width: 300px;
-        margin-right: 10px;
-        margin-top: 80px;
+        min-width: 250px;
+        max-width: calc(100vw - 40px);
+        right: 10px !important;
+        top: 80px !important;
     }
-    
+
     .leaflet-control-sidebar .leaflet-popup-content-wrapper {
-        max-width: 300px;
-        max-height: min(400px, 50vh);
+        min-width: 250px;
+        max-width: calc(100vw - 40px);
+        max-height: min(450px, 55vh);
     }
-    
+
     .leaflet-control-sidebar .leaflet-popup-content {
-        width: 260px;
-        max-height: min(350px, 45vh);
+        max-height: min(400px, 50vh);
     }
 }
 
 @media (max-height: 700px) {
     .leaflet-control-sidebar.sidebar-control-active {
-        margin-top: 70px;
+        top: 70px !important;
     }
-    
+
     .leaflet-control-sidebar .leaflet-popup-content-wrapper {
-        max-height: min(400px, 50vh);
+        max-height: min(450px, 55vh);
     }
-    
+
     .leaflet-control-sidebar .leaflet-popup-content {
-        max-height: min(350px, 45vh);
+        max-height: min(400px, 50vh);
     }
 }
 
-/* ---------------------------
-    ESTADOS ESPECIALES
------------------------------- */
 .loading-popup {
     padding: 2rem 1rem !important;
     text-align: center;
@@ -322,4 +198,215 @@
     background: #ffebee;
     border-radius: 6px;
     font-weight: 500;
+}
+
+/* POPUP CONTENT */
+.popup-content-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.layer-separator {
+    margin: 1rem 0;
+    border: none;
+    border-top: 1px solid #dee2e6;
+    opacity: 0.6;
+}
+
+.layer-popup-section {
+    margin-bottom: 0.5rem;
+}
+
+.layer-popup-section:last-child {
+    margin-bottom: 0;
+}
+
+.layer-popup-section:last-child .layer-separator {
+    display: none;
+}
+
+.popup-section-title {
+    color: var(--color-primary-dark, #691b31);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 2px solid var(--color-primary, #A02142);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.feature-count {
+    font-weight: normal;
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.features-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.feature-item {
+    padding: 0.6rem;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid var(--color-primary-light, #d14565);
+}
+
+.feature-item:last-child {
+    margin-bottom: 0;
+}
+
+.feature-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 0.4rem;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px dashed #ddd;
+}
+
+.feature-properties {
+    overflow-x: auto;
+}
+
+.popup-table {
+    width: 100%;
+    font-size: 0.8rem;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.popup-table td {
+    padding: 0.25rem 0.5rem;
+    vertical-align: top;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.popup-table tr:last-child td {
+    border-bottom: none;
+}
+
+.property-row:hover {
+    background-color: rgba(160, 33, 66, 0.05);
+}
+
+.property-name {
+    color: #333;
+    white-space: nowrap;
+    font-weight: 600;
+    padding-right: 1rem;
+}
+
+.property-value {
+    color: #555;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.more-features-notice {
+    margin-top: 0.6rem;
+    padding: 0.4rem 0.6rem;
+    text-align: center;
+    color: #6c757d;
+    font-size: 0.8rem;
+    background-color: #e9ecef;
+    border-radius: 4px;
+}
+
+.popup-empty-state {
+    padding: 1rem;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    background: #f8f8f8;
+    border-radius: 6px;
+}
+
+/* Loading Fallback */
+.loading-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    min-height: 100px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+}
+
+.loading-fallback .spinner-border {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Mejoras de rendimiento para capas */
+.leaflet-tile-container {
+    will-change: transform;
+}
+
+.leaflet-zoom-animated {
+    will-change: transform;
+}
+
+/* Optimización de transiciones */
+.leaflet-fade-anim .leaflet-tile,
+.leaflet-fade-anim .leaflet-popup {
+    transition: opacity 0.15s linear;
+}
+
+/* Canvas rendering optimization */
+.leaflet-container canvas {
+    image-rendering: optimizeSpeed;
+}
+
+/* Reducir repaints en interacciones */
+.leaflet-interactive {
+    will-change: auto;
+}
+
+.leaflet-interactive:hover {
+    will-change: transform, opacity;
+}
+
+/* Skeleton loader para componentes lazy */
+.skeleton-loader {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Mejora visual para estados de carga de capas */
+.layer-loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.layer-loading-indicator .spinner-border {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-width: 2px;
 }

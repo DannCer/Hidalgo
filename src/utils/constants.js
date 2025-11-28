@@ -1,30 +1,18 @@
 // src/utils/constants.js
+// ============================================
+// CONSTANTES DEL DOMINIO
+// ============================================
+// Las configuraciones de entorno están en src/config/env.js
+// Este archivo contiene solo constantes del dominio de negocio
+// ============================================
+
+import { config } from '../config/env';
 
 /**
- * Configuración para la capa de sequías
+ * Re-exportamos la configuración de sequías desde env.js
+ * para mantener compatibilidad con imports existentes
  */
-export const SEQUIA_CONFIG = {
-  layerName: 'Hidalgo:04_sequias', 
-  fieldName: 'Quincena',            
-  displayName: 'Monitor de Sequía',
-  
-  // Configuración de performance
-  debounceMs: 300,
-  maxFeatures: 5000,
-  cacheTimeout: 5 * 60 * 1000, // 5 minutos
-  
-  // Configuración de UI
-  timelineFormat: 'short',
-  showLoadingIndicator: true,
-  
-  // Configuración de estilo
-  styleField: 'intensidad',
-  defaultStyle: {
-    fillOpacity: 0.6,
-    weight: 1,
-    color: '#333',
-  }
-};
+export { SEQUIA_CONFIG, BASE_LAYERS } from '../config/env';
 
 /**
  * Estados de intensidad de sequía
@@ -60,35 +48,9 @@ export const SEQUIA_LABELS = {
 };
 
 /**
- * Configuración del mapa
+ * Re-exportamos MAP_CONFIG desde env.js
  */
-export const MAP_CONFIG = {
-  center: [20.5, -98.8],
-  zoom: 9,
-  minZoom: 8,
-  maxZoom: 15,
-  zoomDelta: 0.5,
-  zoomSnap: 0.5,
-  maxBounds: [
-    [19.8, -99.5],
-    [21.2, -98.1]
-  ],
-  maxBoundsViscosity: 0.8
-};
-
-/**
- * Configuración de capas base
- */
-export const BASE_LAYERS = {
-  BASE_LAYER_NAME: 'Hidalgo:00_Estado',
-  BASE_LAYER_STYLE: {
-    fillColor: '#f0f0f0',
-    fillOpacity: 0.3,
-    weight: 2,
-    color: '#666',
-    dashArray: '5, 5'
-  }
-};
+export const MAP_CONFIG = config.map;
 
 /**
  * Configuración de performance general
@@ -114,10 +76,11 @@ export const ERROR_MESSAGES = {
 };
 
 /**
- * Configuración de logging
+ * Configuración de logging - Ahora se maneja en config/env.js
+ * @deprecated Usar logger de config/env.js
  */
 export const DEBUG_CONFIG = {
-  enableConsoleLog: process.env.NODE_ENV === 'development',
+  enableConsoleLog: config.app.debug,
   logLevel: 'info',
   logTimeline: true,
   logLayerChanges: true,

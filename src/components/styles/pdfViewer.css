@@ -1,0 +1,110 @@
+/* src/components/styles/pdfViewer.css */
+
+/* ============================================
+   MODAL VISOR DE PDF
+   ============================================ */
+
+.pdf-viewer-modal .modal-dialog {
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.pdf-viewer-modal .modal-content {
+  border-radius: var(--border-radius-md);
+  border: none;
+  box-shadow: var(--shadow-medium);
+  height: 85vh;
+}
+
+.pdf-viewer-header {
+  background: var(--gradient-primary);
+  color: var(--color-text-light);
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+  padding: 12px 20px;
+}
+
+.pdf-viewer-header .modal-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-primary);
+}
+
+.pdf-viewer-header .btn-close {
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+}
+
+.pdf-viewer-header .btn-close:hover {
+  opacity: 1;
+}
+
+.pdf-viewer-body {
+  padding: 0;
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.pdf-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+}
+
+/* ============================================
+   BOTÓN DE AYUDA (?)
+   ============================================ */
+
+.help-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin-left: 6px;
+  background: var(--color-primary);
+  color: var(--color-text-light);
+  border: none;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: var(--font-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.help-btn:hover {
+  background: var(--color-primary-dark);
+  transform: scale(1.1);
+}
+
+.help-btn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .pdf-viewer-modal .modal-dialog {
+    max-width: 98vw;
+    margin: 1vh auto;
+  }
+
+  .pdf-viewer-modal .modal-content {
+    height: 90vh;
+  }
+
+  .help-btn {
+    width: 16px;
+    height: 16px;
+    font-size: 0.65rem;
+  }
+}

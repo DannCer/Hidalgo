@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { getShapefileDownloadUrl, downloadFile } from '../services/wfsService';
+import { getShapefileDownloadUrl, downloadFile } from '../../utils/wfsService';
+import { logger } from '../../config/env';
 
 const DownloadButton = ({ layerName, displayName, className = '' }) => {
   const [isDownloading, setIsDownloading] = useState(false);
@@ -15,7 +16,7 @@ const DownloadButton = ({ layerName, displayName, className = '' }) => {
       downloadFile(downloadUrl, filename);      
      
     } catch (error) {
-      console.error('❌ Error al descargar:', error);
+      logger.error('Error al descargar:', error);
       // Opcional: mostrar mensaje de error al usuario
     } finally {
       setIsDownloading(false);

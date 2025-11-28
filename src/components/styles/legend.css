@@ -110,7 +110,6 @@
     transform: rotate(180deg);
 }
 
-
 /* ---------------------------
     SECCIONES INTERNAS
 ------------------------------ */
@@ -169,6 +168,40 @@
 }
 
 /* ---------------------------
+    SÍMBOLOS DE LEYENDA - CORRECCIÓN PARA PUNTOS
+------------------------------ */
+
+/* Símbolos dentro de la leyenda */
+.legend-symbol {
+    display: inline-block;
+    flex-shrink: 0;
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+}
+
+/* ✅ CORRECCIÓN: Símbolos circulares para puntos */
+.legend-symbol.point,
+.legend-symbol.categorical-point,
+.legend-symbol.ranged-point {
+    border-radius: 50% !important;
+}
+
+/* ✅ CORRECCIÓN: Símbolos cuadrados para polígonos */
+.legend-symbol.polygon,
+.legend-symbol.categorical-polygon,
+.legend-symbol.ranged-polygon {
+    border-radius: 2px !important;
+}
+
+.legend-label {
+    font-size: 0.8rem;
+    color: var(--color-text-dark);
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+/* ---------------------------
     REGLAS DE TOGGLE POR ÍTEM (Vedas)
 ------------------------------ */
 
@@ -209,22 +242,6 @@
 
 .legend-item:last-child {
     margin-bottom: 0;
-}
-
-/* Símbolos dentro de la leyenda */
-.legend-symbol {
-    display: inline-block;
-    flex-shrink: 0;
-    margin-right: 8px;
-    width: 16px;
-    height: 16px;
-}
-
-.legend-label {
-    font-size: 0.8rem;
-    color: var(--color-text-dark);
-    line-height: 1.3;
-    word-break: break-word;
 }
 
 /* Nota inferior */
@@ -326,5 +343,3 @@
 .legend-content::-webkit-scrollbar-thumb:hover {
     background: var(--color-primary-dark);
 }
-
-

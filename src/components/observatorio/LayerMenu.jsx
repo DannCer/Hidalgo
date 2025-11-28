@@ -4,8 +4,11 @@ import Draggable from 'react-draggable';
 import { accordionData } from '../ui/AccordionData';
 import AttributeTableButton from './AttributeTableButton';
 import DownloadButton from './DownloadButton';
+import DiccionarioButton from './DiccionarioButton';
 import Timeline from '../observatorio/Timeline';
+import DiccionarioDatosModal from './DiccionarioDatosModal';
 import '../styles/layerMenu.css';
+import '../styles/diccionarioDatos.css';
 
 // Constants
 const FIXED_LAYERS = ['Hidalgo:00_Estado'];
@@ -167,6 +170,7 @@ const LayerMenu = ({
   const itemRefs = useRef({});
   
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showDiccionario, setShowDiccionario] = useState(false);
   const [localChecked, setLocalChecked] = useState({});
   const [activeSection, setActiveSection] = useState(
     sectionIndex || sectionId || accordionData[0]?.id || '0'
@@ -344,6 +348,9 @@ const LayerMenu = ({
       }
     };
 
+    // Determinar si es capa de calidad del agua
+    const isCalidadAgua = layers.some(l => l.includes('calidadagua'));
+
     return (
       <div
         key={linkIndex}
@@ -379,6 +386,10 @@ const LayerMenu = ({
 
         {!isDisabled && (
           <div className="layermenu-buttons">
+            {/* Botón Diccionario solo para Parámetros e indicadores de calidad del agua */}
+            {isCalidadAgua && (
+              <DiccionarioButton onClick={() => setShowDiccionario(true)} />
+            )}
             <AttributeTableButton
               layerName={layers[0]}
               displayName={displayName}
@@ -445,6 +456,12 @@ const LayerMenu = ({
             ))}
           </Accordion>
         )}
+
+        {/* Modal del Diccionario de Datos */}
+        <DiccionarioDatosModal
+          show={showDiccionario}
+          onHide={() => setShowDiccionario(false)}
+        />
       </div>
     </Draggable>
   );

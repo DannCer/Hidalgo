@@ -1,14 +1,13 @@
 // src/utils/wfsService.js
 import { accordionData } from '../components/ui/AccordionData';
 import proj4 from 'proj4';
+import { config, logger } from '../config/env';
 
 // --- CONSTANTES DE CONFIGURACIÓN ---
+// Ahora se leen desde variables de entorno (ver src/config/env.js)
 
-const local = 'http://localhost:8080/';
-//const local = 'http://observatorio.estatal.hidrico.semarnath.gob.mx/';
-
-const WFS_BASE_URL = local + 'geoserver/Hidalgo/wfs';
-const WMS_BASE_URL = local + 'geoserver/Hidalgo/wms';
+const WFS_BASE_URL = config.geoserver.wfsUrl;
+const WMS_BASE_URL = config.geoserver.wmsUrl;
 
 // Configuración de proj4 para transformaciones de coordenadas
 proj4.defs("EPSG:3857", "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +type=crs");
@@ -21,8 +20,8 @@ const SPATIAL_QUERY_PARAMS = {
     LEGEND_ICON_SIZE: 20
 };
 
-// Timeout para peticiones (en milisegundos)
-const REQUEST_TIMEOUT = 30000;
+// Timeout para peticiones (desde variables de entorno)
+const REQUEST_TIMEOUT = config.geoserver.timeout;
 
 // --- MANEJO DE ERRORES ---
 class GeoServerError extends Error {
@@ -211,9 +210,7 @@ export const fetchWfsLayer = async (
             throw error;
         }
 
-        if (process.env.NODE_ENV === 'development') {
-            console.error(`❌ Error en fetchWfsLayer para ${typeName}:`, error);
-        }
+        logger.error(`Error en fetchWfsLayer para ${typeName}:`, error);
 
         if (error instanceof GeoServerError || error instanceof NetworkError) {
             throw error;

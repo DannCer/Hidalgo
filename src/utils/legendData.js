@@ -27,26 +27,27 @@ export const legendData = {
     note: 'Fuente: INEGI 2020',
   },
   'Hidalgo:00_Censomunicipio': {
-    title: 'Población por Municipio',
+    title: 'Población por Municipio (habitantes)',
     type: 'ranged-polygon',
     propertyName: 'Población total',
     items: [
       { value: 13000, color: '#FFDAB5', label: 'Menos de 13,000' },
       { value: 20000, color: '#FDB871', label: '13,000 - 20,000' },
-      { value: 38000, color: '#F28F27', label: '20,000 - 38,000' },
-      { value: Infinity, color: '#D45B07', label: 'Más de 38,000' },
+      { value: 38000, color: '#F28F27', label: '20,001 - 38,000' },
+      { value: Infinity, color: '#D45B07', label: 'Más de 38,001' },
     ],
     note: 'Fuente: INEGI 2020',
   },
   'Hidalgo:00_Censolocalidad': {
-    title: 'Población por Localidad',
+    title: 'Población por Localidad (habitantes)',
     type: 'ranged-point',
     propertyName: 'Población total',
     items: [
-      { value: 30, color: '#FFDAB5', label: 'Menos de 30' },
-      { value: 150, color: '#FDB871', label: '30 - 150' },
-      { value: 400, color: '#F28F27', label: '150 - 400' },
-      { value: Infinity, color: '#D45B07', label: 'Más de 400' },
+      { value: 249, color: '#FFDAB5', label: 'Menos de 249' },
+      { value: 999, color: '#FDB871', label: '250 - 999' },
+      { value: 4999, color: '#F28F27', label: '1,000 - 4,999' },
+      { value: 29999, color: '#D45B07', label: '5,000 - 29,999' },
+      { value: Infinity, color: '#d40707ff', label: 'Más de 30,000' },
     ],
     note: 'Fuente: INEGI 2020',
   },
@@ -79,8 +80,8 @@ export const legendData = {
     items: [
       { value: 350, color: '#a7d6f1ff', label: 'Menor a 350 ' },
       { value: 500, color: '#4c8eb9ff', label: '350 - 500 ' },
-      { value: 850, color: '#2171b5', label: '500 - 850 ' },
-      { value: Infinity, color: '#08306b', label: 'Mayor a 850 ' }
+      { value: 850, color: '#2171b5', label: '501 - 850 ' },
+      { value: Infinity, color: '#08306b', label: 'Mayor a 851 ' }
     ],
     note: 'Fuente: CONAGUA 2023',
   },
@@ -132,7 +133,7 @@ export const legendData = {
   'Hidalgo:01_advc': {
     title: 'Áreas destinadas voluntariamente a la conservación',
     type: 'polygon',
-    items: [{ color: COLORS.PROTECTED_AREA, label: 'ANP' }],
+    items: [{ color: COLORS.PROTECTED_AREA, label: 'ADVC' }],
     note: 'Fuente: CONANP 2023',
   },
   'Hidalgo:01_humedales': {
@@ -202,8 +203,8 @@ export const legendData = {
     items: [
       { value: 85, color: COLORS.WHITE, label: 'Menor a 85%' },
       { value: 90, color: '#cfc0b1', label: '85% - 90%' },
-      { value: 95, color: '#a08162', label: '90% - 95%' },
-      { value: Infinity, color: '#704214', label: 'Mayor o igual a 95%' }
+      { value: 95, color: '#a08162', label: '90.1% - 95%' },
+      { value: Infinity, color: '#704214', label: 'Mayor a 95.1%' }
     ],
     note: 'Fuente: INEGI 2020',
   },
@@ -214,9 +215,9 @@ export const legendData = {
     items: [
       { value: 75, color: '#edf8fb', label: 'Menor a 75%' },
       { value: 85, color: '#b2e2e2', label: '75% - 85%' },
-      { value: 90, color: '#66c2a4', label: '85% - 90%' },
-      { value: 95, color: '#2ca25f', label: '90% - 95%' },
-      { value: Infinity, color: '#006d2c', label: 'Mayor o igual a 95%' }
+      { value: 90, color: '#66c2a4', label: '85.1% - 90%' },
+      { value: 95, color: '#2ca25f', label: '90.1% - 95%' },
+      { value: Infinity, color: '#006d2c', label: 'Mayor a 95.1%' }
     ],
     note: 'Fuente: CONAGUA 2023',
   },
@@ -254,7 +255,7 @@ export const legendData = {
       { label: 'Centralizado', color: '#72d55c', },
       { label: 'OPD paraestatal', color: '#ba49d0', },
       { label: 'OPD paramunicipal', color: '#74c1e8', },
-      { label: 'Sin Organismo Operador', color: '#d5794e', } // Asume este label como fallback
+      { label: 'Sin Organismo Operador', color: '#ffff', }
     ],
     note: 'Fuente: INEGI 2022',
   },
@@ -265,7 +266,7 @@ export const legendData = {
     items: [
       { value: 95, color: '#16fff9', label: 'Menor a 95%' },
       { value: 97.5, color: '#0bb9e2', label: '95% - 97.5%' },
-      { value: Infinity, color: '#0073cb', label: 'Mayor o igual a 97.5%' }
+      { value: Infinity, color: '#0073cb', label: 'Mayor a 97.6%' }
     ],
     note: 'Fuente: INEGI 2020',
   },
@@ -299,8 +300,8 @@ export const legendData = {
         items: [
           { value: 0, color: COLORS.WHITE, label: 'Sin uso' },
           { value: 0.5, color: '#81a832', label: 'Menor o igual a 0.5 ' },
-          { value: 2.6, color: '#638e2d', label: ' 0.5 - 2.6 ' },
-          { value: Infinity, color: '#457428', label: 'Mayor o igual a 2.6 ' },
+          { value: 2.6, color: '#638e2d', label: ' 0.51 - 2.6 ' },
+          { value: Infinity, color: '#457428', label: 'Mayor a 2.7' },
         ],
         note: 'Fuente: CONAGUA 2023',
       },
@@ -310,10 +311,10 @@ export const legendData = {
         items: [
           { value: 0, color: COLORS.WHITE, label: 'Sin uso' },
           { value: 0.7, color: '#bcdc3c', label: 'menor a 0.7 Hm³' },
-          { value: 1.5, color: '#9ec237', label: '1.5 - 0.7 Hm³' },
-          { value: 6.8, color: '#81a832', label: '6.8 - 1.5 Hm³' },
-          { value: 37.3, color: '#638e2d', label: '37.3 - 6.8 Hm³' },
-          { value: Infinity, color: '#457428', label: 'Mayor o igual a 37.3 Hm³' }
+          { value: 1.5, color: '#9ec237', label: '0.7 - 1.5 Hm³' },
+          { value: 6.8, color: '#81a832', label: '1.51 - 6.8 Hm³' },
+          { value: 37.3, color: '#638e2d', label: ' 6.81 - 37.3 Hm³' },
+          { value: Infinity, color: '#457428', label: 'Mayor o igual a 37.31 Hm³' }
         ],
         note: 'Fuente: CONAGUA 2023',
       },
@@ -325,8 +326,8 @@ export const legendData = {
     propertyName: 'Producción agrícola (Toneladas)',
     items: [
       { value: 159951, color: '#f7fcf5', label: 'Menor a 159,951 ' },
-      { value: 994722, color: '#7bc77c', label: '159,951 - 994,722 ' },
-      { value: Infinity, color: '#00441b', label: 'Mayor o igual a 994,722 ' }
+      { value: 994722, color: '#7bc77c', label: '159,952 - 994,722 ' },
+      { value: Infinity, color: '#00441b', label: 'Mayor a 994,723 ' }
     ],
     note: 'Fuente: CONAGUA 2023',
   },
@@ -336,8 +337,8 @@ export const legendData = {
     propertyName: ' Volumen distribuido (hm³)',
     items: [
       { value: 32, color: '#f7fcf5', label: 'Menor a 32 hm³' },
-      { value: 346, color: '#7bc77c', label: '32 hm³ - 346 hm³' },
-      { value: Infinity, color: '#00441b', label: 'Mayor o igual a 346 hm³' }
+      { value: 346, color: '#7bc77c', label: '32.1 hm³ - 346 hm³' },
+      { value: Infinity, color: '#00441b', label: 'Mayor a 346.1 hm³' }
     ],
     note: 'Fuente: CONAGUA 2023',
   },
@@ -351,9 +352,9 @@ export const legendData = {
         items: [
           { value: 2.59, color: '#f7fcf5', label: 'Menor a 2.59 kg/m³' },
           { value: 3.04, color: '#c9eac2', label: '2.59 - 3.04 kg/m³' },
-          { value: 4.3, color: '#7bc77c', label: '3.04 - 4.3 kg/m³' },
-          { value: 5.86, color: '#2a924b', label: '4.3 - 5.86 kg/m³' },
-          { value: Infinity, color: '#00441b', label: 'Mayor o igual a 5.86 kg/m³' }
+          { value: 4.3, color: '#7bc77c', label: '3.05 - 4.3 kg/m³' },
+          { value: 5.86, color: '#2a924b', label: '4.31 - 5.86 kg/m³' },
+          { value: Infinity, color: '#00441b', label: 'Mayor a 5.87 kg/m³' }
         ],
         note: 'Fuente: CONAGUA 2023',
       },
@@ -363,9 +364,9 @@ export const legendData = {
         items: [
           { value: 4, color: COLORS.WHITE, label: 'Menor a 4 pesos/m³' },
           { value: 4.5, color: '#ffbfbf', label: '4 - 4.5 pesos/m³' },
-          { value: 6.5, color: '#ff8080', label: '4.5 - 6.5 pesos/m³' },
-          { value: 11.5, color: '#ff4040', label: '6.5 - 11.5 pesos/m³' },
-          { value: Infinity, color: COLORS.RED, label: 'Mayor o igual a 11.5 pesos/m³' }
+          { value: 6.5, color: '#ff8080', label: '4.51 - 6.5 pesos/m³' },
+          { value: 11.5, color: '#ff4040', label: '6.51 - 11.5 pesos/m³' },
+          { value: Infinity, color: COLORS.RED, label: 'Mayora 11.51 pesos/m³' }
         ],
         note: 'Fuente: CONAGUA 2023',
       },
@@ -404,8 +405,8 @@ export const legendData = {
     items: [
       { value: 2, color: '#ffffb2', label: 'Menor a 2' },
       { value: 5, color: '#feb751', label: '2 - 5' },
-      { value: 7, color: '#f45629', label: '5 - 7' },
-      { value: Infinity, color: '#bd0026', label: 'Mayor o igual a 7' }
+      { value: 7, color: '#f45629', label: '5.1 - 7' },
+      { value: Infinity, color: '#bd0026', label: 'Mayor a 7.1' }
     ],
     note: 'Fuente: CONAGUA 2023',
   },
@@ -543,8 +544,8 @@ export const legendData = {
     items: [
       { value: 0.001, color: '#fcfbfd', label: 'Menor a 0.001 mdp' },
       { value: 0.2, color: '#c9cae3', label: '0.001 - 0.2 mdp' },
-      { value: 2, color: '#7c76b6', label: '0.2 - 2 mdp' },
-      { value: Infinity, color: '#3f007d', label: 'Mayor a 2 mdp' }
+      { value: 2, color: '#7c76b6', label: '0.21 - 2 mdp' },
+      { value: Infinity, color: '#3f007d', label: 'Mayor a 2.1 mdp' }
     ],
     note: 'Fuente: CONAGUA 2023',
   },
@@ -555,21 +556,28 @@ export const legendData = {
     items: [
       { value: 0.009, color: '#fcfbfd', label: 'Menor a 0.009 mdp' },
       { value: 0.3, color: '#ffaaaa', label: '0.009 - 0.3 mdp' },
-      { value: 4, color: '#ff5555', label: '0.3 - 4 mdp' },
-      { value: Infinity, color: COLORS.RED, label: 'Mayor a 4 mdp' }
+      { value: 4, color: '#ff5555', label: '0.31 - 4 mdp' },
+      { value: Infinity, color: COLORS.RED, label: 'Mayor a 4.1 mdp' }
     ],
     note: 'Fuente: CONAGUA 2023',
   },
   'Hidalgo:05_consejocuenca': {
     title: 'Consejos de Cuenca',
-    type: 'polygon',
-    items: [{ color: COLORS.DEFAULT, label: 'Consejo' }],
+    type: 'categorical-polygon',
+    propertyName: 'Consejo de cuenca',
+    items: [
+      { label: 'Río Pánuco', color: '#81a832', },
+      { label: 'Ríos Tuxpan al Jamapa', color: '#2ca25f', },
+      { label: 'Valle de México', color: '#80c963', }
+    ],
     note: 'Fuente: CONAGUA 2023',
   },
   'Hidalgo:05_comiscuenca': {
     title: 'Comisiones de Cuenca',
     type: 'polygon',
-    items: [{ color: COLORS.COMISIONES_CUENCA, label: 'Comisión' }],
+    items: [
+      { color: COLORS.COMISIONES_CUENCA, label: 'Comisión' }
+    ],
     note: 'Fuente: CONAGUA 2023',
   },
   'Hidalgo:05_comitescuenca': {
@@ -593,7 +601,7 @@ export const legendData = {
 
   // --- Cartografía ---
   'Hidalgo:cart_zonifacuifero': {
-    title: 'Zonificación por acuífero',
+    title: 'Regionalización por acuífero',
     type: 'categorical-polygon',
     propertyName: 'Acuifero',
     items: [

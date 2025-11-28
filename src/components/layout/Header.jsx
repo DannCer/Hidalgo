@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../../assets/img/logo_gobhidalgo.png';
-import '../styles/header.css'
+// BORRAMOS EL IMPORT: import logo from '/assets/img/logo_gobhidalgo.png';
+import '../styles/header.css';
 
 const navLinks = [
   { text: 'Trámites y Servicios', url: 'https://ruts.hidalgo.gob.mx/' },
@@ -30,10 +30,10 @@ const Header = () => {
             </button>
           </div>
           <Link to="/" className="mobile-menu-logo">
-            <img src={logo} alt="Logo Gobierno Hidalgo" />
+             {/* RUTA DIRECTA A PUBLIC */}
+            <img src="/assets/img/logo_gobhidalgo.png" alt="Logo Gobierno Hidalgo" />
           </Link>
         </div>
-
         <div className="site-mobile-menu-body">
           <ul className="mobile-menu-links">
             {navLinks.map((link) => (
@@ -42,7 +42,6 @@ const Header = () => {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={closeMobileMenu}
                   className="mobile-menu-link"
                 >
                   {link.text}
@@ -53,16 +52,18 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Navbar principal */}
-      <nav className="site-nav nav-top" aria-label="Navegación principal">
+      {/* Navbar Desktop */}
+      <nav className="site-nav">
         <div className="container-max">
-          <div className="menu-bg-wrap">
-            <div className="site-navigation">
-              <div className="row g-0 align-items-center">
-                {/* Logo */}
-                <div className="col-6 col-sm-2">
-                  <Link to="/" className="logo m-0 float-start">
-                    <img src={logo} alt="Logo Gobierno Hidalgo" />
+          <div className="row align-items-center">
+            <div className="col-12">
+              <div className="row align-items-center">
+                
+                {/* Logo Desktop */}
+                <div className="col-6 col-sm-2 logo">
+                  <Link to="/">
+                    {/* RUTA DIRECTA A PUBLIC */}
+                    <img src="/assets/img/logo_gobhidalgo.png" alt="Logo Gobierno Hidalgo" />
                   </Link>
                 </div>
 
