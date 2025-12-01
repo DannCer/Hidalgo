@@ -425,7 +425,11 @@ export const accordionData = [
                         layerName: 'Hidalgo:03_drprodfisica',
                         crs: CRS.WEB_MERCATOR,
                         geomType: GEOM_TYPES.POLYGON
-                    }
+                    },
+                    {
+                        text: 'Fertilidad de suelos',
+                        action: 'openVisorFertilidad',
+                    },
                 ]
             },
             {
@@ -438,7 +442,7 @@ export const accordionData = [
                         layerName: ''
                     }
                 ]
-            }
+            },
         ]
     },
     {
@@ -769,7 +773,17 @@ export const accordionData = [
                         layerName: ''
                     }
                 ]
-            }
+            },
+            {
+                image: '/assets/img/Lorem_Picsum.png',
+                title: 'Infografías de fertilidad',
+                links: [
+                    {
+                        text: 'Infografías',
+                        action: 'openVisorInfografias',
+                    },
+                ]
+            },
         ]
     },
 ];

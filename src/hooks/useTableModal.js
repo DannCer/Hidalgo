@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { getLayerInfo } from '../utils/wfsService'; // ✅ Importación correcta
+import { getLayerInfo } from '../utils/wfsService'; 
 
 export const useTableModal = (currentFilters) => {
   const [tableModalState, setTableModalState] = useState({
@@ -13,7 +13,7 @@ export const useTableModal = (currentFilters) => {
 
     // Agregar capas secundarias según sea necesario
     const secondaryLayers = {
-      'Hidalgo:03_usoconsuntivot': 'Hidalgo:03_usoagua',
+      'Hidalgo:03_usoconsuntivo': 'Hidalgo:03_usoagua',
       'Hidalgo:01_spsitios': 'Hidalgo:01_sbsitios',
       'Hidalgo:01_spcalidadagua': 'Hidalgo:01_sbcalidadagua',
       'Hidalgo:02_cloracionmpio': 'Hidalgo:02_cloracionedo'
@@ -28,7 +28,7 @@ export const useTableModal = (currentFilters) => {
 
     const layerTitles = {
       'Hidalgo:03_usoagua': 'Usos Consuntivos Estatal',
-      'Hidalgo:03_usoconsuntivot': 'Usos Consuntivos Municipal',
+      'Hidalgo:03_usoconsuntivo': 'Usos Consuntivos Municipal',
       'Hidalgo:01_sbsitios': 'Sitios subterráneos',
       'Hidalgo:01_spsitios': 'Sitios superficiales',
       'Hidalgo:01_sbcalidadagua': 'Parámetros e indicadores subterráneos',

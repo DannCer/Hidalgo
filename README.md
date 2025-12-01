@@ -1,4 +1,4 @@
-# 🌊 Observatorio del Agua de Hidalgo - Geovisor
+# 🌊 Observatorio Estatal Hídrico - Geovisor
 
 Visor geográfico interactivo para la gestión y monitoreo de recursos hídricos del estado de Hidalgo, México.
 
@@ -6,7 +6,7 @@ Visor geográfico interactivo para la gestión y monitoreo de recursos hídricos
 
 ## 📋 Descripción
 
-El **Observatorio del Agua de Hidalgo (OAH)** es una aplicación web que permite visualizar, analizar y descargar información geoespacial relacionada con los recursos hídricos del estado de Hidalgo. El geovisor se conecta a un servidor GeoServer para obtener capas WFS/WMS y presenta la información de manera interactiva sobre un mapa base.
+El **Observatorio Estatal Hídrico** es una aplicación web que permite visualizar, analizar y descargar información geoespacial relacionada con los recursos hídricos del estado de Hidalgo. El geovisor se conecta a un servidor GeoServer para obtener capas WFS/WMS y presenta la información de manera interactiva sobre un mapa base.
 
 ### Temáticas disponibles
 
@@ -266,7 +266,3 @@ npm run build
 Desarrollado para la **Secretaría de Medio Ambiente y Recursos Naturales del Estado de Hidalgo (SEMARNATH)**
 
 ---
-
-<p align="center">
-  <sub>Hecho con ❤️ para Hidalgo, México</sub>
-</p>

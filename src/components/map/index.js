@@ -24,6 +24,8 @@ export { default as AttributeTableModal } from './AttributeTableModal';
 export { default as AttributeTableContent } from './AttributeTableContent';
 export { default as DiccionarioDatosModal } from './DiccionarioDatosModal';
 export { default as VisorImagenesAcuiferos } from './VisorImagenesAcuiferos';
+export { default as VisorInfografias } from './VisorInfografias';
+export { default as VisorMapasFertilidad } from './VisorMapasFertilidad';
 
 // Utilidades del mapa
 export { default as MapClickHandler } from './MapClickHandler';

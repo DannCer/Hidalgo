@@ -54,7 +54,7 @@ export const legendData = {
   'Hidalgo:00_macrorregiones': {
     title: 'Regiones',
     type: 'categorical-polygon',
-    propertyName: 'Macrorregión',
+    propertyName: 'Región',
     items: [
       { label: 'Actopan', color: '#d7191c', },
       { label: 'Apan', color: '#e44b33', },
@@ -540,7 +540,7 @@ export const legendData = {
   'Hidalgo:05_recextraccion': {
     title: 'Recaudación por Extracción',
     type: 'ranged-polygon',
-    propertyName: 'Total',
+    propertyName: 'Total mdp',
     items: [
       { value: 0.001, color: '#fcfbfd', label: 'Menor a 0.001 mdp' },
       { value: 0.2, color: '#c9cae3', label: '0.001 - 0.2 mdp' },
@@ -552,7 +552,7 @@ export const legendData = {
   'Hidalgo:05_recobro': {
     title: 'Recaudación por Cobro',
     type: 'ranged-polygon',
-    propertyName: 'Total',
+    propertyName: 'Total mdp',
     items: [
       { value: 0.009, color: '#fcfbfd', label: 'Menor a 0.009 mdp' },
       { value: 0.3, color: '#ffaaaa', label: '0.009 - 0.3 mdp' },
