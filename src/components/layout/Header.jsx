@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-// BORRAMOS EL IMPORT: import logo from '/assets/img/logo_gobhidalgo.png';
 import '../../styles/header.css';
 
 const navLinks = [

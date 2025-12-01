@@ -10,6 +10,14 @@ const VisorImagenesAcuiferos = lazy(
   () => import('../map/VisorImagenesAcuiferos')
 );
 
+const VisorInfografias = lazy(
+  () => import('../map/VisorInfografias')
+);
+
+const VisorMapasFertilidad = lazy(
+  () => import('../map/VisorMapasFertilidad')
+);
+
 // ============================================
 // Utilidades (fuera del componente)
 // ============================================
@@ -140,16 +148,26 @@ const useCardNavigation = (sectionId, title) => {
 const InfoCard = memo(({ image, title, links = [], sectionId }) => {
   const [imgError, setImgError] = useState(false);
   const [showVisor, setShowVisor] = useState(false);
+  const [showVisorInfografias, setShowVisorInfografias] = useState(false);
+  const [showVisorFertilidad, setShowVisorFertilidad] = useState(false);
 
   const handleInternalClick = useCardNavigation(sectionId, title);
 
   const handleImageError = () => setImgError(true);
   const openVisor = () => setShowVisor(true);
   const closeVisor = () => setShowVisor(false);
+  const openVisorInfografias = () => setShowVisorInfografias(true);
+  const closeVisorInfografias = () => setShowVisorInfografias(false);
+  const openVisorFertilidad = () => setShowVisorFertilidad(true);
+  const closeVisorFertilidad = () => setShowVisorFertilidad(false);
 
   const handleSpecialAction = useCallback((action) => {
     if (action === 'openVisorAcuiferos') {
       openVisor();
+    } else if (action === 'openVisorInfografias') {
+      openVisorInfografias();
+    } else if (action === 'openVisorFertilidad') {
+      openVisorFertilidad();
     } else {
       console.warn('Acción no reconocida:', action);
     }
@@ -218,6 +236,18 @@ const InfoCard = memo(({ image, title, links = [], sectionId }) => {
       {showVisor && (
         <Suspense fallback={null}>
           <VisorImagenesAcuiferos show={showVisor} onHide={closeVisor} />
+        </Suspense>
+      )}
+
+      {showVisorInfografias && (
+        <Suspense fallback={null}>
+          <VisorInfografias show={showVisorInfografias} onHide={closeVisorInfografias} />
+        </Suspense>
+      )}
+
+      {showVisorFertilidad && (
+        <Suspense fallback={null}>
+          <VisorMapasFertilidad show={showVisorFertilidad} onHide={closeVisorFertilidad} />
         </Suspense>
       )}
     </>

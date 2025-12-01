@@ -4,7 +4,7 @@ import { fetchWfsLayer } from '../../utils/wfsService';
 import { saveAs } from 'file-saver';
 import '../../styles/attributeTableContent.css'
 
-const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar filter como prop
+const AttributeTableContent = ({ layerName, filter = null }) => {
   const [features, setFeatures] = useState([]);
   const [headers, setHeaders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +16,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
 
   const FEATURES_PER_PAGE = 10000;
 
-  // ✅ MODIFICADO: Aceptar filtro como parámetro
+  //  Aceptar filtro como parámetro
   const fetchData = async (isInitialLoad = false, customFilter = filter) => {
     if (!layerName) return;
     setIsLoading(true);
@@ -24,7 +24,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
     try {
       const startIndex = isInitialLoad ? 0 : fetchedCount;
 
-      // ✅ USAR EL FILTRO: pasar el filtro a fetchWfsLayer
+      // pasar el filtro a fetchWfsLayer
       const data = await fetchWfsLayer(layerName, customFilter, FEATURES_PER_PAGE, startIndex);
 
       if (data?.features) {
@@ -51,7 +51,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
     }
   };
 
-  // ✅ MODIFICADO: Recargar datos cuando cambia el filtro
+  // Recargar datos cuando cambia el filtro
   useEffect(() => {
     setFeatures([]);
     setHeaders([]);
@@ -63,13 +63,12 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
     if (layerName) {
       fetchData(true, filter);
     }
-  }, [layerName, filter]); // ✅ Agregar filter como dependencia
+  }, [layerName, filter]);
 
   const handleLoadMore = () => fetchData(false, filter);
 
-  // MODIFICADO: Combinamos el filtrado y el ordenamiento en un solo useMemo
+
   const sortedAndFilteredFeatures = useMemo(() => {
-    // 1. Filtrar primero
     let filtered = features;
     if (searchTerm) {
       const filter = searchTerm.toLowerCase();
@@ -80,19 +79,16 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
       );
     }
 
-    // 2. Luego ordenar los resultados filtrados
     if (sortConfig.key) {
       filtered.sort((a, b) => {
         const valA = a.properties[sortConfig.key] ?? '';
         const valB = b.properties[sortConfig.key] ?? '';
 
-        // Comprobación para ordenar numéricamente si es posible
         const isNumeric = !isNaN(valA) && !isNaN(valB) && valA !== '' && valB !== '';
 
         if (isNumeric) {
           return sortConfig.direction === 'ascending' ? valA - valB : valB - valA;
         } else {
-          // Ordenamiento de texto
           if (String(valA).toLowerCase() < String(valB).toLowerCase()) {
             return sortConfig.direction === 'ascending' ? -1 : 1;
           }
@@ -107,10 +103,8 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
     return filtered;
   }, [searchTerm, features, sortConfig]);
 
-  // NUEVO: Función para manejar el clic en el encabezado
   const requestSort = (key) => {
     let direction = 'ascending';
-    // Si se hace clic en la misma columna, se invierte la dirección
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
     }
@@ -119,12 +113,10 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
 
   const hasMoreData = totalFeatures > fetchedCount;
 
-  // ... (la función exportToExcel se mantiene igual, pero ahora usará los datos ordenados)
-  const exportToExcel = async () => { // 1. Agregamos 'async'
+  const exportToExcel = async () => {
     if (!sortedAndFilteredFeatures.length) return;
 
     try {
-      // 2. Importación dinámica: Vite dividirá esto en un archivo separado
       const XLSX = await import('xlsx');
 
       const dataToExport = sortedAndFilteredFeatures.map(feature => {
@@ -142,7 +134,6 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
       const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
       const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
 
-      // Usamos layerName para el nombre del archivo
       saveAs(data, `${layerName || 'export'}.xlsx`);
 
     } catch (error) {
@@ -150,28 +141,6 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
     }
   };
 
-  //  Componente para mostrar información del filtro
-  const FilterInfo = () => {
-    if (!filter) return null;
-
-    return (
-      <div className="filter-info mb-3" style={{
-        padding: '10px',
-        backgroundColor: '#e8f5e8',
-        border: '1px solid #4caf50',
-        borderRadius: '4px',
-        fontSize: '14px'
-      }}>
-        <strong>🎯 Filtro aplicado:</strong>
-        <code className="ms-2" style={{ backgroundColor: '#f1f8e9', padding: '2px 6px', borderRadius: '3px' }}>
-          {filter}
-        </code>
-        <span className="ms-2 text-muted">
-          • Mostrando datos filtrados por quincena
-        </span>
-      </div>
-    );
-  };
 
   if (isLoading && features.length === 0)
     return (
@@ -208,8 +177,6 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
   return (
     <>
       <div className="d-flex flex-column h-100">
-        {/* ✅ MOSTRAR INFORMACIÓN DEL FILTRO */}
-        <FilterInfo />
 
         <Form.Group controlId="tableSearch" className="mb-3 d-flex gap-2">
           <Form.Control
@@ -238,7 +205,6 @@ const AttributeTableContent = ({ layerName, filter = null }) => { // ✅ Agregar
                     className="sortable-header"
                   >
                     {header}
-                    {/* NUEVO: Indicador SVG minimalista */}
                     {sortConfig.key === header && (
                       <span className={`sort-indicator ${sortConfig.direction}`}>
                         <svg

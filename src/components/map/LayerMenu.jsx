@@ -18,7 +18,11 @@ const EXCLUDED_CARDS = [
   'Sitios de interés',
   'Programas de ordenamiento ecológico territorial',
   'Programa estatal hídrico',
+  'Inspección y vigilancia',
   'Acuíferos de Hidalgo',
+  'Gestión hídrica municipal',
+  'Proceso para la integración del Programa Hídrico del Estado de Hidalgo',
+  'Infografías de fertilidad'
 ];
 
 // Custom hooks
@@ -77,6 +81,10 @@ const useProcessedSections = () => {
   }, []);
 
   const filterLink = useCallback((link) => {
+    // Excluir enlaces con action (visores de imágenes, etc.)
+    if (link.action) {
+      return false;
+    }
     if (link.type === 'dropdown') {
       return link.sublinks?.some(sublink => 
         sublink.layerName && sublink.path === '/observatorio'
@@ -349,7 +357,7 @@ const LayerMenu = ({
     };
 
     // Determinar si es capa de calidad del agua
-    const isCalidadAgua = layers.some(l => l.includes('calidadagua'));
+    const isCalidadAgua = layers.some(l => l && l.includes('calidadagua'));
 
     return (
       <div
