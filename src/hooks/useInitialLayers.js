@@ -1,20 +1,10 @@
-// src/components/observatorio/hooks/useInitialLayers.js
-// ============================================
-// Hook para manejar la carga de capas iniciales
-// ============================================
+
+
 import { useEffect, useRef } from 'react';
 import { fetchWfsLayer } from '../utils/wfsService';
 import { BASE_LAYERS } from '../config/env';
 import { logger } from '../config/env';
 
-/**
- * Hook que maneja la carga de capas iniciales al montar el componente
- * @param {Object} params - Parámetros del hook
- * @param {string|string[]} params.initialLayer - Capa(s) inicial(es) a cargar
- * @param {Function} params.setActiveLayers - Setter para capas activas
- * @param {Function} params.setLoadingLayers - Setter para capas en carga
- * @returns {Object} { isLoading }
- */
 export const useInitialLayers = ({
     initialLayer,
     setActiveLayers,
@@ -23,20 +13,20 @@ export const useInitialLayers = ({
     const loadedRef = useRef(false);
 
     useEffect(() => {
-        // Evitar cargas duplicadas
+
         if (!initialLayer || loadedRef.current) return;
 
         const loadInitialLayers = async () => {
             loadedRef.current = true;
 
             const layersToLoad = Array.isArray(initialLayer) ? initialLayer : [initialLayer];
-            
-            // Filtrar la capa base (ya se carga por separado)
+
+
             const filtered = layersToLoad.filter(n => n !== BASE_LAYERS.ESTADO);
-            
+
             if (filtered.length === 0) return;
 
-            // Marcar capas como cargando
+
             setLoadingLayers(prev => new Set([...prev, ...filtered]));
 
             try {

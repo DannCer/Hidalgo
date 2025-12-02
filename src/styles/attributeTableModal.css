@@ -1,10 +1,5 @@
-/* ===================================================================
-   Estilos CORREGIDOS para el Componente AttributeTableModal
-====================================================================== */
 
-/* --- 1. Encabezado del Modal --- */
 
-/* Selector más específico para asegurar que anule los estilos de Bootstrap */
 .modal-content .modal-header {
   background-color: var(--color-primary);
   color: var(--color-text-light);
@@ -18,16 +13,12 @@
 
 .modal-content .modal-title {
   font-weight: 600;
-  /* El color se hereda del .modal-header, así que no es necesario volver a declararlo */
+
 }
 
 .modal-content .modal-header .btn-close {
   filter: invert(1) grayscale(100%) brightness(200%);
 }
-
-
-/* --- 2. Pestañas (Tabs) dentro del Modal --- */
-/* (Estas reglas no necesitan cambios) */
 
 .nav-tabs {
   border-bottom: 2px solid var(--color-primary);

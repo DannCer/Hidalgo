@@ -1,4 +1,4 @@
-// Parámetros e indicadores de calidad del agua subterránea
+
 const parametrosSubterraneos = [
   {
     "id": "Id de la tabla",

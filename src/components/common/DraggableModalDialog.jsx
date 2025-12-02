@@ -4,7 +4,7 @@ import Draggable from 'react-draggable';
 
 const DraggableModalDialog = (props) => {
   const nodeRef = useRef(null);
-  
+
   return (
     <Draggable handle=".modal-header" nodeRef={nodeRef}>
       <div ref={nodeRef}>

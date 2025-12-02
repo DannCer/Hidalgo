@@ -1,4 +1,4 @@
-// src/components/observatorio/DiccionarioDatosModal.jsx
+
 import React, { useState } from 'react';
 import { Modal, Tabs, Tab, Table } from 'react-bootstrap';
 import DraggableModalDialog from '../common/DraggableModalDialog';
@@ -6,14 +6,10 @@ import parametrosSuperficiales from '../../data/parametrosSuperficiales.js';
 import parametrosSubterraneos from '../../data/parametrosSubterraneos.js';
 import '../../styles/diccionarioDatos.css';
 
-/**
- * Modal que muestra el diccionario de datos con parámetros 
- * e indicadores de calidad del agua
- */
 const DiccionarioDatosModal = ({ show, onHide }) => {
   const [activeTab, setActiveTab] = useState('superficiales');
 
-  // Convertir objeto a array de {parametro, descripcion}
+
   const convertToArray = (data) => {
     if (!data || !data[0]) return [];
     return Object.entries(data[0]).map(([parametro, descripcion]) => ({
@@ -69,15 +65,15 @@ const DiccionarioDatosModal = ({ show, onHide }) => {
         <p className="diccionario-subtitle">
           Parámetros e indicadores de la calidad del agua
         </p>
-        
+
         <Tabs
           activeKey={activeTab}
           onSelect={(k) => setActiveTab(k)}
           className="diccionario-tabs mb-3"
           fill
         >
-          <Tab 
-            eventKey="superficiales" 
+          <Tab
+            eventKey="superficiales"
             title={
               <span>
                 <i className="bi bi-water me-2"></i>
@@ -87,9 +83,9 @@ const DiccionarioDatosModal = ({ show, onHide }) => {
           >
             {activeTab === 'superficiales' && renderTable(datosSuperficiales)}
           </Tab>
-          
-          <Tab 
-            eventKey="subterraneos" 
+
+          <Tab
+            eventKey="subterraneos"
             title={
               <span>
                 <i className="bi bi-moisture me-2"></i>
@@ -103,8 +99,8 @@ const DiccionarioDatosModal = ({ show, onHide }) => {
       </Modal.Body>
       <Modal.Footer className="diccionario-footer">
         <small className="text-muted">
-          Total de parámetros: {activeTab === 'superficiales' 
-            ? datosSuperficiales.length 
+          Total de parámetros: {activeTab === 'superficiales'
+            ? datosSuperficiales.length
             : datosSubterraneos.length}
         </small>
       </Modal.Footer>

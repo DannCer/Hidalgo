@@ -6,16 +6,15 @@ import { fetchFeaturesAtPoint, getLayerInfo } from '../../utils/wfsService';
 import { accordionData } from '../../data/AccordionData';
 import { SEQUIA_CONFIG } from '../../utils/constants';
 
-// Constants
 const MAX_FEATURES_PER_LAYER = 15;
 const CLICK_TOLERANCE = 50;
 
-function MapClickHandler({ 
-  activeLayers, 
-  setPopupData, 
+function MapClickHandler({
+  activeLayers,
+  setPopupData,
   setHighlightData,
-  baseLayerData, 
-  sequiaQuincena 
+  baseLayerData,
+  sequiaQuincena
 }) {
   const map = useMapEvents({});
 
@@ -59,7 +58,7 @@ function MapClickHandler({
   }, [setPopupData, getFixedPopupPosition, setHighlightData]);
 
   const buildPopupContent = useCallback((results, activeLayerNames) => {
-    // Filtrar y mapear resultados válidos manteniendo el índice original
+
     const validResultsWithIndex = results
       .map((r, originalIndex) => ({ result: r, originalIndex }))
       .filter((item) => item.result.status === 'fulfilled' && item.result.value && item.result.value.features?.length > 0);
@@ -73,7 +72,7 @@ function MapClickHandler({
           const layerName = activeLayerNames[item.originalIndex] || layerData.layerName;
           const layerInfo = getLayerInfo(layerName);
           const isLast = displayIndex === validResultsWithIndex.length - 1;
-          
+
           return (
             <PopupContent
               key={`${layerName}-${item.originalIndex}`}
@@ -90,20 +89,15 @@ function MapClickHandler({
     return contentHtml;
   }, []);
 
-  /**
-   * Extrae todos los features de todas las capas que tuvieron resultados
-   * @param {Array} results - Resultados de Promise.allSettled
-   * @param {Array} activeLayerNames - Nombres de las capas activas
-   * @returns {Array} Array de objetos { feature, layerName }
-   */
+
   const extractAllFeatures = useCallback((results, activeLayerNames) => {
     const allFeatures = [];
 
     results.forEach((result, index) => {
       if (result.status === 'fulfilled' && result.value?.features?.length > 0) {
         const layerName = activeLayerNames[index];
-        
-        // Agregar todos los features de esta capa (limitado a MAX_FEATURES_PER_LAYER)
+
+
         result.value.features.slice(0, MAX_FEATURES_PER_LAYER).forEach(feature => {
           allFeatures.push({
             feature,
@@ -141,10 +135,10 @@ function MapClickHandler({
         const additionalFilter = getSequiaFilter(layerName);
 
         return fetchFeaturesAtPoint(
-          layerName, 
-          e.latlng, 
-          geomType, 
-          CLICK_TOLERANCE, 
+          layerName,
+          e.latlng,
+          geomType,
+          CLICK_TOLERANCE,
           additionalFilter
         );
       });
@@ -152,23 +146,23 @@ function MapClickHandler({
       const results = await Promise.allSettled(promises);
       const content = buildPopupContent(results, activeLayerNames);
 
-      // Extraer TODOS los features de TODAS las capas con resultados
+
       const allFeaturesToHighlight = extractAllFeatures(results, activeLayerNames);
-      
+
       if (content && allFeaturesToHighlight.length > 0) {
-        // A. Abrir Sidebar/Popup
+
         setPopupData({
           position: [popupPosition.lat, popupPosition.lng],
           content,
           isSidebar: true
         });
 
-        // B. Establecer Highlight para TODOS los features
+
         if (setHighlightData) {
           setHighlightData(allFeaturesToHighlight);
         }
       } else {
-        // C. Limpiar
+
         setPopupData(null);
         if (setHighlightData) setHighlightData([]);
       }
@@ -176,14 +170,14 @@ function MapClickHandler({
       showErrorPopup(error);
     }
   }, [
-    activeLayers, 
-    allLayersConfig, 
-    setPopupData, 
-    setHighlightData, 
-    showLoadingPopup, 
-    showErrorPopup, 
-    getFixedPopupPosition, 
-    buildPopupContent, 
+    activeLayers,
+    allLayersConfig,
+    setPopupData,
+    setHighlightData,
+    showLoadingPopup,
+    showErrorPopup,
+    getFixedPopupPosition,
+    buildPopupContent,
     getSequiaFilter,
     extractAllFeatures
   ]);

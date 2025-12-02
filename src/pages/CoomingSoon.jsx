@@ -8,7 +8,7 @@ const ComingSoon = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Si el acordeón envió el nombre del enlace, lo mostramos
+
   const sectionName = location.state?.name || 'Sección';
 
   const handleGoHome = () => {
@@ -25,7 +25,7 @@ const ComingSoon = () => {
           <Row className="justify-content-center">
             <Col md={8}>
 
-              {/* Título con animación */}
+              {}
               <motion.h2
                 className="fw-bold mb-3"
                 style={{ color: 'var(--color-primary)' }}
@@ -36,7 +36,7 @@ const ComingSoon = () => {
                 {sectionName} en desarrollo
               </motion.h2>
 
-              {/* Texto secundario */}
+              {}
               <motion.p
                 style={{ color: 'var(--color-text-secondary)' }}
                 initial={{ opacity: 0 }}
@@ -46,7 +46,7 @@ const ComingSoon = () => {
                 Estamos trabajando para habilitar esta sección pronto.
               </motion.p>
 
-              {/* Botón para volver al inicio */}
+              {}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

@@ -1,6 +1,5 @@
-// src/ui/AccordionData.js
 
-// Definición de sistemas de coordenadas y tipos de geometría
+
 const CRS = {
     WGS84: 'EPSG:4326',
     WEB_MERCATOR: 'EPSG:3857',
@@ -361,7 +360,7 @@ export const accordionData = [
                 ]
             },
             {
-                image: '/assets/img/Eje2/InspeccionV.jpeg',
+                image: '/assets/img/Eje2/inspeccion.jpeg',
                 title: 'Inspección y vigilancia',
                 links: [
                     {
@@ -566,7 +565,7 @@ export const accordionData = [
         id: 'eje5',
         cards: [
             {
-                image: '/assets/img/Eje5/Centros.jpg',
+                image: '/assets/img/Eje5/Gestion.jpeg',
                 title: 'Gestión hídrica municipal',
                 links: [
                     {

@@ -1,8 +1,4 @@
-/* ==========================================================================
-   FOOTER STYLES
-   ==========================================================================
-   Compatible con Bootstrap + variables.css
-   ========================================================================== */
+
 
 .footer {
   background-color: var(--color-primary-dark);
@@ -12,10 +8,6 @@
   position: relative;
   z-index: 5;
 }
-
-/* ------------------------------
-   LOGOS Y ESCUDO
---------------------------------- */
 
 .footer-logo {
   max-height: 100px;
@@ -32,10 +24,6 @@
 .footer-escudo:hover {
   transform: scale(1.05);
 }
-
-/* ------------------------------
-   CONTACTO
---------------------------------- */
 
 .footer-contact-title {
   font-size: 1.2rem;
@@ -62,20 +50,12 @@
   color: var(--color-primary-light);
 }
 
-/* ------------------------------
-   SEPARADOR
---------------------------------- */
-
 .footer-divider {
   border: 0;
   height: 1px;
   background-color: rgba(255, 255, 255, 0.3);
   margin-top: 2rem;
 }
-
-/* ------------------------------
-   WIDGETS / COLUMNAS
---------------------------------- */
 
 .footer .widget {
   padding: 0 1rem;
@@ -88,10 +68,6 @@
 .footer .container {
   max-width: 1200px;
 }
-
-/* ------------------------------
-   RESPONSIVE DESIGN
---------------------------------- */
 
 @media (max-width: 992px) {
   .footer {

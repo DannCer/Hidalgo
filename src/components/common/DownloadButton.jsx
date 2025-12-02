@@ -38,14 +38,14 @@ const DownloadButton = ({
     try {
       const layers = Array.isArray(layerName) ? layerName : [layerName];
 
-      // Una sola capa: descarga directa
+
       if (layers.length === 1) {
         const url = getShapefileDownloadUrl(layers[0], format, cqlFilter);
         window.open(url, '_blank');
         return;
       }
 
-      // Múltiples capas: crear ZIP combinado
+
       const zip = new JSZip();
 
       for (const name of layers) {

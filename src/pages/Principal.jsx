@@ -6,11 +6,11 @@ const Principal = () => {
     <div className="py-4">
       <div className="text-center">
         <h1 className='titulo-principal d-flex align-items-center justify-content-center'>
-          <img 
-            src="/assets/img/CINTILLO HGO Y SEMARNATH_COLOR.png" 
-            alt="Logo" 
-            className="logo img-fluid me-4" 
-            style={{ height: '80px' }} 
+          <img
+            src="/assets/img/CINTILLO HGO Y SEMARNATH_COLOR.png"
+            alt="Logo"
+            className="logo img-fluid me-4"
+            style={{ height: '80px' }}
           />
           Observatorio Estatal Hídrico
         </h1>

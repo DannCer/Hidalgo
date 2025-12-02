@@ -10,7 +10,6 @@ import DiccionarioDatosModal from './DiccionarioDatosModal';
 import '../../styles/layerMenu.css';
 import '../../styles/diccionarioDatos.css';
 
-// Constants
 const FIXED_LAYERS = ['Hidalgo:00_Estado'];
 const SEQUIA_LAYER = 'Hidalgo:04_sequias';
 const EXCLUDED_CARDS = [
@@ -25,7 +24,6 @@ const EXCLUDED_CARDS = [
   'Infografías de fertilidad'
 ];
 
-// Custom hooks
 const useLayerHighlight = (highlightLayer, layerToItemMap, activeSection, setActiveSection) => {
   const [highlightedItem, setHighlightedItem] = useState(null);
   const highlightProcessedRef = useRef(null);
@@ -34,12 +32,12 @@ const useLayerHighlight = (highlightLayer, layerToItemMap, activeSection, setAct
     if (!highlightLayer) return;
 
     const layerKey = Array.isArray(highlightLayer) ? highlightLayer.join(',') : highlightLayer;
-    
-    // Prevent duplicate processing
+
+
     if (highlightProcessedRef.current === layerKey) return;
     highlightProcessedRef.current = layerKey;
 
-    // Find target layer in mapping
+
     const findTarget = () => {
       const names = Array.isArray(highlightLayer) ? highlightLayer : [highlightLayer];
       for (const layerName of names) {
@@ -55,15 +53,15 @@ const useLayerHighlight = (highlightLayer, layerToItemMap, activeSection, setAct
       return;
     }
 
-    // Open section if closed
+
     if (target.sectionId !== activeSection) {
       setActiveSection(target.sectionId);
     }
 
-    // Highlight item
+
     setHighlightedItem(target.uniqueId);
 
-    // Auto-remove highlight after 3 seconds
+
     const timer = setTimeout(() => {
       setHighlightedItem(null);
       highlightProcessedRef.current = null;
@@ -81,12 +79,12 @@ const useProcessedSections = () => {
   }, []);
 
   const filterLink = useCallback((link) => {
-    // Excluir enlaces con action (visores de imágenes, etc.)
+
     if (link.action) {
       return false;
     }
     if (link.type === 'dropdown') {
-      return link.sublinks?.some(sublink => 
+      return link.sublinks?.some(sublink =>
         sublink.layerName && sublink.path === '/observatorio'
       );
     }
@@ -176,7 +174,7 @@ const LayerMenu = ({
 }) => {
   const containerRef = useRef(null);
   const itemRefs = useRef({});
-  
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showDiccionario, setShowDiccionario] = useState(false);
   const [localChecked, setLocalChecked] = useState({});
@@ -188,7 +186,7 @@ const LayerMenu = ({
   const layerToItemMap = useLayerMapping(processedSections);
   const highlightedItem = useLayerHighlight(highlightLayer, layerToItemMap, activeSection, setActiveSection);
 
-  // Helper functions
+
   const getLayersArray = useCallback(
     (layerName) => (Array.isArray(layerName) ? layerName : [layerName]),
     []
@@ -222,7 +220,7 @@ const LayerMenu = ({
         };
       }
 
-      const isSequias = text.includes('sequía') || text.includes('sequia') || 
+      const isSequias = text.includes('sequía') || text.includes('sequia') ||
                        layerName.includes('sequia');
 
       if (isSequias) {
@@ -232,15 +230,15 @@ const LayerMenu = ({
         };
       }
 
-      return { 
-        layers: getLayersArray(link.layerName), 
-        displayName: link.text 
+      return {
+        layers: getLayersArray(link.layerName),
+        displayName: link.text
       };
     },
     [getLayersArray]
   );
 
-  // Effects
+
   useEffect(() => {
     const updatedChecked = Object.keys(activeLayers).reduce((acc, key) => {
       acc[key] = true;
@@ -253,7 +251,7 @@ const LayerMenu = ({
     if (sectionId) setActiveSection(sectionId);
   }, [sectionId]);
 
-  // Scroll to highlighted item
+
   useEffect(() => {
     if (!highlightedItem) return;
 
@@ -270,7 +268,7 @@ const LayerMenu = ({
     }
   }, [highlightedItem]);
 
-  // UI Components
+
   const formatDateLabel = (dateStr, formatType = 'quincena') => {
     if (!dateStr) return "";
 
@@ -356,7 +354,7 @@ const LayerMenu = ({
       }
     };
 
-    // Determinar si es capa de calidad del agua
+
     const isCalidadAgua = layers.some(l => l && l.includes('calidadagua'));
 
     return (
@@ -365,8 +363,8 @@ const LayerMenu = ({
         ref={el => {
           if (el) itemRefs.current[itemKey] = el;
         }}
-        className={`layermenu-item 
-          ${isDisabled ? 'disabled' : ''} 
+        className={`layermenu-item
+          ${isDisabled ? 'disabled' : ''}
           ${active ? 'layermenu-active' : ''}
           ${isHighlighted ? 'layermenu-highlighted' : ''}
           ${isLoading ? 'layermenu-loading' : ''}
@@ -394,7 +392,7 @@ const LayerMenu = ({
 
         {!isDisabled && (
           <div className="layermenu-buttons">
-            {/* Botón Diccionario solo para Parámetros e indicadores de calidad del agua */}
+            {}
             {isCalidadAgua && (
               <DiccionarioButton onClick={() => setShowDiccionario(true)} />
             )}
@@ -454,7 +452,7 @@ const LayerMenu = ({
                       <strong className="layermenu-card-title">
                         {card.title}
                       </strong>
-                      {card.filteredLinks.map((link, linkIndex) => 
+                      {card.filteredLinks.map((link, linkIndex) =>
                         renderLayerItem(link, cardIndex, section, linkIndex)
                       )}
                     </div>
@@ -465,7 +463,7 @@ const LayerMenu = ({
           </Accordion>
         )}
 
-        {/* Modal del Diccionario de Datos */}
+        {}
         <DiccionarioDatosModal
           show={showDiccionario}
           onHide={() => setShowDiccionario(false)}

@@ -1,11 +1,10 @@
-// src/components/ui/InfoCard.jsx
+
 import React, { useState, memo, useCallback, Suspense, lazy } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Card, Dropdown } from 'react-bootstrap';
 import '../../styles/InfoCard.css';
 
-// Lazy load del modal
 const VisorImagenesAcuiferos = lazy(
   () => import('../map/VisorImagenesAcuiferos')
 );
@@ -18,9 +17,6 @@ const VisorMapasFertilidad = lazy(
   () => import('../map/VisorMapasFertilidad')
 );
 
-// ============================================
-// Utilidades (fuera del componente)
-// ============================================
 const FALLBACK_IMAGE = '/fallback-image.jpg';
 
 const isExternalUrl = (path) => /^https?:\/\//i.test(path);
@@ -31,9 +27,6 @@ const isExternalLink = (link) =>
 const isGISLayer = (link) =>
   link.layerName && link.path === '/observatorio';
 
-// ============================================
-// Subcomponentes memoizados
-// ============================================
 const ExternalLink = memo(({ link }) => (
   <a
     href={link.path}
@@ -110,9 +103,6 @@ const DropdownLink = memo(({ link, sectionId, idx, onInternalClick }) => {
 });
 DropdownLink.displayName = 'DropdownLink';
 
-// ============================================
-// Custom Hook simplificado
-// ============================================
 const useCardNavigation = (sectionId, title) => {
   const navigate = useNavigate();
 
@@ -142,9 +132,6 @@ const useCardNavigation = (sectionId, title) => {
   return handleInternalClick;
 };
 
-// ============================================
-// Componente principal
-// ============================================
 const InfoCard = memo(({ image, title, links = [], sectionId }) => {
   const [imgError, setImgError] = useState(false);
   const [showVisor, setShowVisor] = useState(false);

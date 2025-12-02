@@ -1,10 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-/**
- * Botón de ayuda (signo de interrogación) 
- * para mostrar información adicional
- */
 const HelpButton = ({ onClick, title = 'Ver información' }) => {
   const handleClick = (e) => {
     e.preventDefault();

@@ -15,8 +15,8 @@ const contactInfoLines = [
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  
-  // Estado para guardar el número de visitas
+
+
   const [visitas, setVisitas] = useState(null);
 
   useEffect(() => {
@@ -30,18 +30,18 @@ const Footer = () => {
       })
       .catch(err => {
         console.warn("El contador fue bloqueado por el navegador o red:", err);
-        setVisitas(null); 
+        setVisitas(null);
       });
   }, []);
 
   return (
     <footer className="footer">
       <div className="container">
-        
-        {/* --- SECCIÓN SUPERIOR (Logos y Contacto) --- */}
+
+        {}
         <div className="row align-items-center pt-4">
-          
-          {/* Logo 1 */}
+
+          {}
           <div className="col-md-4 mb-4 mb-md-0">
             <div className="widget text-center text-md-start">
               <img
@@ -53,7 +53,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Logo 2 (Escudo) */}
+          {}
           <div className="col-md-4 mb-4 mb-md-0">
             <div className="widget text-center">
               <img
@@ -65,7 +65,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Información de Contacto */}
+          {}
           <div className="col-md-4">
             <div className="widget text-center text-md-end">
               <h2 className="footer-contact-title text-white fw-bold mb-3">Contacto</h2>
@@ -73,7 +73,7 @@ const Footer = () => {
                 {contactInfoLines.map((line, index) => (
                   <React.Fragment key={index}>
                     {line}
-                    {line && <br />} 
+                    {line && <br />}
                   </React.Fragment>
                 ))}
               </address>
@@ -81,14 +81,14 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Línea divisoria */}
+        {}
         <div className="row">
           <div className="col-12">
             <hr className="footer-divider border-white opacity-25" />
           </div>
         </div>
 
-        {/* --- SECCIÓN INFERIOR (Copyright y Contador) --- */}
+        {}
         <div className="row pb-4">
           <div className="col-md-6 text-center text-md-start">
             <small className="text-white-50">

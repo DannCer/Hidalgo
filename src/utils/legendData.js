@@ -1,7 +1,7 @@
 import { COLORS } from './colors';
 
 export const legendData = {
-  // --- Contexto Geográfico y Socioeconómico ---
+
   'Hidalgo:00_Estado': {
     title: 'Estado de Hidalgo',
     type: 'polygon',
@@ -72,7 +72,7 @@ export const legendData = {
     note: 'Fuente: SEMARNATH 2024',
   },
 
-  // --- Eje 1. Conservación hídrica ---
+
   'Hidalgo:01_precipitacion': {
     title: 'Precipitación (mm/año)',
     type: 'ranged-polygon',
@@ -183,7 +183,7 @@ export const legendData = {
     note: 'Fuente: CONAGUA 2023',
   },
 
-  // --- Eje 2. Acceso universal y sustentable al agua y saneamiento ---
+
   'Hidalgo:02_potabilizadoras': {
     title: 'Plantas Potabilizadoras',
     type: 'point',
@@ -289,7 +289,7 @@ export const legendData = {
     note: 'Fuente: CONAGUA 2023',
   },
 
-  // --- Eje 3. Uso responsable y sostenible del agua ---
+
   'Hidalgo:03_usoconsuntivo': {
     title: 'Usos Consuntivos ',
     type: 'variant',
@@ -373,7 +373,7 @@ export const legendData = {
     },
   },
 
-  // --- Eje 4. Resiliencia y adaptación a fenómenos hidrometeorológicos ---
+
   'Hidalgo:04_climatologicas': {
     title: 'Estaciones Climatológicas',
     type: 'point',
@@ -536,7 +536,7 @@ export const legendData = {
     note: 'Fuente: CONAGUA 2025',
   },
 
-  // --- Eje 5. Gobernanza hídrica participativa y transparente ---
+
   'Hidalgo:05_recextraccion': {
     title: 'Recaudación por Extracción',
     type: 'ranged-polygon',
@@ -599,7 +599,7 @@ export const legendData = {
     note: 'Fuente: SEMARNATH 2025',
   },
 
-  // --- Cartografía ---
+
   'Hidalgo:cart_zonifacuifero': {
     title: 'Regionalización por acuífero',
     type: 'categorical-polygon',

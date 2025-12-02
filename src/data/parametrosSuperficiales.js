@@ -1,4 +1,4 @@
-// Parámetros e indicadores de calidad del agua superficial
+
 const parametrosSuperficiales = [
   {
     "id": "Id de la tabla",

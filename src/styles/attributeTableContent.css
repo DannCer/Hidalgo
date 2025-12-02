@@ -1,20 +1,16 @@
-/* ===================================================================
-   Estilos para el Componente AttributeTableContent
-====================================================================== */
+
 .btn-primary {
   background-color: var(--color-primary) !important;
   border-color: var(--color-primary) !important;
   color: var(--color-text-light) !important;
 }
 
-/* Estado al pasar el cursor por encima */
 .btn-primary:hover {
   background-color: var(--color-primary-dark) !important;
   border-color: var(--color-primary-dark) !important;
   color: var(--color-text-light) !important;
 }
 
-/* Estado al hacer foco (p. ej. con el tabulador) */
 .btn-primary:focus,
 .btn-primary.focus {
   background-color: var(--color-primary-dark) !important;
@@ -23,7 +19,6 @@
   box-shadow: 0 0 0 0.2rem rgba(160, 33, 66, 0.5) !important;
 }
 
-/* Estado al hacer clic */
 .btn-primary:active,
 .btn-primary.active {
   background-color: var(--color-primary-dark) !important;
@@ -31,14 +26,12 @@
   color: var(--color-text-light) !important;
 }
 
-/* Estado deshabilitado */
 .btn-primary:disabled,
 .btn-primary.disabled {
   background-color: var(--color-primary) !important;
   border-color: var(--color-primary) !important;
 }
 
-/* Estilos para encabezados de tabla ordenables */
 .sortable-header {
   cursor: pointer;
   -webkit-user-select: none;
@@ -52,7 +45,6 @@
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-/* Estilos para el nuevo indicador de ordenamiento (SVG) */
 .sort-indicator {
   display: inline-block;
   vertical-align: middle;
@@ -60,7 +52,6 @@
   transition: transform 0.2s ease-in-out;
 }
 
-/* Rota el indicador cuando la dirección es descendente */
 .sort-indicator.descending {
   transform: rotate(180deg);
 }
@@ -71,12 +62,10 @@
   fill: currentColor;
 }
 
-/* --- ESTILOS PARA LA TABLA CON SCROLL --- */
 .table-scroll-container {
   overflow: auto;
 }
 
-/* Encabezado Fijo (Sticky) */
 .sticky-header th {
   position: sticky;
   top: 0;
@@ -85,11 +74,6 @@
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
 }
 
-/* ===================================================================
-   Estilos para el Componente AttributeTableModal
-====================================================================== */
-
-/* --- 1. Encabezado del Modal --- */
 .modal-content .modal-header {
   background-color: var(--color-primary);
   color: var(--color-text-light);
@@ -109,7 +93,6 @@
   filter: invert(1) grayscale(100%) brightness(200%);
 }
 
-/* --- 2. Pestañas (Tabs) dentro del Modal --- */
 .nav-tabs {
   border-bottom: 2px solid var(--color-primary);
 }
@@ -137,17 +120,11 @@
   font-weight: 600;
 }
 
-/* ===================================================================
-   🔥 DESHABILITAR ANIMACIONES DE BOOTSTRAP EN TABS Y MODAL
-====================================================================== */
-
-/* Deshabilitar TODAS las transiciones y animaciones globalmente en el modal */
 .modal * {
   transition: none !important;
   animation: none !important;
 }
 
-/* Deshabilitar la transición fade de Bootstrap en el contenido de las tabs */
 .tab-content > .tab-pane {
   display: none !important;
   transition: none !important;
@@ -162,7 +139,6 @@
   opacity: 1 !important;
 }
 
-/* Deshabilitar animaciones en el modal-body durante cambios de tab */
 .modal-body {
   transition: none !important;
   animation: none !important;
@@ -170,20 +146,17 @@
   height: auto !important;
 }
 
-/* Prevenir cualquier animación de altura en el modal */
 .modal-content {
   transition: none !important;
   animation: none !important;
 }
 
-/* Asegurar que el modal-dialog no se anime al cambiar tabs */
 .modal-dialog {
   transition: none !important;
   animation: none !important;
   transform: none !important;
 }
 
-/* Deshabilitar backdrop fade */
 .modal.fade .modal-dialog {
   transition: none !important;
   transform: none !important;
@@ -193,7 +166,6 @@
   transform: none !important;
 }
 
-/* Deshabilitar clase .fade de Bootstrap en tabs */
 .tab-pane.fade,
 .tab-pane.fade.show,
 .tab-pane.fade.active {
@@ -202,19 +174,16 @@
   opacity: 1 !important;
 }
 
-/* Forzar display inmediato sin transiciones */
 .tab-content {
   transition: none !important;
   animation: none !important;
 }
 
-/* Deshabilitar animación de entrada/salida de tabs */
 .tab-pane {
   transition: none !important;
   animation: none !important;
 }
 
-/* Prevenir cambios de altura en contenedores */
 .modal-body > div,
 .tab-content > div {
   transition: none !important;
