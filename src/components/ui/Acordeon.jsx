@@ -1,4 +1,4 @@
-// src/components/Acordeon.jsx
+
 import React, { memo, useState, useCallback, useMemo } from 'react';
 import { Accordion, Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
@@ -6,7 +6,7 @@ import { accordionData as defaultData } from '../../data/AccordionData';
 import InfoCard from './InfoCard';
 import '../../styles/acordeon.css';
 
-const Acordeon = memo(({ 
+const Acordeon = memo(({
   data: externalData,
   defaultActiveSection,
   showEmptyMessage = true,
@@ -15,23 +15,23 @@ const Acordeon = memo(({
   loading = false,
   onSectionChange
 }) => {
-  // Usar datos externos o default directamente, sin duplicar en estado
+
   const data = externalData ?? defaultData;
-  
-  // Calcular sección activa inicial una sola vez
+
+
   const initialSection = useMemo(() => {
     return defaultActiveSection || data?.[0]?.id || '0';
   }, [defaultActiveSection, data]);
-  
+
   const [activeSection, setActiveSection] = useState(initialSection);
 
-  // Memoizar el handler para evitar recreaciones
+
   const handleSectionChange = useCallback((sectionId) => {
     setActiveSection(sectionId);
     onSectionChange?.(sectionId);
   }, [onSectionChange]);
 
-  // Early returns para estados especiales
+
   if (loading) {
     return (
       <div className="principal-layout">
@@ -53,8 +53,8 @@ const Acordeon = memo(({
     ) : null;
   }
 
-  const containerClassName = className 
-    ? `principal-layout ${className}` 
+  const containerClassName = className
+    ? `principal-layout ${className}`
     : 'principal-layout';
 
   return (
@@ -75,9 +75,8 @@ const Acordeon = memo(({
   );
 });
 
-// Extraer a componente separado para mejor memoización
 const AccordionSection = memo(({ section }) => (
-  <Accordion.Item 
+  <Accordion.Item
     eventKey={section.id}
     className="accordion-item-custom"
     data-section-id={section.id}

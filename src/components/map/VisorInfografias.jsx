@@ -1,6 +1,6 @@
-// src/components/map/VisorInfografias.jsx
+
 import React, { useMemo } from 'react';
-import VisorBaseImagenes from '../common/VisorBaseImagenes'; 
+import VisorBaseImagenes from '../common/VisorBaseImagenes';
 import '../../styles/visorImagenes.css';
 
 const INFOGRAFIAS_DATA = [
@@ -18,7 +18,7 @@ const INFOGRAFIAS_DATA = [
 const BASE_PATH = '/assets/img/Infografias/';
 
 const VisorInfografias = ({ show, onHide }) => {
-  const infografias = useMemo(() => 
+  const infografias = useMemo(() =>
     INFOGRAFIAS_DATA.map(item => ({
       src: `${BASE_PATH}${item.file}`,
       title: item.title

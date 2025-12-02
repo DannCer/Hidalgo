@@ -1,11 +1,5 @@
-/* src/components/styles/diccionarioDatos.css */
 
-/* ============================================
-   ESTILOS PARA MODAL DICCIONARIO DE DATOS
-   Usa colores de variables.css
-   ============================================ */
 
-/* Modal no bloqueante - permite interacción con el fondo */
 .diccionario-modal {
   pointer-events: none;
 }
@@ -69,10 +63,6 @@
   border-bottom: 1px solid var(--color-accent-2);
 }
 
-/* ============================================
-   TABS
-   ============================================ */
-
 .diccionario-tabs .nav-link {
   color: var(--color-primary);
   font-weight: 500;
@@ -96,10 +86,6 @@
 .diccionario-tabs .nav-link i {
   font-size: 1rem;
 }
-
-/* ============================================
-   TABLA
-   ============================================ */
 
 .diccionario-table-container {
   max-height: 50vh;
@@ -169,10 +155,6 @@
   line-height: 1.5;
 }
 
-/* ============================================
-   FOOTER
-   ============================================ */
-
 .diccionario-footer {
   background-color: #f8f9fa;
   border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
@@ -180,10 +162,6 @@
   justify-content: flex-start;
   border-top: 1px solid var(--color-accent-2);
 }
-
-/* ============================================
-   SCROLLBAR PERSONALIZADO
-   ============================================ */
 
 .diccionario-table-container::-webkit-scrollbar,
 .diccionario-body::-webkit-scrollbar {
@@ -206,10 +184,6 @@
 .diccionario-body::-webkit-scrollbar-thumb:hover {
   background: var(--color-gray-dark);
 }
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
 
 @media (max-width: 768px) {
   .diccionario-body {
@@ -240,11 +214,11 @@
     padding: 2px 6px;
   }
 
-  /* En móviles, desactivar arrastre */
+
   .diccionario-header {
     cursor: default;
   }
-  
+
   .diccionario-header .modal-title {
     cursor: default;
   }

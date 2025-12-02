@@ -16,7 +16,7 @@ const Header = () => {
 
   return (
     <header className="main-header">
-      {/* Menú móvil */}
+      {}
       <div className={`site-mobile-menu ${isMobileMenuOpen ? 'mobile-menu-active' : ''}`}>
         <div className="site-mobile-menu-header">
           <div className="site-mobile-menu-close">
@@ -29,7 +29,7 @@ const Header = () => {
             </button>
           </div>
           <Link to="/" className="mobile-menu-logo">
-             {/* RUTA DIRECTA A PUBLIC */}
+             {}
             <img src="/assets/img/logo_gobhidalgo.png" alt="Logo Gobierno Hidalgo" />
           </Link>
         </div>
@@ -51,22 +51,22 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Navbar Desktop */}
+      {}
       <nav className="site-nav">
         <div className="container-max">
           <div className="row align-items-center">
             <div className="col-12">
               <div className="row align-items-center">
-                
-                {/* Logo Desktop */}
+
+                {}
                 <div className="col-6 col-sm-2 logo">
                   <Link to="/">
-                    {/* RUTA DIRECTA A PUBLIC */}
+                    {}
                     <img src="/assets/img/logo_gobhidalgo.png" alt="Logo Gobierno Hidalgo" />
                   </Link>
                 </div>
 
-                {/* Botón móvil */}
+                {}
                 <div className="col-6 d-sm-none text-end">
                   <button
                     className="mobile-menu-toggle"
@@ -78,7 +78,7 @@ const Header = () => {
                   </button>
                 </div>
 
-                {/* Enlaces desktop */}
+                {}
                 <div className="col-10 text-center d-none d-sm-block">
                   <ul className="menu-derecha">
                     {navLinks.map((link) => (
@@ -101,7 +101,7 @@ const Header = () => {
         </div>
       </nav>
 
-      {/* Overlay para móvil */}
+      {}
       {isMobileMenuOpen && (
         <div className="mobile-menu-overlay" onClick={closeMobileMenu} />
       )}

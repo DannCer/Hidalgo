@@ -1,10 +1,9 @@
-import React, { useState, useMemo } from 'react'; 
+import React, { useState, useMemo } from 'react';
 import HelpButton from '../common/HelpButton';
 import PdfViewerModal from '../common/PdfViewerModal';
 import '../../styles/legend.css';
 import '../../styles/pdfViewer.css';
 
-// Mapeo de capas antiguas a nuevas claves unificadas
 const LEGEND_MAPPING = {
   'Hidalgo:01_spsitios': 'Hidalgo:01_sitios',
   'Hidalgo:01_sbsitios': 'Hidalgo:01_sitios',
@@ -12,12 +11,11 @@ const LEGEND_MAPPING = {
   'Hidalgo:01_spcalidadagua': 'Hidalgo:01_calidadagua',
 };
 
-// Función auxiliar para determinar si es punto
 const isPointType = (legendType, variantType) => {
   const type = variantType || legendType;
   return type && (
-    type === 'point' || 
-    type === 'categorical-point' || 
+    type === 'point' ||
+    type === 'categorical-point' ||
     type === 'ranged-point' ||
     type.includes('point')
   );
@@ -33,19 +31,19 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
 
     const activeLayerNames = Object.keys(activeLayers);
 
-    // Aplicar mapeo y eliminar duplicados
+
     const layersWithLegend = useMemo(() => {
         if (activeLayerNames.length === 0) return [];
-        
-        // Mapear capas a sus claves unificadas
-        const mappedLayers = activeLayerNames.map(layerName => 
+
+
+        const mappedLayers = activeLayerNames.map(layerName =>
             LEGEND_MAPPING[layerName] || layerName
         );
-        
-        // Eliminar duplicados
+
+
         const uniqueLayers = [...new Set(mappedLayers)];
-        
-        // Filtrar solo las que tienen leyenda
+
+
         return uniqueLayers.filter(layerName =>
             legendData[layerName] &&
             (legendData[layerName].items?.length > 0 || legendData[layerName].variants)
@@ -69,13 +67,13 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
                 <div className="legend-content">
                     {layersWithLegend.map(layerName => {
                         const layerLegend = legendData[layerName];
-                        
+
                         const originalLayers = Object.keys(LEGEND_MAPPING).filter(
                             key => LEGEND_MAPPING[key] === layerName
                         );
-                        const isLoading = originalLayers.some(layer => loadingLayers.has(layer)) || 
+                        const isLoading = originalLayers.some(layer => loadingLayers.has(layer)) ||
                                         loadingLayers.has(layerName);
-                        
+
                         const hasVariants = !!layerLegend.variants;
 
                         let currentLegend = layerLegend;
@@ -98,7 +96,7 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
                                     <h5 className="legend-layer-title">
                                         {layerLegend.title || layerName.split(':')[1] || layerName}
                                         {layerName.includes('calidadagua') && (
-                                            <HelpButton 
+                                            <HelpButton
                                                 onClick={() => setShowPdfModal(true)}
                                                 title="Ver información sobre calidad del agua"
                                             />
@@ -168,7 +166,7 @@ const Legend = ({ activeLayers, legendData, loadingLayers = new Set(), activeVar
                 </div>
             )}
 
-            {/* Modal del PDF de Calidad del Agua */}
+            {}
             <PdfViewerModal
                 show={showPdfModal}
                 onHide={() => setShowPdfModal(false)}

@@ -1,10 +1,5 @@
-/* =========================================================
-   LAYER MENU — ESTILOS MODERNOS Y AMIGABLES (Montserrat)
-   ========================================================= */
 
-/* ---------------------------------------------------------
-   CONTENEDOR PRINCIPAL
---------------------------------------------------------- */
+
 .layermenu-container {
   position: absolute;
   left: 15px;
@@ -20,9 +15,6 @@
   transition: all var(--transition-normal);
 }
 
-/* ---------------------------------------------------------
-   CABECERA DRAGGABLE
---------------------------------------------------------- */
 .layermenu-handle {
   cursor: move;
   display: flex;
@@ -53,9 +45,6 @@
   transform: scale(1.1);
 }
 
-/* ---------------------------------------------------------
-   TÍTULOS Y BLOQUES
---------------------------------------------------------- */
 .layermenu-card-title {
   display: block;
   margin: 0.6rem 0;
@@ -66,9 +55,6 @@
   border-left: 3px solid var(--color-primary);
 }
 
-/* ---------------------------------------------------------
-   ELEMENTOS DE CAPA
---------------------------------------------------------- */
 .layermenu-item {
   background: #fff;
   border: 1px solid #e0e0e0;
@@ -77,7 +63,7 @@
   margin-bottom: 0.8rem;
   box-shadow: var(--shadow-light);
   transition: all var(--transition-normal);
-  /* ✅ MEJORA: Scroll suave y posicionamiento */
+
   scroll-margin-top: 20px;
   scroll-margin-bottom: 20px;
 }
@@ -87,7 +73,6 @@
   transform: translateY(-1px);
 }
 
-/* ===== ✅ ESTILOS PARA DROPDOWN SUBLINKS ===== */
 .dropdown-sublink {
   margin-left: 12px;
   border-left: 3px solid #e9ecef;
@@ -132,7 +117,6 @@
   color: var(--color-primary);
 }
 
-/* Estado activo */
 .layermenu-active {
   border-color: var(--color-primary);
   background-color: #fff4f6;
@@ -141,26 +125,23 @@
   padding-left: 0.7rem !important;
 }
 
-/* ===== ✅ HIGHLIGHT MEJORADO AL NAVEGAR DESDE MENÚ PRINCIPAL ===== */
 .layermenu-highlighted {
-  /* Animación más suave y profesional */
+
   animation: pulse-highlight 2.5s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid var(--color-primary) !important;
   box-shadow: 0 0 16px rgba(160, 33, 66, 0.5) !important;
-  /* ✅ MEJORA: Usar will-change para mejor rendimiento */
+
   will-change: background-color, box-shadow;
-  /* ✅ MEJORA: Z-index para destacar sobre otros elementos */
+
   position: relative;
   z-index: 10;
 }
 
-/* ✅ Highlight específico para sublinks */
 .dropdown-sublink.layermenu-highlighted {
   border-left-color: var(--color-primary) !important;
   background-color: rgba(160, 33, 66, 0.08);
 }
 
-/* ✅ MEJORA: Animación más fluida y profesional */
 @keyframes pulse-highlight {
   0% {
     background-color: rgba(160, 33, 66, 0.08);
@@ -199,12 +180,11 @@
   }
 }
 
-/* ✅ MEJORA: Reducir movimiento para usuarios con preferencias de accesibilidad */
 @media (prefers-reduced-motion: reduce) {
   .layermenu-highlighted {
     animation: pulse-highlight-reduced 2.5s ease-in-out;
   }
-  
+
   @keyframes pulse-highlight-reduced {
     0%, 100% {
       background-color: rgba(160, 33, 66, 0.05);
@@ -215,13 +195,12 @@
       box-shadow: 0 0 12px rgba(160, 33, 66, 0.5);
     }
   }
-  
+
   .layermenu-item {
     transition: none;
   }
 }
 
-/* Estado de carga */
 .layermenu-loading {
   opacity: 0.6;
   pointer-events: none;
@@ -246,9 +225,6 @@
   display: flex !important;
 }
 
-/* ---------------------------------------------------------
-   CONTENIDO Y FILAS
---------------------------------------------------------- */
 .layermenu-row {
   display: flex;
   align-items: center;
@@ -287,9 +263,6 @@
   font-weight: 500;
 }
 
-/* ---------------------------------------------------------
-   BOTONES DE ACCIÓN
---------------------------------------------------------- */
 .layermenu-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -327,9 +300,6 @@
   transform: translateY(0);
 }
 
-/* ---------------------------------------------------------
-   ACORDEÓN
---------------------------------------------------------- */
 .layermenu-container .accordion-item {
   border: none;
   border-radius: var(--border-radius-sm);
@@ -373,9 +343,6 @@
   animation: fadeInAccordion 0.25s ease;
 }
 
-/* ---------------------------------------------------------
-   SCROLL PERSONALIZADO
---------------------------------------------------------- */
 .layermenu-container::-webkit-scrollbar {
   width: 8px;
 }
@@ -389,14 +356,10 @@
   background-color: rgba(160, 33, 66, 0.5);
 }
 
-/* ✅ MEJORA: Scroll suave nativo */
 .layermenu-container {
   scroll-behavior: smooth;
 }
 
-/* ---------------------------------------------------------
-   ESTADOS Y ANIMACIONES
---------------------------------------------------------- */
 .layermenu-item *:focus {
   outline: none !important;
   box-shadow: none !important;
@@ -413,7 +376,6 @@
   }
 }
 
-/* Estado deshabilitado */
 .layermenu-item.disabled {
   cursor: not-allowed;
   pointer-events: none;
@@ -429,7 +391,6 @@
   color: var(--color-text-muted);
 }
 
-/* Tooltip sutil */
 .layermenu-item[title]:hover::after {
   content: attr(title);
   position: absolute;
@@ -445,7 +406,6 @@
   z-index: 20;
 }
 
-/* --- Estilos para el Time Slider en el LayerMenu --- */
 .layer-timeslider {
   margin-top: 5px;
   margin-bottom: 10px;
@@ -511,7 +471,6 @@
   text-align: center;
 }
 
-/* Caja completa */
 .timeline-box {
   background: #ffffff;
   border-radius: 12px;
@@ -539,7 +498,6 @@
   letter-spacing: 0.5px;
 }
 
-/* Línea de puntos */
 .timeline-points-row {
   display: flex;
   justify-content: space-between;
@@ -566,14 +524,12 @@
   box-shadow: 0 0 0 2px rgba(160, 33, 66, 0.3);
 }
 
-/* Slider */
 .timeline-slider {
   width: 100%;
   cursor: pointer;
   margin-bottom: 4px;
 }
 
-/* Texto de la quincena actual */
 .timeline-current {
   text-align: center;
   font-size: 13px;
@@ -585,7 +541,6 @@
   border-radius: var(--border-radius-sm);
 }
 
-/* ===== CHECKBOXES PERSONALIZADOS CON COLOR PRIMARIO ===== */
 .layermenu-item .form-check-input {
   border: 2px solid var(--color-gray);
   background-color: white;
@@ -623,16 +578,12 @@
   border-color: var(--color-primary);
 }
 
-/* Para checkboxes deshabilitados */
 .layermenu-item.disabled .form-check-input {
   background-color: var(--color-gray);
   border-color: var(--color-gray-dark);
   cursor: not-allowed;
 }
 
-/* ===== LÍNEA DE TIEMPO PERSONALIZADA CON COLOR PRIMARIO ===== */
-
-/* Track de la línea de tiempo */
 .timeline-slider-menu {
   width: 100%;
   height: 6px;
@@ -642,7 +593,6 @@
   cursor: pointer;
 }
 
-/* Track del slider */
 .timeline-slider-menu::-webkit-slider-track {
   background: var(--color-gray);
   border-radius: 3px;
@@ -655,7 +605,6 @@
   height: 6px;
 }
 
-/* Thumb del slider */
 .timeline-slider-menu::-webkit-slider-thumb {
   appearance: none;
   -webkit-appearance: none;
@@ -690,12 +639,10 @@
   transform: scale(1.1);
 }
 
-/* Progress del track (parte llena) */
 .timeline-slider-menu {
   background: linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) var(--slider-progress, 0%), var(--color-gray) var(--slider-progress, 0%), var(--color-gray) 100%);
 }
 
-/* Range input personalizado */
 .menu-timeline-range {
   width: 100%;
   height: 6px;
@@ -738,7 +685,6 @@
   transform: scale(1.1);
 }
 
-/* ===== SPINNER DE CARGA ===== */
 .spinner-border-sm {
   width: 0.875rem;
   height: 0.875rem;
@@ -751,7 +697,6 @@
   color: var(--color-primary) !important;
 }
 
-/* ===== ANIMACIÓN DE ENTRADA ===== */
 @keyframes slideInLeft {
   from {
     opacity: 0;
@@ -767,13 +712,11 @@
   animation: slideInLeft 0.3s ease-out;
 }
 
-/* ===== ACCESIBILIDAD ===== */
 .layermenu-item:focus-within {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-/* ✅ MEJORA: Mejores indicadores de foco para teclado */
 .layermenu-item:focus-visible {
   outline: 3px solid var(--color-primary);
   outline-offset: 3px;
@@ -784,7 +727,6 @@
   outline-offset: 2px;
 }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .layermenu-container {
     width: calc(100vw - 30px);
@@ -809,12 +751,12 @@
     padding: 0.3rem 0.6rem;
     font-size: 0.75rem;
   }
-  
-  /* ✅ MEJORA: Animación de highlight más sutil en móvil */
+
+
   .layermenu-highlighted {
     animation: pulse-highlight-mobile 2s ease-in-out;
   }
-  
+
   @keyframes pulse-highlight-mobile {
     0%, 100% {
       background-color: rgba(160, 33, 66, 0.05);
@@ -825,40 +767,33 @@
       box-shadow: 0 0 10px rgba(160, 33, 66, 0.5);
     }
   }
-  
-  /* ✅ Ajustes para sublinks en móvil */
+
+
   .dropdown-sublink {
     margin-left: 8px;
     padding-left: 10px;
   }
-  
+
   .dropdown-indicator {
     margin-right: 6px;
     font-size: 0.75rem;
   }
 }
 
-/* ===== MEJORAS DE RENDIMIENTO ===== */
-
-/* ✅ Usar transform en lugar de propiedades que causan reflow */
 .layermenu-item {
   transform: translateZ(0);
   backface-visibility: hidden;
 }
 
-/* ✅ Hardware acceleration para animaciones */
 .layermenu-highlighted {
   transform: translateZ(0);
   backface-visibility: hidden;
 }
 
-/* ✅ Optimización de repaint para accordions */
 .accordion-body {
   contain: layout style paint;
 }
-/* ---------------------------------------------------------
-   BOTÓN DICCIONARIO - Estilo distintivo
---------------------------------------------------------- */
+
 .layermenu-buttons button.download-btn.diccionario {
   background: var(--color-primary);
   color: var(--color-text-light);

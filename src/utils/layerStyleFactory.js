@@ -4,10 +4,6 @@ import { COLORS } from "./colors";
 import { createRangedStyleFromLegend, createCategoricalStyleFromLegend } from "./styleGenerators";
 import { legendData } from "./legendData";
 
-// ===================================================================
-// CONFIGURACIÓN - Usar constantes locales para compatibilidad
-// ===================================================================
-
 const LEGEND_MAPPING = {
   'Hidalgo:01_spsitios': 'Hidalgo:01_sitios',
   'Hidalgo:01_sbsitios': 'Hidalgo:01_sitios',
@@ -20,10 +16,6 @@ const SPECIAL_LAYERS = {
   ESTADO: 'Hidalgo:00_Estado',
   SEQUIAS: 'Hidalgo:04_sequias',
 };
-
-// ===================================================================
-// GESTIÓN DE CACHÉ SIMPLIFICADA
-// ===================================================================
 
 class StyleCache {
   constructor() {
@@ -61,10 +53,6 @@ class StyleCache {
 
 const cache = new StyleCache();
 
-// ===================================================================
-// UTILIDADES
-// ===================================================================
-
 const getLegendKey = (layerName) => LEGEND_MAPPING[layerName] || layerName;
 
 const getPointColor = (layerName, items) => {
@@ -73,20 +61,16 @@ const getPointColor = (layerName, items) => {
   return items[idx]?.color || COLORS.DEFAULT;
 };
 
-// ===================================================================
-// GENERADORES DE ESTILOS
-// ===================================================================
-
 const createPointLayerStyle = (legendKey, layerName, legend) => {
   const color = getPointColor(layerName, legend.items);
-  return (feature, latlng) => L.circleMarker(latlng, { 
-    ...basePointStyle, 
-    fillColor: color 
+  return (feature, latlng) => L.circleMarker(latlng, {
+    ...basePointStyle,
+    fillColor: color
   });
 };
 
 const createPolygonLayerStyle = (legendKey, legend) => {
-  // Estilos especiales
+
   if (legendKey === SPECIAL_LAYERS.MUNICIPIOS) {
     return () => styleOutlineRed;
   }
@@ -102,7 +86,7 @@ const createPolygonLayerStyle = (legendKey, legend) => {
     });
   }
 
-  // Estilo estándar
+
   const { color: fillColor = COLORS.LIGHT_GRAY, borderColor = COLORS.BLACK } = legend.items[0] || {};
   return () => ({ ...basePolygonStyle, fillColor, color: borderColor });
 };
@@ -117,19 +101,19 @@ const getActiveVariant = (legend, variant) => {
 };
 
 const createStyleFromLegend = (legendKey, layerName, legend, variant) => {
-  // Manejar variantes
+
   const activeVariant = getActiveVariant(legend, variant);
   if (activeVariant) {
     const { key, data } = activeVariant;
     const propertyName = data.propertyName || key;
-    
+
     if (data.type === "ranged-polygon") {
       return {
         styleFunc: createRangedStyleFromLegend(propertyName, data.items, "polygon"),
         isPoint: false
       };
     }
-    
+
     if (data.type === "categorical-polygon") {
       return {
         styleFunc: createCategoricalStyleFromLegend(propertyName, data.items, "polygon"),
@@ -138,7 +122,7 @@ const createStyleFromLegend = (legendKey, layerName, legend, variant) => {
     }
   }
 
-  // Estilos directos (sin variantes)
+
   const { type, propertyName, items } = legend;
 
   const styleMap = {
@@ -174,37 +158,26 @@ const createStyleFromLegend = (legendKey, layerName, legend, variant) => {
   })))();
 };
 
-// ===================================================================
-// FUNCIÓN PRINCIPAL
-// ===================================================================
-
-/**
- * Obtiene opciones de estilo para una capa
- * @param {string} layerName - Nombre de la capa
- * @param {string|null} variant - Variante activa (si aplica)
- * @param {boolean} forceUpdate - Forzar actualización del caché
- * @returns {Object} Opciones de configuración de la capa
- */
 export function getLayerOptions(layerName, variant = null, forceUpdate = false) {
   const isSequiaLayer = layerName === SPECIAL_LAYERS.SEQUIAS;
 
-  // Invalidar caché para capas dinámicas
+
   if (isSequiaLayer && forceUpdate) {
     cache.incrementVersion();
   }
 
   const cacheKey = cache.getCacheKey(layerName, variant);
 
-  // Retornar desde caché
+
   if (!forceUpdate && cache.get(cacheKey)) {
     return cache.get(cacheKey);
   }
 
-  // Obtener leyenda
+
   const legendKey = getLegendKey(layerName);
   const legend = legendData[legendKey];
 
-  // Sin leyenda: estilo por defecto
+
   if (!legend) {
     const result = {
       style: { ...basePolygonStyle, fillColor: COLORS.LIGHT_GRAY }
@@ -213,15 +186,15 @@ export function getLayerOptions(layerName, variant = null, forceUpdate = false) 
     return result;
   }
 
-  // Crear estilo
+
   const { styleFunc, isPoint } = createStyleFromLegend(legendKey, layerName, legend, variant);
 
-  // Construir opciones
+
   const result = {
     ...(isPoint ? { pointToLayer: styleFunc } : { style: styleFunc }),
     onEachFeature: (feature, layer) => {
       if (isSequiaLayer && layer.setStyle) {
-        // Aplicar estilos asíncronamente para capas dinámicas
+
         setTimeout(() => {
           const style = typeof styleFunc === 'function' ? styleFunc(feature) : styleFunc;
           layer.setStyle(style);
@@ -234,33 +207,16 @@ export function getLayerOptions(layerName, variant = null, forceUpdate = false) 
   return result;
 }
 
-// ===================================================================
-// API PÚBLICA
-// ===================================================================
-
-/**
- * Fuerza actualización de estilos incrementando la versión del caché
- * @returns {number} Nueva versión del caché
- */
 export const forceStyleUpdate = () => {
   cache.incrementVersion();
   return cache.version;
 };
 
-/**
- * Limpia el caché de estilos
- * @param {string|null} layerName - Nombre de capa específica o null para limpiar todo
- * @returns {string} 'partial' o 'full' según el tipo de limpieza
- */
 export const clearStyleCache = (layerName = null) => {
   cache.invalidate(layerName);
   return layerName ? 'partial' : 'full';
 };
 
-/**
- * Obtiene información del caché (útil para debugging)
- * @returns {Object} Info del caché
- */
 export const getCacheInfo = () => ({
   size: cache.cache.size,
   version: cache.version,

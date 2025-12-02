@@ -3,9 +3,6 @@ import { Modal } from 'react-bootstrap';
 import DraggableModalDialog from './DraggableModalDialog';
 import '../../styles/pdfViewer.css';
 
-/**
- * Modal para visualizar archivos PDF
- */
 const PdfViewerModal = ({ show, onHide, pdfUrl, title = 'Documento' }) => {
   return (
     <Modal

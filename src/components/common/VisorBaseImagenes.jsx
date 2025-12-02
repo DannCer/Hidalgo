@@ -1,11 +1,11 @@
-// src/components/common/VisorBaseImagenes.jsx
+
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Modal, Spinner, Alert, Button, Form } from 'react-bootstrap';
-// Importa tus estilos base que contienen las variables
+
 import '../../styles/visorImagenes.css'; 
 
-// Configuración de zoom
+
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 5;
 const ZOOM_STEP = 0.25;
@@ -13,10 +13,10 @@ const ZOOM_STEP = 0.25;
 const VisorBaseImagenes = ({ 
   show, 
   onHide, 
-  images, // Array de objetos { src, title }
-  title,  // Título base del modal
-  basePath, // Ruta base para generar URLs (ya integrado en el array 'images')
-  sourceText = 'SEMARNATH', // Texto de fuente
+  images,
+  title,
+  basePath,
+  sourceText = 'SEMARNATH',
   footerShortcutText = '← → navegar | F pantalla completa' 
 }) => {
   const [index, setIndex] = useState(0);
@@ -25,7 +25,7 @@ const VisorBaseImagenes = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showThumbnails, setShowThumbnails] = useState(false);
   
-  // Estados de zoom y pan
+
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -34,7 +34,7 @@ const VisorBaseImagenes = ({
   const imageRef = useRef(null);
   const imageContainerRef = useRef(null);
   
-  // --- Funcionalidad de Zoom/Pan ---
+
 
   const resetZoom = useCallback(() => {
     setZoom(1);
@@ -50,7 +50,7 @@ const VisorBaseImagenes = ({
     const containerRect = container.getBoundingClientRect();
     const imageRect = image.getBoundingClientRect();
     
-    // Calcula el tamaño real escalado de la imagen para determinar los límites de arrastre
+
     const scaledWidth = image.naturalWidth * zoom * (imageRect.width / image.naturalWidth / zoom);
     const scaledHeight = image.naturalHeight * zoom * (imageRect.height / image.naturalHeight / zoom);
     
@@ -60,7 +60,7 @@ const VisorBaseImagenes = ({
     return { maxX, maxY };
   }, [zoom]);
 
-  // Manejar Zoom (Rueda y Botones)
+
   const zoomIn = useCallback(() => {
     setZoom(prev => Math.min(MAX_ZOOM, prev + ZOOM_STEP));
   }, []);
@@ -81,7 +81,7 @@ const VisorBaseImagenes = ({
     setZoom(newZoom);
   }, [zoom]);
   
-  // Manejar Pan (Arrastre)
+
   const handleMouseDown = useCallback((e) => {
     if (zoom > 1) {
       e.preventDefault();
@@ -112,19 +112,19 @@ const VisorBaseImagenes = ({
     transformOrigin: 'center center'
   }), [zoom, position, isDragging]);
   
-  // --- Funcionalidad de Navegación y Carga ---
+
 
   const currentImage = images[index];
   const totalImages = images.length;
   
-  // Carga inicial y reset
+
   useEffect(() => {
     if (!show || totalImages === 0) return;
     setLoading(true);
     setIndex(0);
     resetZoom();
     
-    // Pre-carga inicial (primeras 3)
+
     const preloadInitial = async () => {
       const initialImages = images.slice(0, 3);
       const loaded = {};
@@ -144,7 +144,7 @@ const VisorBaseImagenes = ({
     preloadInitial();
   }, [show, totalImages, images, resetZoom]);
 
-  // Pre-carga adyacente
+
   useEffect(() => {
     if (!show || loading) return;
     const indicesToPreload = [index - 1, index + 1, index + 2].filter(
@@ -159,7 +159,7 @@ const VisorBaseImagenes = ({
     });
   }, [index, show, loading, totalImages, images, imagesLoaded]);
 
-  // Handlers de navegación
+
   const goToFirst = useCallback(() => { setIndex(0); resetZoom(); }, [resetZoom]);
   const goToLast = useCallback(() => { setIndex(totalImages - 1); resetZoom(); }, [totalImages, resetZoom]);
   const goToPrev = useCallback(() => { 
@@ -174,7 +174,7 @@ const VisorBaseImagenes = ({
   const handleImageLoad = useCallback((idx) => { setImagesLoaded(prev => prev[idx] ? prev : { ...prev, [idx]: true }); }, []);
   const toggleFullscreen = useCallback(() => { setIsFullscreen(prev => !prev); }, []);
 
-  // Manejo de Descarga
+
   const handleDownload = useCallback(() => {
     if (!currentImage) return;
     const link = document.createElement('a');
@@ -183,7 +183,7 @@ const VisorBaseImagenes = ({
     link.click();
   }, [currentImage, title]);
 
-  // Navegación con teclado
+
   useEffect(() => {
     if (!show) return;
     
@@ -220,7 +220,7 @@ const VisorBaseImagenes = ({
       onHide={onHide} 
       size="xl" 
       centered 
-      // CLASE BASE QUE DEFINE LOS ESTILOS DE VISORIMAGENES.CSS
+
       className={`visor-imagenes-modal ${isFullscreen ? 'visor-fullscreen' : ''}`}
       backdrop="static"
       fullscreen={isFullscreen}
@@ -244,7 +244,7 @@ const VisorBaseImagenes = ({
       <Modal.Body className="visor-imagenes-body">
         {loading ? (
           <div className="loading-container">
-            <Spinner animation="border" variant="light" /> {/* Usar variant light para fondo oscuro */}
+            <Spinner animation="border" variant="light" /> {}
             <p>Cargando imágenes...</p>
           </div>
         ) : totalImages === 0 ? (
@@ -283,7 +283,7 @@ const VisorBaseImagenes = ({
                   title={zoom > 1 ? "Arrastra para mover" : "Usa la rueda del mouse para zoom"}
                 />
                 
-                {/* Controles de zoom (Estilos en visorImagenes.css) */}
+                {}
                 <div className="zoom-controls">
                   <Button variant="light" size="sm" onClick={zoomOut} disabled={zoom <= MIN_ZOOM} title="Alejar (-)">−
                   </Button>
@@ -303,7 +303,7 @@ const VisorBaseImagenes = ({
               </button>
             </div>
 
-            {/* Barra de Progreso (Estilos en visorImagenes.css) */}
+            {}
             <div className="progress-bar-container">
               <div 
                 className="progress-bar-fill" 
@@ -311,7 +311,7 @@ const VisorBaseImagenes = ({
               />
             </div>
 
-            {/* Controles de Navegación (Estilos en visorImagenes.css) */}
+            {}
             <div className="visor-controls">
               <div className="controls-left">
                 <Button variant="link" size="sm" onClick={goToFirst} disabled={index === 0} title="Primera (Home)">⏮</Button>
@@ -351,7 +351,7 @@ const VisorBaseImagenes = ({
                   ▦
                 </Button>
                 <Button
-                  variant="outline-primary" // ESTANDARIZADO POR GLOBAL.CSS
+                  variant="outline-primary"
                   size="sm"
                   onClick={handleDownload}
                   disabled={!imagesLoaded[index]}
@@ -362,7 +362,7 @@ const VisorBaseImagenes = ({
               </div>
             </div>
 
-            {/* Miniaturas (Estilos en visorImagenes.css) */}
+            {}
             {showThumbnails && (
               <div className="thumbnails-container">
                 <div className="thumbnails-scroll">

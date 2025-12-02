@@ -1,7 +1,7 @@
 
-// src/components/observatorio/VisorImagenesAcuiferos.jsx
+
 import React, { useMemo } from 'react';
-import VisorBaseImagenes from '../common/VisorBaseImagenes'; 
+import VisorBaseImagenes from '../common/VisorBaseImagenes';
 import '../../styles/visorImagenes.css';
 
 const ACUIFEROS_DATA = [
@@ -33,7 +33,7 @@ const ACUIFEROS_DATA = [
 const BASE_PATH = '/assets/img/acuiferos/';
 
 const VisorImagenesAcuiferos = ({ show, onHide }) => {
-  const imagenesAcuiferos = useMemo(() => 
+  const imagenesAcuiferos = useMemo(() =>
     ACUIFEROS_DATA.map(item => ({
       src: `${BASE_PATH}${item.file}`,
       title: item.title

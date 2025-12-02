@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { formatDisplayValue } from '../../utils/dataUtils';
 
-// Constants
 const EXCLUDED_PROPERTIES = ['geom', 'geometry'];
 const DEFAULT_MAX_FEATURES = 15;
 
-// Campos que NO deben formatearse como número aunque sean numéricos
 const EXCLUDE_FROM_NUMBER_FORMAT = [
   'clave de la cuenca',
   'clave_cuenca',
@@ -24,28 +23,29 @@ const EXCLUDE_FROM_NUMBER_FORMAT = [
   'Año',
 ];
 
-// Utility functions
 const formatPropertyValue = (value, propertyName = '') => {
   if (value == null) return '';
-  
+
   const stringValue = String(value).trim();
   const lowerPropertyName = propertyName.toLowerCase();
-  
-  // Verificar si el campo debe excluirse del formato numérico
+
+  const formattedDate = formatDisplayValue(value, propertyName);
+  if (formattedDate !== stringValue) {
+    return formattedDate;
+  }
+
   const shouldExcludeFromNumberFormat = EXCLUDE_FROM_NUMBER_FORMAT.some(
     excluded => lowerPropertyName.includes(excluded)
   );
-  
-  // Format numbers with commas (solo si no está excluido)
+
   if (!shouldExcludeFromNumberFormat && !isNaN(value) && stringValue !== '') {
     return Number(value).toLocaleString();
   }
-  
-  // Capitalize first letter for strings
+
   if (stringValue.length > 0) {
     return stringValue.charAt(0).toUpperCase() + stringValue.slice(1);
   }
-  
+
   return stringValue;
 };
 
@@ -55,21 +55,21 @@ const getDisplayName = (layerName, layerInfo) => {
 
 const shouldDisplayProperty = (key, value) => {
   const lowerKey = key.toLowerCase();
-  return !EXCLUDED_PROPERTIES.includes(lowerKey) && 
-         value != null && 
+  return !EXCLUDED_PROPERTIES.includes(lowerKey) &&
+         value != null &&
          String(value).trim() !== '';
 };
 
-const PopupContent = ({ 
-  layerName, 
-  layerInfo = {}, 
-  features = [], 
+const PopupContent = ({
+  layerName,
+  layerInfo = {},
+  features = [],
   maxFeatures = DEFAULT_MAX_FEATURES,
   className = '',
   showFeatureCount = true,
   isLast = false
 }) => {
-  // Early return for empty features
+
   if (!features || features.length === 0) {
     return (
       <div className={`layer-popup-section ${className}`}>
@@ -86,18 +86,18 @@ const PopupContent = ({
 
   return (
     <div className={`layer-popup-section ${className}`}>
-      {/* Header */}
+      {}
       {showFeatureCount && (
         <h5 className="popup-section-title">
-          {displayName} 
+          {displayName}
           <span className="feature-count">({features.length})</span>
         </h5>
       )}
-      
-      {/* Features List */}
+
+      {}
       <div className="features-list">
         {displayedFeatures.map((feature, index) => (
-          <FeatureItem 
+          <FeatureItem
             key={`feature-${index}-${feature.id || index}`}
             feature={feature}
             index={index}
@@ -105,14 +105,14 @@ const PopupContent = ({
         ))}
       </div>
 
-      {/* Hidden Features Notice */}
+      {}
       {hiddenFeaturesCount > 0 && (
         <div className="more-features-notice">
           <em>... y {hiddenFeaturesCount} elemento(s) más</em>
         </div>
       )}
 
-      {/* Separator between layers */}
+      {}
       {!isLast && (
         <hr className="layer-separator" />
       )}
@@ -120,7 +120,6 @@ const PopupContent = ({
   );
 };
 
-// Sub-component for individual feature
 const FeatureItem = ({ feature, index }) => {
   const properties = feature.properties || {};
   const validProperties = Object.entries(properties)
@@ -153,7 +152,6 @@ const FeatureItem = ({ feature, index }) => {
   );
 };
 
-// PropTypes
 PopupContent.propTypes = {
   layerName: PropTypes.string.isRequired,
   layerInfo: PropTypes.shape({

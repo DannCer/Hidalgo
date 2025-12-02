@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Table, Spinner, Alert, Button, Form } from 'react-bootstrap';
 import { fetchWfsLayer } from '../../utils/wfsService';
+import { formatDisplayValue } from '../../utils/dataUtils';
 import { saveAs } from 'file-saver';
 import '../../styles/attributeTableContent.css'
 
@@ -16,7 +17,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => {
 
   const FEATURES_PER_PAGE = 10000;
 
-  //  Aceptar filtro como parámetro
+
   const fetchData = async (isInitialLoad = false, customFilter = filter) => {
     if (!layerName) return;
     setIsLoading(true);
@@ -24,7 +25,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => {
     try {
       const startIndex = isInitialLoad ? 0 : fetchedCount;
 
-      // pasar el filtro a fetchWfsLayer
+
       const data = await fetchWfsLayer(layerName, customFilter, FEATURES_PER_PAGE, startIndex);
 
       if (data?.features) {
@@ -51,7 +52,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => {
     }
   };
 
-  // Recargar datos cuando cambia el filtro
+
   useEffect(() => {
     setFeatures([]);
     setHeaders([]);
@@ -66,7 +67,6 @@ const AttributeTableContent = ({ layerName, filter = null }) => {
   }, [layerName, filter]);
 
   const handleLoadMore = () => fetchData(false, filter);
-
 
   const sortedAndFilteredFeatures = useMemo(() => {
     let filtered = features;
@@ -122,7 +122,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => {
       const dataToExport = sortedAndFilteredFeatures.map(feature => {
         const row = {};
         headers.forEach(header => {
-          row[header] = feature.properties[header];
+          row[header] = formatDisplayValue(feature.properties[header], header);
         });
         return row;
       });
@@ -140,7 +140,6 @@ const AttributeTableContent = ({ layerName, filter = null }) => {
       console.error("Error cargando el módulo de Excel:", error);
     }
   };
-
 
   if (isLoading && features.length === 0)
     return (
@@ -225,7 +224,7 @@ const AttributeTableContent = ({ layerName, filter = null }) => {
                 <tr key={feature.id || index}>
                   {headers.map(header => (
                     <td key={`${feature.id}-${header}`}>
-                      {String(feature.properties[header])}
+                      {formatDisplayValue(feature.properties[header], header)}
                     </td>
                   ))}
                 </tr>

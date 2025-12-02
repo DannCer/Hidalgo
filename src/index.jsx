@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client'; // Nota el cambio: '/client'
+import ReactDOM from 'react-dom/client';
 import './styles/variables.css';
 import './styles/global.css';
 import 'bootstrap/dist/css/bootstrap.min.css';

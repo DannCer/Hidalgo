@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import MapView from '../components/map/MapView'; 
+import MapView from '../components/map/MapView';
 
 const Observatorio = () => {
   const location = useLocation();
@@ -9,9 +9,9 @@ const Observatorio = () => {
   const sectionIndex = location.state?.sectionIndex;
 
   return (
-    <MapView 
-      initialLayer={initialLayer} 
-      sectionIndex={sectionIndex} 
+    <MapView
+      initialLayer={initialLayer}
+      sectionIndex={sectionIndex}
     />
   );
 };

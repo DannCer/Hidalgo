@@ -1,8 +1,4 @@
-/* src/components/styles/pdfViewer.css */
 
-/* ============================================
-   MODAL VISOR DE PDF
-   ============================================ */
 
 .pdf-viewer-modal .modal-dialog {
   max-width: 90vw;
@@ -54,10 +50,6 @@
   border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
 }
 
-/* ============================================
-   BOTÓN DE AYUDA (?)
-   ============================================ */
-
 .help-btn {
   display: inline-flex;
   align-items: center;
@@ -87,10 +79,6 @@
 .help-btn:active {
   transform: scale(0.95);
 }
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
 
 @media (max-width: 768px) {
   .pdf-viewer-modal .modal-dialog {

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { getLayerInfo } from '../utils/wfsService'; 
+import { getLayerInfo } from '../utils/wfsService';
 
 export const useTableModal = (currentFilters) => {
   const [tableModalState, setTableModalState] = useState({
@@ -11,7 +11,7 @@ export const useTableModal = (currentFilters) => {
   const handleShowTable = useCallback((layers, displayName) => {
     let layerNamesArray = Array.isArray(layers) ? [...layers] : [layers];
 
-    // Agregar capas secundarias según sea necesario
+
     const secondaryLayers = {
       'Hidalgo:03_usoconsuntivo': 'Hidalgo:03_usoagua',
       'Hidalgo:01_spsitios': 'Hidalgo:01_sbsitios',

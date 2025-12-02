@@ -1,10 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-/**
- * Botón para abrir el modal del Diccionario de Datos
- * Muestra los parámetros e indicadores de calidad del agua
- */
 const DiccionarioButton = ({ onClick, disabled = false }) => {
   return (
     <button

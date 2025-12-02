@@ -1,4 +1,4 @@
-/* ===== TIMELINE COMPONENT STYLES ===== */
+
 .timeline-container {
   margin-top: 10px;
   padding: 12px;
@@ -13,16 +13,15 @@
   box-shadow: var(--shadow-light);
 }
 
-/* ===== SLIDER PERSONALIZADO CON COLOR PRIMARIO ===== */
 .timeline-slider {
   width: 100%;
   height: 6px;
   border-radius: 3px;
   background: linear-gradient(
-    to right, 
-    var(--color-primary) 0%, 
-    var(--color-primary) var(--slider-progress, 50%), 
-    var(--color-gray) var(--slider-progress, 50%), 
+    to right,
+    var(--color-primary) 0%,
+    var(--color-primary) var(--slider-progress, 50%),
+    var(--color-gray) var(--slider-progress, 50%),
     var(--color-gray) 100%
   );
   outline: none;
@@ -32,14 +31,12 @@
   appearance: none;
 }
 
-/* Track del slider - Webkit */
 .timeline-slider::-webkit-slider-track {
   background: transparent;
   height: 6px;
   border-radius: 3px;
 }
 
-/* Thumb del slider - Webkit */
 .timeline-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -58,7 +55,6 @@
   transform: scale(1.1);
 }
 
-/* Track del slider - Firefox */
 .timeline-slider::-moz-range-track {
   background: var(--color-gray);
   height: 6px;
@@ -66,7 +62,6 @@
   border: none;
 }
 
-/* Thumb del slider - Firefox */
 .timeline-slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
@@ -84,7 +79,6 @@
   transform: scale(1.1);
 }
 
-/* ===== TIMELINE TRACK Y PUNTOS ===== */
 .timeline-track {
   position: relative;
   height: 4px;
@@ -146,7 +140,6 @@
   background: var(--color-primary-dark);
 }
 
-/* ===== ETIQUETA ACTUAL ===== */
 .timeline-current-label {
   text-align: center;
   font-size: 0.9em;
@@ -166,7 +159,6 @@
   box-shadow: var(--shadow-light);
 }
 
-/* ===== TIMELINE BOX (PARA EL MENÚ DE CAPAS) ===== */
 .timeline-box {
   margin-top: 12px;
   padding: 12px;
@@ -193,24 +185,22 @@
   font-weight: 600;
 }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .timeline-container {
     padding: 8px;
     margin-top: 8px;
   }
-  
+
   .timeline-slider {
     margin: 10px 0;
   }
-  
+
   .timeline-current-label {
     font-size: 0.85em;
     padding: 6px 10px;
   }
 }
 
-/* ===== ESTADOS DE FOCUS PARA ACCESIBILIDAD ===== */
 .timeline-slider:focus {
   outline: none;
 }

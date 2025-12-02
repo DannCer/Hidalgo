@@ -1,12 +1,9 @@
-// src/components/observatorio/MapContent.jsx
-// ============================================
-// Componente interno del mapa (dentro de MapContainer)
-// ============================================
+
+
 import React, { memo, useMemo } from 'react';
 import { ScaleControl, GeoJSON, ZoomControl } from "react-leaflet";
 import PropTypes from 'prop-types';
 
-// Componentes del mapa
 import MapClickHandler from './MapClickHandler';
 import KeepPopupInView from './KeepPopupInView';
 import GeoJsonLayers from './GeoJsonLayers';
@@ -14,33 +11,28 @@ import BaseLayerControls from './BaseLayerControls';
 import ControlSidebarWrapper from './ControlSidebarWrapper';
 import HighlightLayer from './HighlightLayer';
 
-// Utilidades
 import { getLayerOptions } from '../../utils/layerStyleFactory';
 import { BASE_LAYERS } from '../../config/env';
 
-/**
- * Contenido interno del mapa
- * Separado del MapContainer para optimizar re-renders
- */
 const MapContent = memo(({
-    // Datos
+
     baseLayerData,
     activeLayers,
     highlightData,
     popupData,
-    
-    // Variantes
+
+
     productionVariant,
     usoConsuntivoVariant,
     riesgosVariant,
     sequiaQuincena,
-    
-    // Handlers
+
+
     setPopupData,
     setHighlightData,
     handleClosePopup
 }) => {
-    // Memoizar props de GeoJsonLayers
+
     const geoJsonLayersProps = useMemo(() => ({
         activeLayers,
         productionVariant,
@@ -51,24 +43,24 @@ const MapContent = memo(({
 
     return (
         <>
-            {/* Controles de zoom */}
-            <ZoomControl 
-                position="topright" 
-                zoomInTitle="Acercar" 
-                zoomOutTitle="Alejar" 
-            />
-            
-            {/* Escala */}
-            <ScaleControl 
-                maxWidth="150" 
-                position="bottomright" 
-                imperial={false} 
+            {}
+            <ZoomControl
+                position="topright"
+                zoomInTitle="Acercar"
+                zoomOutTitle="Alejar"
             />
 
-            {/* Selector de capas base (satélite, calles, etc.) */}
+            {}
+            <ScaleControl
+                maxWidth="150"
+                position="bottomright"
+                imperial={false}
+            />
+
+            {}
             <BaseLayerControls />
 
-            {/* Manejador de clics en el mapa */}
+            {}
             <MapClickHandler
                 activeLayers={activeLayers}
                 setPopupData={setPopupData}
@@ -77,19 +69,19 @@ const MapContent = memo(({
                 setHighlightData={setHighlightData}
             />
 
-            {/* Mantener popup en vista */}
+            {}
             <KeepPopupInView />
 
-            {/* Sidebar con información del popup */}
-            <ControlSidebarWrapper 
-                popupData={popupData} 
-                setPopupData={handleClosePopup} 
+            {}
+            <ControlSidebarWrapper
+                popupData={popupData}
+                setPopupData={handleClosePopup}
             />
 
-            {/* Capa de resaltado de features seleccionados */}
+            {}
             <HighlightLayer data={highlightData} />
 
-            {/* Capa base del estado */}
+            {}
             {baseLayerData && (
                 <GeoJSON
                     key={`${BASE_LAYERS.ESTADO}-base`}
@@ -98,7 +90,7 @@ const MapContent = memo(({
                 />
             )}
 
-            {/* Capas GeoJSON activas */}
+            {}
             <GeoJsonLayers {...geoJsonLayersProps} />
         </>
     );

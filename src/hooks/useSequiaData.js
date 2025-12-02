@@ -1,17 +1,9 @@
-// src/components/observatorio/hooks/useSequiaData.js
+
 import { useState, useEffect, useRef } from 'react';
 import { fetchUniqueValuesCached } from '../utils/wfsService';
 import { SEQUIA_CONFIG } from '../utils/constants';
 import { sortQuincenas } from '../utils/dataUtils';
 
-/**
- * Hook optimizado para manejar datos de sequías
- * ✅ MEJORAS:
- * - Usa cache para evitar requests repetidos
- * - Mejor manejo de loading states
- * - Cancelación de requests al desmontar
- * - Retry automático con backoff
- */
 export const useSequiaData = () => {
   const [sequiaQuincenaList, setSequiaQuincenaList] = useState([]);
   const [sequiaQuincena, setSequiaQuincena] = useState(null);
@@ -19,14 +11,14 @@ export const useSequiaData = () => {
   const [isLoadingQuincenas, setIsLoadingQuincenas] = useState(true);
   const [error, setError] = useState(null);
 
-  // Referencias para control
+
   const abortControllerRef = useRef(null);
   const isMountedRef = useRef(true);
   const retryCountRef = useRef(0);
 
-  // ===================================================================
-  // LIMPIEZA AL DESMONTAR
-  // ===================================================================
+
+
+
   useEffect(() => {
     isMountedRef.current = true;
 
@@ -38,15 +30,15 @@ export const useSequiaData = () => {
     };
   }, []);
 
-  // ===================================================================
-  // CARGAR LISTA DE QUINCENAS (solo una vez, con retry)
-  // ===================================================================
+
+
+
   useEffect(() => {
     const fetchSequiaQuincenas = async () => {
-      // Ya tenemos datos, no recargar
+
       if (sequiaQuincenaList.length > 0) return;
 
-      // Cancelar request anterior si existe
+
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
@@ -58,7 +50,7 @@ export const useSequiaData = () => {
       setError(null);
 
       try {
-        // ✅ Usar versión cacheada
+
         const uniqueQuincenas = await fetchUniqueValuesCached(
           SEQUIA_CONFIG.layerName,
           SEQUIA_CONFIG.fieldName,
@@ -67,37 +59,37 @@ export const useSequiaData = () => {
           SEQUIA_CONFIG.cacheTimeout
         );
 
-        // Verificar si seguimos montados
+
         if (!isMountedRef.current) return;
 
         if (!uniqueQuincenas || uniqueQuincenas.length === 0) {
           throw new Error('No se encontraron quincenas disponibles');
         }
 
-        // ✅ Ordenar cronológicamente (más antiguo al más reciente)
+
         const sortedQuincenas = sortQuincenas(uniqueQuincenas, true);
 
         setSequiaQuincenaList(sortedQuincenas);
 
-        // Establecer la quincena más reciente como predeterminada
+
         const defaultQuincena = sortedQuincenas[sortedQuincenas.length - 1];
         setSequiaQuincena(defaultQuincena);
 
-        // Resetear contador de reintentos
+
         retryCountRef.current = 0;
 
         if (process.env.NODE_ENV === 'development') {
-          console.log(`✅ Cargadas ${sortedQuincenas.length} quincenas. Última: ${defaultQuincena}`);
+          logger.log(`✅ Cargadas ${sortedQuincenas.length} quincenas. Última: ${defaultQuincena}`);
         }
 
       } catch (err) {
-        // No procesar si fue abortado o desmontado
+
         if (!isMountedRef.current || err.name === 'AbortError') return;
 
         console.error('❌ Error obteniendo quincenas:', err);
         setError(err.message);
 
-        // ✅ RETRY CON BACKOFF EXPONENCIAL
+
         const maxRetries = 3;
         if (retryCountRef.current < maxRetries) {
           retryCountRef.current++;
@@ -108,7 +100,7 @@ export const useSequiaData = () => {
           setTimeout(() => {
             if (isMountedRef.current) {
               setIsLoadingQuincenas(false);
-              // Forzar re-ejecución cambiando una dependencia dummy
+
               setError(null);
             }
           }, delay);
@@ -125,9 +117,9 @@ export const useSequiaData = () => {
     fetchSequiaQuincenas();
   }, [sequiaQuincenaList.length]);
 
-  // ===================================================================
-  // ACTUALIZAR TIMELINE CONFIG cuando cambian quincenas o la actual
-  // ===================================================================
+
+
+
   useEffect(() => {
     if (sequiaQuincenaList.length > 0) {
       const currentValue = sequiaQuincena || sequiaQuincenaList[sequiaQuincenaList.length - 1];
@@ -145,36 +137,28 @@ export const useSequiaData = () => {
     }
   }, [sequiaQuincenaList, sequiaQuincena]);
 
-  // ===================================================================
-  // HELPERS
-  // ===================================================================
 
-  /**
-   * Forzar recarga de quincenas (útil si se necesita refrescar)
-   */
+
+
+
+
   const refreshQuincenas = () => {
     setSequiaQuincenaList([]);
     retryCountRef.current = 0;
     setError(null);
   };
 
-  /**
-   * Validar si una quincena existe en la lista
-   */
+
   const isValidQuincena = (quincena) => {
     return sequiaQuincenaList.includes(quincena);
   };
 
-  /**
-   * Obtener índice de una quincena
-   */
+
   const getQuincenaIndex = (quincena) => {
     return sequiaQuincenaList.indexOf(quincena);
   };
 
-  /**
-   * Obtener quincena anterior
-   */
+
   const getPreviousQuincena = () => {
     const currentIndex = getQuincenaIndex(sequiaQuincena);
     if (currentIndex > 0) {
@@ -183,9 +167,7 @@ export const useSequiaData = () => {
     return null;
   };
 
-  /**
-   * Obtener quincena siguiente
-   */
+
   const getNextQuincena = () => {
     const currentIndex = getQuincenaIndex(sequiaQuincena);
     if (currentIndex < sequiaQuincenaList.length - 1) {
@@ -195,7 +177,7 @@ export const useSequiaData = () => {
   };
 
   return {
-    // Estados
+
     sequiaQuincenaList,
     setSequiaQuincenaList,
     sequiaQuincena,
@@ -205,14 +187,14 @@ export const useSequiaData = () => {
     isLoadingQuincenas,
     error,
 
-    // Helpers
+
     refreshQuincenas,
     isValidQuincena,
     getQuincenaIndex,
     getPreviousQuincena,
     getNextQuincena,
 
-    // Metadata
+
     totalQuincenas: sequiaQuincenaList.length,
     hasQuincenas: sequiaQuincenaList.length > 0,
     firstQuincena: sequiaQuincenaList[0] || null,

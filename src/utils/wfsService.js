@@ -1,28 +1,22 @@
-// src/utils/wfsService.js
+
 import { accordionData } from '../data/AccordionData';
 import proj4 from 'proj4';
 import { config, logger } from '../config/env';
 
-// --- CONSTANTES DE CONFIGURACIÓN ---
-
 const WFS_BASE_URL = config.geoserver.wfsUrl;
 const WMS_BASE_URL = config.geoserver.wmsUrl;
 
-// Configuración de proj4 para transformaciones de coordenadas
 proj4.defs("EPSG:3857", "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +type=crs");
 proj4.defs("EPSG:6362", "+proj=lcc +lat_1=17.5 +lat_2=29.5 +lat_0=12 +lon_0=-102 +x_0=2500000 +y_0=0 +ellps=GRS80 +units=m +no_defs");
 
-// Parámetros de tolerancia para consultas espaciales
 const SPATIAL_QUERY_PARAMS = {
     TOLERANCE_DEGREES_POINTS_LINES: 0.005,
     TOLERANCE_DEGREES_POLYGONS: 0.00001,
     LEGEND_ICON_SIZE: 20
 };
 
-// Timeout para peticiones (desde variables de entorno)
 const REQUEST_TIMEOUT = config.geoserver.timeout;
 
-// --- MANEJO DE ERRORES ---
 class GeoServerError extends Error {
     constructor(message, status, url, layerName = '') {
         super(message);
@@ -43,17 +37,14 @@ class NetworkError extends Error {
     }
 }
 
-/**
-* Función de fetch con timeout y manejo de errores mejorado
-*/
 const fetchWithTimeout = async (url, options = {}, timeout = REQUEST_TIMEOUT) => {
-    // ✅ Si ya viene un signal externo, usarlo; si no, crear uno nuevo
+
     const externalSignal = options.signal;
     const controller = externalSignal ? null : new AbortController();
-    
+
     let timeoutId;
-    
-    // Solo crear timeout si no hay señal externa (para no interferir con debouncing)
+
+
     if (!externalSignal) {
         timeoutId = setTimeout(() => controller.abort(), timeout);
     }
@@ -63,25 +54,22 @@ const fetchWithTimeout = async (url, options = {}, timeout = REQUEST_TIMEOUT) =>
             ...options,
             signal: externalSignal || controller?.signal
         });
-        
+
         if (timeoutId) clearTimeout(timeoutId);
         return response;
-        
+
     } catch (error) {
         if (timeoutId) clearTimeout(timeoutId);
-        
-        // ✅ Preservar AbortError para que pueda ser manejado por useTimelineManager
+
+
         if (error.name === 'AbortError') {
-            throw error; // No envolver en NetworkError
+            throw error;
         }
-        
+
         throw new NetworkError(`Error de red: ${error.message}`, error);
     }
 };
 
-/**
-* Valida los parámetros de entrada para las funciones WFS
-*/
 const validateWfsParams = (typeName, functionName) => {
     if (!typeName || typeof typeName !== 'string') {
         throw new Error(`${functionName}: typeName debe ser un string no vacío`);
@@ -92,11 +80,10 @@ const validateWfsParams = (typeName, functionName) => {
     }
 };
 
-// Función auxiliar para verificar si el link coincide con el nombre de la capa
 const isLayerMatch = (link, layerName) => {
   if (!link.layerName) return false;
-  return Array.isArray(link.layerName) 
-    ? link.layerName.includes(layerName) 
+  return Array.isArray(link.layerName)
+    ? link.layerName.includes(layerName)
     : link.layerName === layerName;
 };
 
@@ -110,12 +97,12 @@ export const getLayerInfo = (layerName) => {
       if (!card.links) continue;
 
       for (const link of card.links) {
-        // 1. Revisar enlace directo
+
         if (isLayerMatch(link, layerName)) {
           return link;
         }
 
-        // 2. Revisar subenlaces (dropdowns)
+
         if (link.sublinks) {
           for (const sublink of link.sublinks) {
              if (isLayerMatch(sublink, layerName)) {
@@ -129,17 +116,6 @@ export const getLayerInfo = (layerName) => {
   return null;
 };
 
-
-/**
-* Obtiene una capa del servicio WFS de GeoServer.
-* ✅ MEJORADO: Mejor soporte para AbortController
-* @param {string} typeName - El nombre de la capa (ej. 'Hidalgo:municipios').
-* @param {string} [cql_filter] - Un filtro CQL opcional para la consulta.
-* @param {number} [maxFeatures=5000] - Número máximo de features a retornar.
-* @param {number} [startIndex=0] - Índice de inicio para paginación.
-* @param {AbortSignal} [signal=null] - Señal para cancelar la petición.
-* @returns {Promise<Object>} Una promesa que resuelve a la colección de features en formato GeoJSON.
-*/
 export const fetchWfsLayer = async (
     typeName,
     cql_filter = null,
@@ -165,11 +141,11 @@ export const fetchWfsLayer = async (
     const url = `${WFS_BASE_URL}?${params.toString()}`;
 
     try {
-        // ✅ Pasar el signal al fetch
+
         const response = await fetchWithTimeout(
-            url, 
-            { signal }, 
-            signal ? Infinity : REQUEST_TIMEOUT // Si hay signal, no usar timeout interno
+            url,
+            { signal },
+            signal ? Infinity : REQUEST_TIMEOUT
         );
 
         if (!response.ok) {
@@ -203,7 +179,7 @@ export const fetchWfsLayer = async (
         };
 
     } catch (error) {
-        // ✅ No loguear errores de abort (son esperados durante debouncing)
+
         if (error.name === 'AbortError') {
             throw error;
         }
@@ -223,23 +199,11 @@ export const fetchWfsLayer = async (
     }
 };
 
-
-/**
-* Consulta features en un punto específico usando filtros espaciales inteligentes.
-* ✅ MEJORADO: Soporte para signal
-* @param {string} typeName - Nombre de la capa.
-* @param {object} latlng - Objeto con latitud y longitud { lat: number, lng: number }.
-* @param {string} [geomType] - Tipo de geometría (opcional, se obtiene de accordionData si no se proporciona).
-* @param {number} [maxFeatures=50] - Límite de features a retornar.
-* @param {string} [cqlFilter] - Filtro CQL adicional (para sequías por quincena).
-* @param {AbortSignal} [signal=null] - Señal para cancelar la petición.
-* @returns {Promise<Object>} GeoJSON con los features encontrados.
-*/
 export const fetchFeaturesAtPoint = async (
-    typeName, 
-    latlng, 
-    geomType, 
-    maxFeatures = 50, 
+    typeName,
+    latlng,
+    geomType,
+    maxFeatures = 50,
     cqlFilter = null,
     signal = null
 ) => {
@@ -249,7 +213,7 @@ export const fetchFeaturesAtPoint = async (
         throw new Error('latlng debe ser un objeto con propiedades lat y lng numéricas');
     }
 
-    // ✅ Obtener geomType de accordionData si no se proporciona
+
     let finalGeomType = geomType;
     if (!finalGeomType) {
         const layerInfo = getLayerInfo(typeName);
@@ -295,7 +259,7 @@ export const fetchFeaturesAtPoint = async (
             );
         }
 
-        // ✅ COMBINAR FILTROS: espacial + quincena (si existe)
+
         let finalCqlFilter = spatialFilter;
         if (cqlFilter) {
             finalCqlFilter = `${spatialFilter} AND ${cqlFilter}`;
@@ -314,9 +278,9 @@ export const fetchFeaturesAtPoint = async (
 
         const url = `${WFS_BASE_URL}?${params.toString()}`;
 
-        // ✅ Pasar signal
+
         const response = await fetchWithTimeout(
-            url, 
+            url,
             { signal },
             signal ? Infinity : REQUEST_TIMEOUT
         );
@@ -347,7 +311,7 @@ export const fetchFeaturesAtPoint = async (
             );
         }
     } catch (error) {
-        // ✅ No loguear AbortError
+
         if (error.name === 'AbortError') {
             throw error;
         }
@@ -367,10 +331,6 @@ export const fetchFeaturesAtPoint = async (
     }
 };
 
-
-/**
-* Genera URL para descargar capa en formato Shapefile
-*/
 export const getShapefileDownloadUrl = (typeName, format = 'shape-zip', cqlFilter = null) => {
     validateWfsParams(typeName, 'getShapefileDownloadUrl');
 
@@ -391,9 +351,6 @@ export const getShapefileDownloadUrl = (typeName, format = 'shape-zip', cqlFilte
     return url;
 };
 
-/**
-* Descarga un archivo desde una URL
-*/
 export const downloadFile = (url, filename) => {
     if (!url || !filename) {
         throw new Error('URL y filename son parámetros requeridos');
@@ -416,10 +373,6 @@ export const downloadFile = (url, filename) => {
 
 export { SPATIAL_QUERY_PARAMS };
 
-/**
-* Carga inicial de todas las capas
-* ✅ OPTIMIZADO: Con mejor manejo de errores
-*/
 export const fetchInitialLayers = async (maxFeaturesPerLayer = 500) => {
     const layerPromises = [];
     const layerNames = [];
@@ -427,8 +380,8 @@ export const fetchInitialLayers = async (maxFeaturesPerLayer = 500) => {
     accordionData.forEach(section => {
         section.cards.forEach(card => {
             card.links.forEach(link => {
-                const currentLayerNames = Array.isArray(link.layerName) 
-                    ? link.layerName 
+                const currentLayerNames = Array.isArray(link.layerName)
+                    ? link.layerName
                     : (link.layerName ? [link.layerName] : []);
 
                 currentLayerNames.forEach(name => {
@@ -464,13 +417,10 @@ export const fetchInitialLayers = async (maxFeaturesPerLayer = 500) => {
     return initialLayers;
 };
 
-/**
-* Obtiene URL de leyenda gráfica
-*/
 export const getLegendGraphicUrl = (
-    layerName, 
-    width = SPATIAL_QUERY_PARAMS.LEGEND_ICON_SIZE, 
-    height = SPATIAL_QUERY_PARAMS.LEGEND_ICON_SIZE, 
+    layerName,
+    width = SPATIAL_QUERY_PARAMS.LEGEND_ICON_SIZE,
+    height = SPATIAL_QUERY_PARAMS.LEGEND_ICON_SIZE,
     format = 'image/png'
 ) => {
     if (!layerName) {
@@ -496,15 +446,12 @@ export const getLegendGraphicUrl = (
     }
 };
 
-/**
-* Verifica disponibilidad de GeoServer
-*/
 export const checkGeoServerAvailability = async () => {
     try {
         const response = await fetchWithTimeout(
             `${WFS_BASE_URL}?service=WFS&version=1.0.0&request=GetCapabilities`,
             {},
-            5000 // Timeout corto para verificación
+            5000
         );
         return response.ok;
     } catch (error) {
@@ -513,18 +460,9 @@ export const checkGeoServerAvailability = async () => {
     }
 };
 
-/**
-* Obtiene valores únicos de un campo
-* ✅ OPTIMIZADO: Mejor normalización y manejo de errores
-* @param {string} layerName - Nombre de la capa
-* @param {string} fieldName - Nombre del campo
-* @param {number} [maxFeatures=1000] - Límite de features
-* @param {AbortSignal} [signal=null] - Señal para cancelar
-* @returns {Promise<Array<string>>} Array de valores únicos normalizados
-*/
 export const fetchUniqueValues = async (
-    layerName, 
-    fieldName, 
+    layerName,
+    fieldName,
     maxFeatures = 1000,
     signal = null
 ) => {
@@ -542,7 +480,7 @@ export const fetchUniqueValues = async (
 
         const url = `${WFS_BASE_URL}?${params.toString()}`;
 
-        // ✅ Pasar signal
+
         const response = await fetchWithTimeout(
             url,
             { signal },
@@ -560,13 +498,13 @@ export const fetchUniqueValues = async (
             return [];
         }
 
-        // ✅ NORMALIZAR FORMATO: Eliminar 'Z', timestamps, y ordenar
+
         const uniqueValues = [...new Set(
             data.features
                 .map(f => f.properties?.[fieldName])
                 .filter(Boolean)
                 .map(val => {
-                    // Limpiar y normalizar el valor
+
                     const cleanVal = val.toString()
                         .replace('Z', '')
                         .replace('T00:00:00.000', '')
@@ -578,7 +516,7 @@ export const fetchUniqueValues = async (
         return uniqueValues;
 
     } catch (error) {
-        // ✅ No loguear AbortError
+
         if (error.name === 'AbortError') {
             throw error;
         }
@@ -588,10 +526,6 @@ export const fetchUniqueValues = async (
     }
 };
 
-/**
-* ✅ NUEVA FUNCIÓN: Cache simple en memoria para valores únicos
-* Útil para evitar requests repetidos de quincenas
-*/
 const uniqueValuesCache = new Map();
 
 export const fetchUniqueValuesCached = async (
@@ -599,17 +533,17 @@ export const fetchUniqueValuesCached = async (
     fieldName,
     maxFeatures = 1000,
     signal = null,
-    cacheTimeout = 5 * 60 * 1000 // 5 minutos por defecto
+    cacheTimeout = 5 * 60 * 1000
 ) => {
     const cacheKey = `${layerName}:${fieldName}`;
     const cached = uniqueValuesCache.get(cacheKey);
 
-    // Verificar si hay cache válido
+
     if (cached && (Date.now() - cached.timestamp < cacheTimeout)) {
         return cached.values;
     }
 
-    // Fetch y actualizar cache
+
     try {
         const values = await fetchUniqueValues(layerName, fieldName, maxFeatures, signal);
         uniqueValuesCache.set(cacheKey, {
@@ -618,7 +552,7 @@ export const fetchUniqueValuesCached = async (
         });
         return values;
     } catch (error) {
-        // Si falla pero hay cache antiguo, devolverlo
+
         if (cached) {
             console.warn('⚠️ Usando cache expirado debido a error en fetch');
             return cached.values;
@@ -627,21 +561,18 @@ export const fetchUniqueValuesCached = async (
     }
 };
 
-/**
-* ✅ NUEVA FUNCIÓN: Limpiar cache
-*/
 export const clearUniqueValuesCache = (layerName = null, fieldName = null) => {
     if (layerName && fieldName) {
         uniqueValuesCache.delete(`${layerName}:${fieldName}`);
     } else if (layerName) {
-        // Limpiar todas las entradas de una capa
+
         for (const key of uniqueValuesCache.keys()) {
             if (key.startsWith(`${layerName}:`)) {
                 uniqueValuesCache.delete(key);
             }
         }
     } else {
-        // Limpiar todo
+
         uniqueValuesCache.clear();
     }
 };

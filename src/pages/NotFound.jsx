@@ -21,7 +21,7 @@ const NotFound = () => {
           <Row className="justify-content-center">
             <Col md={8}>
 
-              {/* Título principal */}
+              {}
               <motion.h2
                 className="fw-bold mb-3"
                 style={{ color: 'var(--color-primary)' }}
@@ -32,7 +32,7 @@ const NotFound = () => {
                 Página no encontrada
               </motion.h2>
 
-              {/* Texto secundario */}
+              {}
               <motion.p
                 style={{ color: 'var(--color-text-secondary)' }}
                 initial={{ opacity: 0 }}
@@ -42,7 +42,7 @@ const NotFound = () => {
                 La dirección que has ingresado no existe o fue movida.
               </motion.p>
 
-              {/* Botón volver al inicio */}
+              {}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

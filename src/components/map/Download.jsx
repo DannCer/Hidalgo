@@ -7,17 +7,17 @@ const DownloadButton = ({ layerName, displayName, className = '' }) => {
 
   const handleDownload = async () => {
     if (isDownloading || !layerName) return;
-    
+
     setIsDownloading(true);
     try {
       const downloadUrl = getShapefileDownloadUrl(layerName);
       const filename = `${displayName || layerName.replace(':', '_')}.zip`;
-      
-      downloadFile(downloadUrl, filename);      
-     
+
+      downloadFile(downloadUrl, filename);
+
     } catch (error) {
       logger.error('Error al descargar:', error);
-      // Opcional: mostrar mensaje de error al usuario
+
     } finally {
       setIsDownloading(false);
     }
