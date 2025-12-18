@@ -1,13 +1,38 @@
-
+/**
+ * @fileoverview Componente principal del visor de mapas.
+ * 
+ * MapView es el componente orquestador que integra todos los hooks y
+ * sub-componentes del sistema de visualización geoespacial. Coordina:
+ * - Carga de capas base y temáticas
+ * - Gestión de timeline de sequías
+ * - Popups informativos y resaltado de features
+ * - Leyenda dinámica con variantes
+ * - Tabla de atributos
+ * 
+ * @module components/map/MapView
+ */
 
 import React, { useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import { MapContainer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import PropTypes from 'prop-types';
 
+// ============================================================================
+// LAZY LOADING DE COMPONENTES PESADOS
+// ============================================================================
+
+/** Menú lateral de capas (carga diferida) */
 const LayerMenu = lazy(() => import('./LayerMenu'));
+
+/** Leyenda del mapa (carga diferida) */
 const Legend = lazy(() => import('./Legend'));
+
+/** Modal de tabla de atributos (carga diferida) */
 const AttributeTableModal = lazy(() => import('./AttributeTableModal'));
+
+// ============================================================================
+// IMPORTACIONES ESTÁNDAR
+// ============================================================================
 
 import MapContent from './MapContent';
 
@@ -31,6 +56,15 @@ import { forceStyleUpdate } from '../../utils/layerStyleFactory';
 
 import '../../styles/mapView.css';
 
+// ============================================================================
+// COMPONENTES AUXILIARES
+// ============================================================================
+
+/**
+ * Componente de loading para Suspense.
+ * @param {Object} props - Propiedades
+ * @param {string} [props.message='Cargando...'] - Mensaje a mostrar
+ */
 const LoadingFallback = ({ message = 'Cargando...' }) => (
     <div className="loading-fallback">
         <div className="spinner-border text-primary" role="status">
@@ -39,13 +73,47 @@ const LoadingFallback = ({ message = 'Cargando...' }) => (
     </div>
 );
 
+// ============================================================================
+// COMPONENTE PRINCIPAL
+// ============================================================================
+
+/**
+ * Componente principal del visor de mapas interactivo.
+ * 
+ * Orquesta todos los hooks y componentes del sistema:
+ * - useBaseLayer: Carga capa límite del estado
+ * - useSequiaData: Datos del timeline de sequías
+ * - useLayerManagement: Activación/desactivación de capas
+ * - useTimelineManager: Optimizaciones del timeline
+ * - useVariants: Variantes de visualización
+ * - useHighlightManager: Resaltado de features
+ * - usePopupManager: Popups informativos
+ * - useTableModal: Modal de tabla de atributos
+ * 
+ * @component
+ * @param {Object} props - Propiedades del componente
+ * @param {string|string[]} [props.initialLayer] - Capa(s) a cargar inicialmente
+ * @param {string} [props.sectionIndex] - Índice de sección a expandir en el menú
+ * @returns {JSX.Element} Visor de mapas completo
+ * 
+ * @example
+ * // Uso básico
+ * <MapView />
+ * 
+ * @example
+ * // Con capa inicial
+ * <MapView initialLayer="Hidalgo:01_cuencas" sectionIndex="1" />
+ */
 const MapView = ({ initialLayer, sectionIndex }) => {
 
+    // =========================================================================
+    // HOOKS - DATOS BASE
+    // =========================================================================
 
-
+    /** Capa base del estado (contorno de Hidalgo) */
     const { baseLayerData } = useBaseLayer();
 
-
+    /** Datos y configuración del timeline de sequías */
     const {
         sequiaQuincenaList,
         sequiaQuincena,
@@ -54,7 +122,7 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         setTimelineConfigs
     } = useSequiaData();
 
-
+    /** Gestión de capas activas y estados de carga */
     const {
         activeLayers,
         setActiveLayers,
@@ -65,7 +133,7 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         handleLayerToggle: originalHandleLayerToggle
     } = useLayerManagement(sequiaQuincena);
 
-
+    /** Optimizaciones del timeline (debounce, caché) */
     const {
         handleTimelineChange: timelineManagerChange,
         optimisticQuincena,
@@ -77,9 +145,11 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         setCurrentFilters
     );
 
+    // =========================================================================
+    // HOOKS - VISUALIZACIÓN
+    // =========================================================================
 
-
-
+    /** Variantes de visualización para capas con múltiples estilos */
     const {
         currentVariants,
         productionVariant,
@@ -88,7 +158,7 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         handleVariantChange
     } = useVariants();
 
-
+    /** Resaltado de features seleccionados */
     const {
         highlightData,
         setHighlightData,
@@ -96,43 +166,51 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         clearAllHighlights
     } = useHighlightManager(activeLayers);
 
-
+    /** Popups informativos en el mapa */
     const {
         popupData,
         setPopupData,
         closePopup
     } = usePopupManager(activeLayers, baseLayerData, clearAllHighlights);
 
-
+    /** Modal de tabla de atributos */
     const {
         tableModalState,
         handleShowTable,
         handleCloseTable
     } = useTableModal(currentFilters);
 
+    // =========================================================================
+    // HANDLERS
+    // =========================================================================
 
-
-
+    /**
+     * Handler extendido para toggle de capas.
+     * Limpia resaltados y popups cuando se desactiva una capa.
+     */
     const handleLayerToggle = useCallback((layerConfig, isActive) => {
-
+        // Al desactivar, limpiar resaltados asociados
         if (!isActive) {
             const layerName = layerConfig.layerName || layerConfig;
             const layerNames = Array.isArray(layerName) ? layerName : [layerName];
 
             const hadHighlights = clearHighlightsForLayers(layerNames);
 
-
+            // Cerrar popup si se limpiaron todos los highlights
             if (hadHighlights && highlightData.length <= layerNames.length) {
                 closePopup();
             }
         }
 
-
+        // Ejecutar toggle original
         originalHandleLayerToggle(layerConfig, isActive);
     }, [originalHandleLayerToggle, clearHighlightsForLayers, highlightData.length, closePopup]);
 
+    // =========================================================================
+    // NAVEGACIÓN Y CARGA INICIAL
+    // =========================================================================
 
-
+    /** Navegación desde otras páginas */
     const { navLayer, sectionId } = useNavigation({
         sequiaQuincenaList,
         sequiaQuincena,
@@ -140,26 +218,31 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         handleLayerToggle
     });
 
-
-
+    /** Carga de capa inicial si se especifica */
     useInitialLayers({
         initialLayer,
         setActiveLayers,
         setLoadingLayers
     });
 
+    // =========================================================================
+    // HANDLER DE TIMELINE
+    // =========================================================================
 
-
-
+    /**
+     * Handler para cambios en el timeline de sequías.
+     * Actualiza el estado local y delega al manager optimizado.
+     */
     const handleTimelineChange = useCallback((layerName, newQuincena) => {
         if (layerName !== SEQUIA_CONFIG.layerName) return;
 
+        // Limpiar formato de quincena
         const cleanedQuincena = newQuincena.toString()
             .replace('Z', '')
             .replace('T00:00:00.000', '')
             .trim();
 
-
+        // Actualizar estado local (optimistic update)
         setSequiaQuincena(cleanedQuincena);
         setTimelineConfigs(prev => ({
             ...prev,
@@ -169,19 +252,21 @@ const MapView = ({ initialLayer, sectionIndex }) => {
             }
         }));
 
-
+        // Delegar al manager optimizado
         timelineManagerChange(layerName, cleanedQuincena);
     }, [setSequiaQuincena, setTimelineConfigs, timelineManagerChange]);
 
-
+    /** Handler para cerrar popup y limpiar resaltados */
     const handleClosePopup = useCallback(() => {
         closePopup();
         clearAllHighlights();
     }, [closePopup, clearAllHighlights]);
 
+    // =========================================================================
+    // EFECTOS
+    // =========================================================================
 
-
-
+    // Forzar actualización de estilos cuando cambia la capa de sequías
     useEffect(() => {
         const sequiaLayer = activeLayers[SEQUIA_CONFIG.layerName];
         if (sequiaLayer?._metadata?.lastUpdate) {
@@ -191,12 +276,14 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         }
     }, [activeLayers[SEQUIA_CONFIG.layerName]?._metadata?.lastUpdate]);
 
+    // =========================================================================
+    // VALORES COMPUTADOS
+    // =========================================================================
 
-
-
+    /** Quincena efectiva (optimista si está cargando) */
     const effectiveSequiaQuincena = optimisticQuincena || sequiaQuincena;
 
-
+    /** Capas para la leyenda (incluye capa base) */
     const layersForLegend = useMemo(() => {
         const legendLayers = { ...activeLayers };
         if (baseLayerData) {
@@ -205,14 +292,16 @@ const MapView = ({ initialLayer, sectionIndex }) => {
         return legendLayers;
     }, [activeLayers, baseLayerData]);
 
-
+    /** Configuración del mapa desde env */
     const mapConfig = config.map;
 
-
+    // =========================================================================
+    // RENDER
+    // =========================================================================
 
     return (
         <div className="map-view-container">
-            {}
+            {/* Panel lateral con menú de capas */}
             <Suspense fallback={<LoadingFallback message="Cargando menú..." />}>
                 <LayerMenu
                     onLayerToggle={handleLayerToggle}
@@ -230,7 +319,7 @@ const MapView = ({ initialLayer, sectionIndex }) => {
                 />
             </Suspense>
 
-            {}
+            {/* Contenedor del mapa Leaflet */}
             <div className="map-container">
                 <MapContainer
                     preferCanvas={true}
@@ -262,7 +351,7 @@ const MapView = ({ initialLayer, sectionIndex }) => {
                     />
                 </MapContainer>
 
-                {}
+                {/* Leyenda dinámica */}
                 <Suspense fallback={null}>
                     <Legend
                         activeLayers={layersForLegend}
@@ -274,7 +363,7 @@ const MapView = ({ initialLayer, sectionIndex }) => {
                 </Suspense>
             </div>
 
-            {}
+            {/* Modal de tabla de atributos */}
             <Suspense fallback={null}>
                 <AttributeTableModal
                     show={tableModalState.isOpen}
@@ -288,11 +377,17 @@ const MapView = ({ initialLayer, sectionIndex }) => {
     );
 };
 
+// ============================================================================
+// PROP TYPES
+// ============================================================================
+
 MapView.propTypes = {
+    /** Capa(s) a cargar inicialmente al entrar al observatorio */
     initialLayer: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.arrayOf(PropTypes.string)
     ]),
+    /** Índice de sección del acordeón a expandir */
     sectionIndex: PropTypes.string
 };
 

@@ -1,35 +1,75 @@
 import { COLORS } from './colors';
 
+/**
+ * Base de datos completa de leyendas para todas las capas del sistema.
+ * Cada entrada define cómo se debe visualizar una capa específica.
+ * 
+ * Estructura por sección temática:
+ * 00: Capas base y demográficas
+ * 01: Recursos hídricos
+ * 02: Infraestructura y servicios
+ * 03: Usos del agua
+ * 04: Riesgos y monitoreo
+ * 05: Gestión y gobernanza
+ * cart: Cartografía especializada
+ */
 export const legendData = {
+  // ============================================================
+  // SECCIÓN 00: CAPAS BASE Y DEMOGRÁFICAS
+  // ============================================================
 
+  /**
+   * Capa base: Límite estatal de Hidalgo
+   * Tipo: Contorno sin relleno
+   */
   'Hidalgo:00_Estado': {
     title: 'Estado de Hidalgo',
     type: 'polygon',
     items: [{ color: 'transparent', borderColor: COLORS.BLACK, label: 'Límite estatal' }],
     note: 'Fuente: INEGI 2024',
   },
+
+  /**
+   * Capa base: Límites municipales
+   * Tipo: Contornos rojos sin relleno
+   */
   'Hidalgo:00_Municipios': {
     title: 'Municipios',
     type: 'polygon',
     items: [{ color: 'transparent', borderColor: COLORS.RED, label: 'Límite municipal' }],
     note: 'Fuente: INEGI 2024',
   },
+
+  /**
+   * Capa: Localidades (puntos)
+   * Tipo: Puntos con color por defecto
+   */
   'Hidalgo:00_Localidades': {
     title: 'Localidades',
     type: 'point',
     items: [{ color: COLORS.DEFAULT, borderColor: COLORS.BLACK, label: 'Localidad' }],
     note: 'Fuente: INEGI 2020',
   },
+
+  /**
+   * Capa: Representación del estado completo
+   * Tipo: Polígono sólido naranja
+   */
   'Hidalgo:00_Censoestado': {
     title: 'Censo Estatal',
     type: 'polygon',
     items: [{ color: '#D45B07', label: 'Estado' }],
     note: 'Fuente: INEGI 2020',
   },
+
+  /**
+   * Capa: Población municipal con rangos
+   * Tipo: Polígonos con degradado de naranjas según población
+   */
   'Hidalgo:00_Censomunicipio': {
     title: 'Población por Municipio (habitantes)',
     type: 'ranged-polygon',
-    propertyName: 'Población total',
+    propertyName: 'Población total',  // Propiedad del GeoJSON a evaluar
     items: [
       { value: 13000, color: '#FFDAB5', label: 'Menos de 13,000' },
       { value: 20000, color: '#FDB871', label: '13,000 - 20,000' },
@@ -38,6 +78,11 @@ export const legendData = {
     ],
     note: 'Fuente: INEGI 2020',
   },
+
+  /**
+   * Capa: Población por localidad con rangos
+   * Tipo: Puntos con tamaño/color según población
+   */
   'Hidalgo:00_Censolocalidad': {
     title: 'Población por Localidad (habitantes)',
     type: 'ranged-point',
@@ -51,6 +96,11 @@ export const legendData = {
     ],
     note: 'Fuente: INEGI 2020',
   },
+
+  /**
+   * Capa: Regiones del estado
+   * Tipo: Polígonos categóricos con 12 colores distintos
+   */
   'Hidalgo:00_macrorregiones': {
     title: 'Regiones',
     type: 'categorical-polygon',
@@ -72,7 +122,14 @@ export const legendData = {
     note: 'Fuente: SEMARNATH 2024',
   },
 
+  // ============================================================
+  // SECCIÓN 01: RECURSOS HÍDRICOS
+  // ============================================================
 
+  /**
+   * Capa: Precipitación anual
+   * Tipo: Polígonos con degradado de azules según mm/año
+   */
   'Hidalgo:01_precipitacion': {
     title: 'Precipitación (mm/año)',
     type: 'ranged-polygon',
@@ -85,24 +142,41 @@ export const legendData = {
     ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Disponibilidad en cuencas
+   * Tipo: Polígonos categóricos (verde/rojo)
+   */
   'Hidalgo:01_dispcuencas': {
     title: 'Disponibilidad Cuencas',
     type: 'categorical-polygon',
     propertyName: 'situacion',
     items: [
       { label: 'Con disponibilidad', color: COLORS.GREEN, },
-      { label: 'Sin disponibilidad', color: COLORS.RED, }],
+      { label: 'Sin disponibilidad', color: COLORS.RED, }
+    ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Disponibilidad en acuíferos
+   * Tipo: Polígonos categóricos (agua/rojo)
+   */
   'Hidalgo:01_dispacuiferos': {
     title: 'Disponibilidad Acuíferos',
     type: 'categorical-polygon',
     propertyName: 'Situación',
     items: [
       { label: 'Con Disponibilidad', color: COLORS.WATER, },
-      { label: 'Sin Disponibilidad', color: COLORS.RED, }],
+      { label: 'Sin Disponibilidad', color: COLORS.RED, }
+    ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Sitios de monitoreo (reutilizada por capas superficiales y subterráneas)
+   * Tipo: Puntos con colores distintos por tipo
+   */
   'Hidalgo:01_sitios': {
     title: 'Sitios de Monitoreo',
     type: 'point',
@@ -113,6 +187,10 @@ export const legendData = {
     note: 'Fuente: CONAGUA 2023',
   },
 
+  /**
+   * Capa: Calidad del agua (reutilizada por capas superficiales y subterráneas)
+   * Tipo: Puntos categóricos con semáforo (rojo/amarillo/verde)
+   */
   'Hidalgo:01_calidadagua': {
     title: 'Calidad del Agua',
     type: 'categorical-point',
@@ -124,48 +202,88 @@ export const legendData = {
     ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Áreas Naturales Protegidas
+   * Tipo: Polígonos con color específico para ANP
+   */
   'Hidalgo:01_ANP': {
     title: 'Áreas Naturales Protegidas',
     type: 'polygon',
     items: [{ color: COLORS.PROTECTED_AREA, label: 'ANP' }],
     note: 'Fuente: CONANP 2023',
   },
+
+  /**
+   * Capa: Áreas destinadas voluntariamente a la conservación
+   * Tipo: Polígonos con mismo color que ANP
+   */
   'Hidalgo:01_advc': {
     title: 'Áreas destinadas voluntariamente a la conservación',
     type: 'polygon',
     items: [{ color: COLORS.PROTECTED_AREA, label: 'ADVC' }],
     note: 'Fuente: CONANP 2023',
   },
+
+  /**
+   * Capa: Humedales
+   * Tipo: Polígonos con color específico para humedales
+   */
   'Hidalgo:01_humedales': {
     title: 'Humedales',
     type: 'polygon',
     items: [{ color: COLORS.WETLAND, label: 'Humedal' }],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Emergencias hidroecológicas
+   * Tipo: Puntos con color de emergencia
+   */
   'Hidalgo:01_ehyca': {
     title: 'Emergencias Hidroecológicas',
     type: 'point',
     items: [{ color: COLORS.EMERGENCY, label: 'Punto de Emergencia' }],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Descargas de aguas residuales
+   * Tipo: Puntos con color específico para descargas
+   */
   'Hidalgo:01_descargas': {
     title: 'Descargas de Aguas Residuales',
     type: 'point',
     items: [{ color: COLORS.DISCHARGE, label: 'Punto de Descarga' }],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Vedas en cuencas
+   * Tipo: Polígonos con color verde claro
+   */
   'Hidalgo:01_cuencavedas': {
     title: 'Vedas en Cuencas',
     type: 'polygon',
     items: [{ color: COLORS.LIGHT_GREEN, label: 'Veda' }],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Reservas en cuencas
+   * Tipo: Polígonos con color verde oscuro
+   */
   'Hidalgo:01_cuencareservas': {
     title: 'Reservas en Cuencas',
     type: 'polygon',
     items: [{ color: COLORS.GREEN, label: 'Reserva' }],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Acuíferos en veda
+   * Tipo: Polígonos con color verde claro
+   */
   'Hidalgo:01_acuifvedas': {
     title: 'Acuíferos en Veda',
     type: 'polygon',
@@ -174,6 +292,11 @@ export const legendData = {
     ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Acuerdo general de acuíferos
+   * Tipo: Polígonos con color de descarga
+   */
   'Hidalgo:01_acuifacuerdogral': {
     title: 'Acuerdo general de Acuíferos',
     type: 'polygon',
@@ -183,19 +306,36 @@ export const legendData = {
     note: 'Fuente: CONAGUA 2023',
   },
 
+  // ============================================================
+  // SECCIÓN 02: INFRAESTRUCTURA Y SERVICIOS
+  // ============================================================
 
+  /**
+   * Capa: Plantas potabilizadoras
+   * Tipo: Puntos con color por defecto
+   */
   'Hidalgo:02_potabilizadoras': {
     title: 'Plantas Potabilizadoras',
     type: 'point',
     items: [{ color: COLORS.DEFAULT, label: 'Planta Potabilizadora' }],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Servicios de suministro de agua potable
+   * Tipo: Polígonos con color de descarga
+   */
   'Hidalgo:02_abastecimiento': {
     title: 'Servicios de suministro de agua potable gestionados de manera segura',
     type: 'polygon',
     items: [{ color: COLORS.DISCHARGE, label: 'Servicios de suministro de agua potable' }],
     note: 'Fuente: INEGI 2024',
   },
+
+  /**
+   * Capa: Cobertura de alcantarillado con rangos
+   * Tipo: Polígonos con degradado de marrones según cobertura
+   */
   'Hidalgo:02_alcantarillado': {
     title: 'Redes de Alcantarillado',
     type: 'ranged-polygon',
@@ -208,6 +348,11 @@ export const legendData = {
     ],
     note: 'Fuente: INEGI 2020',
   },
+
+  /**
+   * Capa: Eficiencia de cloración municipal con rangos
+   * Tipo: Polígonos con degradado de verdes según eficiencia
+   */
   'Hidalgo:02_cloracionmpio': {
     title: 'Eficiencia de Cloración (Municipio)',
     type: 'ranged-polygon',
@@ -221,6 +366,11 @@ export const legendData = {
     ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Plantas de tratamiento municipales
+   * Tipo: Puntos categóricos con 18 colores según proceso
+   */
   'Hidalgo:02_ptarmunicipales': {
     title: 'Plantas de Tratamiento de Aguas Residuales Municipales',
     type: 'categorical-point',
@@ -247,6 +397,11 @@ export const legendData = {
     ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Organismos operadores
+   * Tipo: Polígonos categóricos según tipo de prestador
+   */
   'Hidalgo:02_orgoperadores': {
     title: 'Organismos Operadores',
     type: 'categorical-polygon',
@@ -259,6 +414,11 @@ export const legendData = {
     ],
     note: 'Fuente: INEGI 2022',
   },
+
+  /**
+   * Capa: Cobertura de agua potable con rangos
+   * Tipo: Polígonos con degradado de azules según cobertura
+   */
   'Hidalgo:02_cobaguapotable': {
     title: 'Cobertura de Agua Potable',
     type: 'ranged-polygon',
@@ -270,6 +430,11 @@ export const legendData = {
     ],
     note: 'Fuente: INEGI 2020',
   },
+
+  /**
+   * Capa: Plantas de tratamiento no municipales
+   * Tipo: Polígonos categóricos según proceso de tratamiento
+   */
   'Hidalgo:02_ptarnomunicipales': {
     title: 'Plantas de Tratamiento de Aguas Residuales No Municipales',
     type: 'categorical-polygon',
@@ -289,11 +454,20 @@ export const legendData = {
     note: 'Fuente: CONAGUA 2023',
   },
 
+  // ============================================================
+  // SECCIÓN 03: USOS DEL AGUA
+  // ============================================================
 
+  /**
+   * Capa: Usos consuntivos (con variantes)
+   * Tipo: Capa con múltiples representaciones (variantes)
+   * Permite cambiar entre diferentes métricas de uso de agua
+   */
   'Hidalgo:03_usoconsuntivo': {
     title: 'Usos Consuntivos ',
-    type: 'variant',
+    type: 'variant',  // Tipo especial que indica múltiples variantes
     variants: {
+      // Variante 1: Uso de agua subterránea
       'Total SB (hm³)': {
         type: 'ranged-polygon',
         propertyName: 'Total SB (hm³)',
@@ -305,6 +479,7 @@ export const legendData = {
         ],
         note: 'Fuente: CONAGUA 2023',
       },
+      // Variante 2: Uso de agua superficial
       'Total SP (hm³)': {
         type: 'ranged-polygon',
         propertyName: 'Total SP (hm³)',
@@ -320,6 +495,11 @@ export const legendData = {
       },
     },
   },
+
+  /**
+   * Capa: Producción de cultivos con rangos
+   * Tipo: Polígonos con degradado de verdes según producción
+   */
   'Hidalgo:03_drcultivos': {
     title: 'Producción de Cultivos',
     type: 'ranged-polygon',
@@ -331,6 +511,11 @@ export const legendData = {
     ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Volumen distribuido con rangos
+   * Tipo: Polígonos con degradado de verdes según volumen
+   */
   'Hidalgo:03_drvolumenes': {
     title: 'Volumen Distribuido',
     type: 'ranged-polygon',
@@ -342,10 +527,16 @@ export const legendData = {
     ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Productividad agrícola (con variantes)
+   * Tipo: Capa con múltiples representaciones de productividad
+   */
   'Hidalgo:03_drprodfisica': {
     title: 'Producción agrícola',
     type: 'variant',
     variants: {
+      // Variante 1: Productividad física (kg por m³)
       'Productividad física (Kg/m³)': {
         type: 'ranged-polygon',
         propertyName: 'Productividad física (Kg/m³)',
@@ -358,6 +549,7 @@ export const legendData = {
         ],
         note: 'Fuente: CONAGUA 2023',
       },
+      // Variante 2: Productividad económica (pesos por m³)
       'Productividad económica (pesos constantes de 2012/m³)': {
         type: 'ranged-polygon',
         propertyName: 'Productividad económica (pesos constantes de 2012/m³)',
@@ -373,31 +565,58 @@ export const legendData = {
     },
   },
 
+  // ============================================================
+  // SECCIÓN 04: RIESGOS Y MONITOREO
+  // ============================================================
 
+  /**
+   * Capa: Estaciones climatológicas
+   * Tipo: Puntos con color agua
+   */
   'Hidalgo:04_climatologicas': {
     title: 'Estaciones Climatológicas',
     type: 'point',
     items: [{ color: COLORS.WATER, label: 'Estaciones Climatológicas' }],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Estaciones hidrométricas
+   * Tipo: Puntos con color verde claro
+   */
   'Hidalgo:04_hidrometricas': {
     title: 'Estaciones Hidrométricas',
     type: 'point',
     items: [{ color: COLORS.LIGHT_GREEN, label: 'Estaciones Hidrométricas' }],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Presas
+   * Tipo: Puntos con color azul claro
+   */
   'Hidalgo:04_presas': {
     title: 'Presas',
     type: 'point',
     items: [{ color: '#a7d6f1ff', label: 'Presas' }],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Infraestructura de presas
+   * Tipo: Puntos con color azul oscuro
+   */
   'Hidalgo:04_infrapresas': {
     title: 'Infraestructura de Presas',
     type: 'point',
     items: [{ color: '#2d25a5ff', label: 'Infraestructura de Presas' }],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Fenómenos hidrometeorológicos con rangos
+   * Tipo: Polígonos con degradado según frecuencia
+   */
   'Hidalgo:04_hidrometeorologicos': {
     title: 'Fenómenos hidrometeorológicos',
     type: 'ranged-polygon',
@@ -410,10 +629,17 @@ export const legendData = {
     ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Riesgos municipales (con múltiples variantes)
+   * Tipo: Capa con 9 diferentes tipos de riesgos como variantes
+   * Permite analizar diferentes tipos de riesgo por separado
+   */
   'Hidalgo:04_riesgosmunicipales': {
     title: 'Riesgos Municipales',
     type: 'variant',
     variants: {
+      // Variante 1: Riesgo de sequía
       'Sequía': {
         type: 'categorical-polygon',
         propertyName: 'Sequía',
@@ -426,6 +652,7 @@ export const legendData = {
         ],
         note: 'Fuente: CENAPRED 2023',
       },
+      // Variante 2: Riesgo de onda de calor
       'Onda de calor': {
         type: 'categorical-polygon',
         propertyName: 'Onda de calor',
@@ -438,6 +665,7 @@ export const legendData = {
         ],
         note: 'Fuente: CENAPRED 2023',
       },
+      // Variante 3: Riesgo de bajas temperaturas
       'Bajas temperaturas': {
         type: 'categorical-polygon',
         propertyName: 'Bajas temperaturas',
@@ -450,6 +678,7 @@ export const legendData = {
         ],
         note: 'Fuente: CENAPRED 2023',
       },
+      // Variante 4: Riesgo de tormenta eléctrica
       'Tormenta eléctrica': {
         type: 'categorical-polygon',
         propertyName: 'Tormenta eléctrica',
@@ -462,6 +691,7 @@ export const legendData = {
         ],
         note: 'Fuente: CENAPRED 2023',
       },
+      // Variante 5: Riesgo de ciclón tropical
       'Ciclón tropical': {
         type: 'categorical-polygon',
         propertyName: 'Ciclón tropical',
@@ -474,6 +704,7 @@ export const legendData = {
         ],
         note: 'Fuente: CENAPRED 2023',
       },
+      // Variante 6: Riesgo de nevada
       'Nevada': {
         type: 'categorical-polygon',
         propertyName: 'Nevada',
@@ -486,6 +717,7 @@ export const legendData = {
         ],
         note: 'Fuente: CENAPRED 2023',
       },
+      // Variante 7: Riesgo de granizada
       'Granizada': {
         type: 'categorical-polygon',
         propertyName: 'Granizada',
@@ -498,6 +730,7 @@ export const legendData = {
         ],
         note: 'Fuente: CENAPRED 2023',
       },
+      // Variante 8: Riesgo de tornado (binario)
       'Tornado': {
         type: 'categorical-polygon',
         propertyName: 'Tornado',
@@ -507,6 +740,7 @@ export const legendData = {
         ],
         note: 'Fuente: CENAPRED 2023',
       },
+      // Variante 9: Riesgo de inundación
       'Inundación': {
         type: 'categorical-polygon',
         propertyName: 'Inundación',
@@ -521,22 +755,34 @@ export const legendData = {
       },
     },
   },
+
+  /**
+   * Capa: Sequías (capa especial que requiere actualización dinámica)
+   * Tipo: Polígonos categóricos con 6 niveles de sequía
+   */
   'Hidalgo:04_sequias': {
     title: 'Sequías',
     type: 'categorical-polygon',
     propertyName: 'Sequía',
     items: [
-      { label: 'Sequía Excepcional', color: '#730000', },
-      { label: 'Sequía Extrema', color: COLORS.RED, },
-      { label: 'Sequía Severa', color: '#e69800', },
-      { label: 'Sequía Moderada', color: '#e69800', },
-      { label: 'Anormalmente Seco', color: COLORS.YELLOW, },
-      { label: 'Sin Sequía', color: '#dadaeb', }
+      { label: 'Sequía Excepcional', color: '#730000', },  // Marrón muy oscuro
+      { label: 'Sequía Extrema', color: COLORS.RED, },     // Rojo
+      { label: 'Sequía Severa', color: '#e69800', },       // Naranja
+      { label: 'Sequía Moderada', color: '#e69800', },     // Naranja (mismo que severa)
+      { label: 'Anormalmente Seco', color: COLORS.YELLOW, }, // Amarillo
+      { label: 'Sin Sequía', color: '#dadaeb', }           // Gris claro
     ],
-    note: 'Fuente: CONAGUA 2025',
+    note: 'Fuente: CONAGUA 2025',  // Fuente actualizada anualmente
   },
 
+  // ============================================================
+  // SECCIÓN 05: GESTIÓN Y GOBERNANZA
+  // ============================================================
 
+  /**
+   * Capa: Recaudación por extracción con rangos
+   * Tipo: Polígonos con degradado de morados según monto
+   */
   'Hidalgo:05_recextraccion': {
     title: 'Recaudación por Extracción',
     type: 'ranged-polygon',
@@ -549,6 +795,11 @@ export const legendData = {
     ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Recaudación por cobro con rangos
+   * Tipo: Polígonos con degradado de rojos según monto
+   */
   'Hidalgo:05_recobro': {
     title: 'Recaudación por Cobro',
     type: 'ranged-polygon',
@@ -561,6 +812,11 @@ export const legendData = {
     ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Consejos de cuenca
+   * Tipo: Polígonos categóricos con 3 cuencas principales
+   */
   'Hidalgo:05_consejocuenca': {
     title: 'Consejos de Cuenca',
     type: 'categorical-polygon',
@@ -572,6 +828,11 @@ export const legendData = {
     ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Comisiones de cuenca
+   * Tipo: Polígonos con color específico para comisiones
+   */
   'Hidalgo:05_comiscuenca': {
     title: 'Comisiones de Cuenca',
     type: 'polygon',
@@ -580,18 +841,33 @@ export const legendData = {
     ],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Comités de cuenca
+   * Tipo: Polígonos con color específico para comités
+   */
   'Hidalgo:05_comitescuenca': {
     title: 'Comités de Cuenca',
     type: 'polygon',
     items: [{ color: COLORS.COMITES_CUENCA, label: 'Comité' }],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Comités técnicos de agua subterránea (COTAS)
+   * Tipo: Polígonos con color específico para COTAS
+   */
   'Hidalgo:05_cotas': {
     title: 'Comités Técnicos de Agua Subterránea',
     type: 'polygon',
     items: [{ color: COLORS.COTAS, label: 'COTAS' }],
     note: 'Fuente: CONAGUA 2023',
   },
+
+  /**
+   * Capa: Organizaciones locales de agua y saneamiento (OLAS)
+   * Tipo: Puntos con color por defecto
+   */
   'Hidalgo:05_ola': {
     title: 'Organizaciones locales de agua y saneamiento',
     type: 'point',
@@ -599,7 +875,15 @@ export const legendData = {
     note: 'Fuente: SEMARNATH 2025',
   },
 
+  // ============================================================
+  // CARTOGRAFÍA ESPECIALIZADA
+  // ============================================================
 
+  /**
+   * Capa: Regionalización por acuífero
+   * Tipo: Polígonos categóricos con 23 acuíferos diferentes
+   * Muestra la división hidrogeológica del estado
+   */
   'Hidalgo:cart_zonifacuifero': {
     title: 'Regionalización por acuífero',
     type: 'categorical-polygon',
@@ -631,5 +915,4 @@ export const legendData = {
     ],
     note: 'Fuente: SEMARNATH 2025',
   },
-
 };

@@ -1,0 +1,106 @@
+/**
+ * Estilos para la página Principal
+ * Incluye logo responsivo y título
+ */
+
+/* ============================================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================================ */
+
+.principal-page {
+  padding: 1.5rem 1rem;
+}
+
+/* ============================================================================
+   CABECERA
+   ============================================================================ */
+
+.principal-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* ============================================================================
+   LOGO RESPONSIVO
+   ============================================================================ */
+
+.principal-logo {
+  max-width: 100%;
+  height: auto;
+  max-height: 120px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ============================================================================
+   TÍTULO
+   ============================================================================ */
+
+.principal-title {
+  font-family: var(--font-primary, 'Montserrat', sans-serif);
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  font-weight: 700;
+  color: var(--color-text-dark, #a02142);
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+/* Tablets */
+@media (min-width: 768px) {
+  .principal-page {
+    padding: 2rem 1.5rem;
+  }
+
+  .principal-header {
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .principal-logo {
+    max-height: 140px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 992px) {
+  .principal-page {
+    padding: 2.5rem 2rem;
+  }
+
+  .principal-header {
+    gap: 1.5rem;
+  }
+
+  .principal-logo {
+    max-height: 150px;
+  }
+}
+
+/* Pantallas pequeñas */
+@media (max-width: 480px) {
+  .principal-page {
+    padding: 1rem 0.75rem;
+  }
+
+  .principal-header {
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .principal-logo {
+    max-height: 80px;
+    padding: 0 0.5rem;
+  }
+
+  .principal-title {
+    padding: 0 0.5rem;
+  }
+}

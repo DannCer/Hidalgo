@@ -1,9 +1,23 @@
-
+/**
+ * @fileoverview Visor de imágenes de acuíferos de Hidalgo.
+ * 
+ * Muestra una galería de imágenes de los 23 acuíferos del estado.
+ * 
+ * @module components/map/VisorImagenesAcuiferos
+ */
 
 import React, { useMemo } from 'react';
 import VisorBaseImagenes from '../common/VisorBaseImagenes';
 import '../../styles/visorImagenes.css';
 
+// ============================================================================
+// DATOS DE ACUÍFEROS
+// ============================================================================
+
+/**
+ * Lista de acuíferos del estado de Hidalgo.
+ * @constant {Array<{file: string, title: string}>}
+ */
 const ACUIFEROS_DATA = [
   { file: 'acuifero acaxochitlan.jpg', title: 'Acaxochitlan' },
   { file: 'acuifero Actopan-Santiago de Anaya.jpg', title: 'Actopan Santiago de Anaya' },
@@ -30,9 +44,24 @@ const ACUIFEROS_DATA = [
   { file: 'acuifero Zimapan.jpg', title: 'Zimapan' },
 ];
 
+/** @constant {string} Ruta base de las imágenes */
 const BASE_PATH = '/assets/img/acuiferos/';
 
+// ============================================================================
+// COMPONENTE PRINCIPAL
+// ============================================================================
+
+/**
+ * Visor de imágenes de acuíferos.
+ * 
+ * @component
+ * @param {Object} props - Propiedades del componente
+ * @param {boolean} props.show - Si el visor está visible
+ * @param {Function} props.onHide - Callback para cerrar el visor
+ * @returns {JSX.Element} Visor de acuíferos
+ */
 const VisorImagenesAcuiferos = ({ show, onHide }) => {
+  /** Imágenes con rutas completas */
   const imagenesAcuiferos = useMemo(() =>
     ACUIFEROS_DATA.map(item => ({
       src: `${BASE_PATH}${item.file}`,

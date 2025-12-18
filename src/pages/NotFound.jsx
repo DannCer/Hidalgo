@@ -4,15 +4,27 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import LayoutPrincipal from '../components/layout/LayoutPrincipal';
 
+/**
+ * Componente NotFound - Página de error 404 personalizada.
+ * Se muestra cuando el usuario intenta acceder a una ruta no existente.
+ * Incluye animaciones y opción para regresar al inicio.
+ * 
+ * @returns {JSX.Element} Componente de página no encontrada
+ */
 const NotFound = () => {
   const navigate = useNavigate();
 
+  /**
+   * Maneja el evento de clic para regresar a la página principal
+   */
   const handleGoHome = () => {
     navigate('/');
   };
 
   return (
+    // Layout principal que incluye header y footer
     <LayoutPrincipal>
+      {/* Contenedor principal centrado verticalmente */}
       <div
         className="principal-layout d-flex align-items-center justify-content-center text-center"
         style={{ minHeight: '70vh' }}
@@ -20,8 +32,7 @@ const NotFound = () => {
         <Container>
           <Row className="justify-content-center">
             <Col md={8}>
-
-              {}
+              {/* Título con animación de entrada */}
               <motion.h2
                 className="fw-bold mb-3"
                 style={{ color: 'var(--color-primary)' }}
@@ -32,7 +43,7 @@ const NotFound = () => {
                 Página no encontrada
               </motion.h2>
 
-              {}
+              {/* Mensaje descriptivo con animación */}
               <motion.p
                 style={{ color: 'var(--color-text-secondary)' }}
                 initial={{ opacity: 0 }}
@@ -42,7 +53,7 @@ const NotFound = () => {
                 La dirección que has ingresado no existe o fue movida.
               </motion.p>
 
-              {}
+              {/* Botón de acción con animación */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
