@@ -1,26 +1,39 @@
+/**
+ * @fileoverview Archivo índice (barrel file) para exportar componentes del módulo de mapas.
+ * Centraliza las exportaciones para facilitar las importaciones en otros módulos.
+ * Organiza los componentes por funcionalidad y responsabilidad.
+ * 
+ * @module components/map/index
+ * @version 1.0.0
+ */
 
+// Componentes principales del mapa
+export { default as MapView } from './MapView';           // Vista principal del mapa
+export { default as MapContent } from './MapContent';     // Contenido y controles del mapa
 
-export { default as MapView } from './MapView';
-export { default as MapContent } from './MapContent';
+// Componentes de capas y renderizado
+export { default as GeoJsonLayers } from './GeoJsonLayers';     // Gestor de capas GeoJSON
+export { default as HighlightLayer } from './HighlightLayer';   // Capa de resaltado
 
-export { default as GeoJsonLayers } from './GeoJsonLayers';
-export { default as HighlightLayer } from './HighlightLayer';
+// Componentes de controles y utilidades
+export { default as BaseLayerControls } from './BaseLayerControls';   // Selector de capas base
+export { default as Timeline } from './Timeline';                     // Línea de tiempo
+export { default as ControlSidebarWrapper } from './ControlSidebarWrapper'; // Sidebar personalizado
 
-export { default as BaseLayerControls } from './BaseLayerControls';
-export { default as Timeline } from './Timeline';
-export { default as ControlSidebarWrapper } from './ControlSidebarWrapper';
+// Componentes de interfaz y menús
+export { default as LayerMenu } from './LayerMenu';           // Menú de capas
+export { default as Legend } from './Legend';                 // Leyenda del mapa
+export { default as PopupContent } from './PopupContent';     // Contenido de popups
 
-export { default as LayerMenu } from './LayerMenu';
-export { default as Legend } from './Legend';
-export { default as PopupContent } from './PopupContent';
+// Componentes de modales y visualizadores
+export { default as AttributeTableModal } from './AttributeTableModal';         // Modal de tabla de atributos
+export { default as AttributeTableContent } from './AttributeTableContent';     // Contenido de tabla de atributos
+export { default as DiccionarioDatosModal } from './DiccionarioDatosModal';    // Modal de diccionario de datos
+export { default as VisorImagenesAcuiferos } from './VisorImagenesAcuiferos';  // Visor de imágenes de acuíferos
+export { default as VisorInfografias } from './VisorInfografias';              // Visor de infografías
+export { default as VisorMapasFertilidad } from './VisorMapasFertilidad';      // Visor de mapas de fertilidad
 
-export { default as AttributeTableModal } from './AttributeTableModal';
-export { default as AttributeTableContent } from './AttributeTableContent';
-export { default as DiccionarioDatosModal } from './DiccionarioDatosModal';
-export { default as VisorImagenesAcuiferos } from './VisorImagenesAcuiferos';
-export { default as VisorInfografias } from './VisorInfografias';
-export { default as VisorMapasFertilidad } from './VisorMapasFertilidad';
-
-export { default as MapClickHandler } from './MapClickHandler';
-export { default as KeepPopupInView } from './KeepPopupInView';
-export { default as Download } from './Download';
+// Componentes de manejo de eventos
+export { default as MapClickHandler } from './MapClickHandler';   // Manejador de clics en el mapa
+export { default as KeepPopupInView } from './KeepPopupInView';   // Mantener popups visibles
+export { default as Download } from './Download';                 // Funcionalidad de descarga

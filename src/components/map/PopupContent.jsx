@@ -1,10 +1,21 @@
+/**
+ * @fileoverview Componente PopupContent del Geovisor.
+ * Renderiza contenido estructurado para popups en el mapa, mostrando información
+ * de características geográficas con formato especializado y filtrado inteligente.
+ * 
+ * @module components/map/PopupContent
+ * @version 1.0.0
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { formatDisplayValue } from '../../utils/dataUtils';
 
+// Propiedades que deben excluirse de la visualización (geometrías)
 const EXCLUDED_PROPERTIES = ['geom', 'geometry'];
 const DEFAULT_MAX_FEATURES = 15;
 
+// Propiedades que deben excluirse del formato numérico (IDs, códigos)
 const EXCLUDE_FROM_NUMBER_FORMAT = [
   'clave de la cuenca',
   'clave_cuenca',
@@ -23,25 +34,37 @@ const EXCLUDE_FROM_NUMBER_FORMAT = [
   'Año',
 ];
 
+/**
+ * Formatea un valor de propiedad para mostrar en el popup
+ * Aplica reglas especiales para fechas, números y mayúsculas
+ * 
+ * @param {any} value - Valor a formatear
+ * @param {string} propertyName - Nombre de la propiedad (para reglas específicas)
+ * @returns {string} Valor formateado
+ */
 const formatPropertyValue = (value, propertyName = '') => {
   if (value == null) return '';
 
   const stringValue = String(value).trim();
   const lowerPropertyName = propertyName.toLowerCase();
 
+  // Intentar formatear como fecha primero
   const formattedDate = formatDisplayValue(value, propertyName);
   if (formattedDate !== stringValue) {
     return formattedDate;
   }
 
+  // Verificar si se debe excluir del formato numérico
   const shouldExcludeFromNumberFormat = EXCLUDE_FROM_NUMBER_FORMAT.some(
     excluded => lowerPropertyName.includes(excluded)
   );
 
+  // Aplicar formato numérico si corresponde
   if (!shouldExcludeFromNumberFormat && !isNaN(value) && stringValue !== '') {
     return Number(value).toLocaleString();
   }
 
+  // Capitalizar primera letra si es texto
   if (stringValue.length > 0) {
     return stringValue.charAt(0).toUpperCase() + stringValue.slice(1);
   }
@@ -49,10 +72,24 @@ const formatPropertyValue = (value, propertyName = '') => {
   return stringValue;
 };
 
+/**
+ * Obtiene el nombre de visualización de una capa
+ * 
+ * @param {string} layerName - Nombre técnico de la capa
+ * @param {Object} layerInfo - Información adicional de la capa
+ * @returns {string} Nombre para mostrar
+ */
 const getDisplayName = (layerName, layerInfo) => {
   return layerInfo?.text || layerName.split(':')[1] || layerName;
 };
 
+/**
+ * Determina si una propiedad debe mostrarse en el popup
+ * 
+ * @param {string} key - Nombre de la propiedad
+ * @param {any} value - Valor de la propiedad
+ * @returns {boolean} True si debe mostrarse
+ */
 const shouldDisplayProperty = (key, value) => {
   const lowerKey = key.toLowerCase();
   return !EXCLUDED_PROPERTIES.includes(lowerKey) &&
@@ -60,6 +97,21 @@ const shouldDisplayProperty = (key, value) => {
          String(value).trim() !== '';
 };
 
+/**
+ * Componente principal para contenido de popups en el mapa
+ * Organiza características por capa con límite de elementos y formato especializado
+ * 
+ * @component
+ * @param {Object} props - Propiedades del componente
+ * @param {string} props.layerName - Nombre de la capa
+ * @param {Object} props.layerInfo - Información adicional de la capa
+ * @param {Array} props.features - Características a mostrar
+ * @param {number} props.maxFeatures - Máximo de características por capa
+ * @param {string} props.className - Clases CSS adicionales
+ * @param {boolean} props.showFeatureCount - Mostrar conteo de características
+ * @param {boolean} props.isLast - Si es la última capa en el popup
+ * @returns {JSX.Element} Contenido formateado del popup
+ */
 const PopupContent = ({
   layerName,
   layerInfo = {},
@@ -69,7 +121,7 @@ const PopupContent = ({
   showFeatureCount = true,
   isLast = false
 }) => {
-
+  // Estado sin datos
   if (!features || features.length === 0) {
     return (
       <div className={`layer-popup-section ${className}`}>
@@ -86,7 +138,7 @@ const PopupContent = ({
 
   return (
     <div className={`layer-popup-section ${className}`}>
-      {}
+      {/* Título de la sección con conteo de características */}
       {showFeatureCount && (
         <h5 className="popup-section-title">
           {displayName}
@@ -94,7 +146,7 @@ const PopupContent = ({
         </h5>
       )}
 
-      {}
+      {/* Lista de características */}
       <div className="features-list">
         {displayedFeatures.map((feature, index) => (
           <FeatureItem
@@ -105,14 +157,14 @@ const PopupContent = ({
         ))}
       </div>
 
-      {}
+      {/* Indicador de características ocultas */}
       {hiddenFeaturesCount > 0 && (
         <div className="more-features-notice">
           <em>... y {hiddenFeaturesCount} elemento(s) más</em>
         </div>
       )}
 
-      {}
+      {/* Separador entre capas (excepto última) */}
       {!isLast && (
         <hr className="layer-separator" />
       )}
@@ -120,8 +172,20 @@ const PopupContent = ({
   );
 };
 
+/**
+ * Componente para renderizar una característica individual
+ * Muestra las propiedades formateadas en una tabla
+ * 
+ * @component
+ * @param {Object} props - Propiedades del componente
+ * @param {Object} props.feature - Característica a renderizar
+ * @param {number} props.index - Índice de la característica
+ * @returns {JSX.Element|null} Tabla con propiedades o null si no hay propiedades válidas
+ */
 const FeatureItem = ({ feature, index }) => {
   const properties = feature.properties || {};
+  
+  // Filtrar propiedades válidas para mostrar
   const validProperties = Object.entries(properties)
     .filter(([key, value]) => shouldDisplayProperty(key, value));
 
@@ -152,6 +216,7 @@ const FeatureItem = ({ feature, index }) => {
   );
 };
 
+// Validación de tipos de propiedades
 PopupContent.propTypes = {
   layerName: PropTypes.string.isRequired,
   layerInfo: PropTypes.shape({
@@ -169,6 +234,7 @@ PopupContent.propTypes = {
   isLast: PropTypes.bool
 };
 
+// Valores por defecto
 PopupContent.defaultProps = {
   layerInfo: {},
   features: [],

@@ -1,3 +1,7 @@
+/**
+ * Punto de entrada principal para exportar todos los hooks personalizados del módulo.
+ * Este archivo centraliza las exportaciones para facilitar su importación en otros módulos.
+ */
 export { useBaseLayer } from './useBaseLayer';
 export { useHighlightManager } from './useHighlightManager';
 export { useInitialLayers } from './useInitialLayers';

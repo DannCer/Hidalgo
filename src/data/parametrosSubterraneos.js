@@ -1,4 +1,33 @@
+/**
+ * @fileoverview Diccionario de parámetros de calidad de aguas subterráneas.
+ * 
+ * Define las descripciones de cada campo/columna de las tablas de
+ * calidad del agua para sitios de monitoreo subterráneo (pozos,
+ * manantiales, norias).
+ * 
+ * Los parámetros incluyen:
+ * - Alcalinidad y conductividad
+ * - SDT (Sólidos Disueltos Totales)
+ * - Fluoruros y dureza
+ * - Coliformes fecales
+ * - Nitrógeno de nitratos
+ * - Metales pesados (As, Cd, Cr, Hg, Pb, Mn, Fe)
+ * 
+ * @module data/parametrosSubterraneos
+ */
 
+/**
+ * Diccionario de parámetros de calidad de aguas subterráneas.
+ * Cada objeto contiene pares campo:descripción para la tabla de atributos
+ * y el diccionario de datos del visor.
+ * 
+ * @constant {Array<Object>}
+ * 
+ * @example
+ * // Uso en DiccionarioDatosModal
+ * const datos = Object.entries(parametrosSubterraneos[0])
+ *   .map(([parametro, descripcion]) => ({ parametro, descripcion }));
+ */
 const parametrosSubterraneos = [
   {
     "id": "Id de la tabla",

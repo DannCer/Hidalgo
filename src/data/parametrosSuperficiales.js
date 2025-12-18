@@ -1,4 +1,33 @@
+/**
+ * @fileoverview Diccionario de parámetros de calidad de aguas superficiales.
+ * 
+ * Define las descripciones de cada campo/columna de las tablas de
+ * calidad del agua para sitios de monitoreo superficial (ríos, lagos,
+ * lagunas, presas).
+ * 
+ * Los parámetros incluyen:
+ * - DBO (Demanda Bioquímica de Oxígeno)
+ * - DQO (Demanda Química de Oxígeno)
+ * - SST (Sólidos Suspendidos Totales)
+ * - Coliformes fecales y E. coli
+ * - Oxígeno disuelto (superficial, medio, fondo)
+ * - Toxicidad (Vibrio Fisheri, Daphnia magna)
+ * 
+ * @module data/parametrosSuperficiales
+ */
 
+/**
+ * Diccionario de parámetros de calidad de aguas superficiales.
+ * Cada objeto contiene pares campo:descripción para la tabla de atributos
+ * y el diccionario de datos del visor.
+ * 
+ * @constant {Array<Object>}
+ * 
+ * @example
+ * // Uso en DiccionarioDatosModal
+ * const datos = Object.entries(parametrosSuperficiales[0])
+ *   .map(([parametro, descripcion]) => ({ parametro, descripcion }));
+ */
 const parametrosSuperficiales = [
   {
     "id": "Id de la tabla",
