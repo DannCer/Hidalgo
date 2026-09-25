@@ -29,3 +29,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# respaldos de base de datos (Docker)
+docker/db/backups/*
+!docker/db/backups/README.md

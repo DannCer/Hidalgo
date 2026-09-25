@@ -1,0 +1,67 @@
+# Capas publicadas en GeoServer (workspace Hidalgo).
+# Formato: <nombre de capa en GeoServer>  <esquema>  <tabla o vista en PostGIS>
+# Los nombres de capa son los que usa el front (src/data/AccordionData.js).
+
+# --- Contexto (public) ---
+00_Estado               public  vw_estados
+00_Municipios           public  vw_municipios
+00_Localidades          public  vw_localidades
+00_macrorregiones       public  vw_macrorregiones
+00_Censoestado          public  vw_censoestado
+00_Censomunicipio       public  vw_censomunicipio
+00_Censolocalidad       public  vw_censolocalidad
+
+# --- Eje 1: Conservación ---
+01_ANP                  eje1    vw_anp
+01_acuifacuerdogral     eje1    vw_acuifacuerdogral
+01_acuifvedas           eje1    vw_acuifvedas
+01_advc                 eje1    vw_advc
+01_cuencareservas       eje1    vw_cuencareservas
+01_cuencavedas          eje1    vw_cuencavedas
+01_descargas            eje1    vw_descargas
+01_dispacuiferos        eje1    vw_dispacuiferos
+01_dispcuencas          eje1    vw_dispcuencas
+01_ehyca                eje1    vw_ehyca
+01_humedales            eje1    vw_humedales
+01_precipitacion        eje1    vw_precipitacion
+01_sbcalidadagua        eje1    vw_sbcalidadagua
+01_sbsitios             eje1    vw_sbsitios
+01_spcalidadagua        eje1    vw_spcalidadagua
+01_spsitios             eje1    vw_spsitios
+cart_zonifacuifero      eje1    vw_zonifacuifero
+
+# --- Eje 2: Abastecimiento ---
+02_abastecimiento       eje2    vw_abastecimiento
+02_alcantarillado       eje2    vw_alcantarillado
+02_cloracionedo         eje2    vw_cloracionedo
+02_cloracionmpio        eje2    vw_cloracionmpio
+02_cobaguapotable       eje2    vw_cobaguapotable
+02_orgoperadores        eje2    vw_orgoperadores
+02_potabilizadoras      eje2    vw_potabilizadoras
+02_ptarmunicipales      eje2    vw_ptarmunicipales
+02_ptarnomunicipales    eje2    vw_ptarnomunicipales
+
+# --- Eje 3: Productividad ---
+03_drcultivos           eje3    vw_drcultivos
+03_drprodfisica         eje3    vw_drprodfisica
+03_drvolumenes          eje3    vw_drvolumenes
+03_usoagua              eje3    vw_usoagua
+03_usoconsuntivo        eje3    vw_usoconsuntivo
+
+# --- Eje 4: Riesgos ---
+04_climatologicas       eje4    vw_climatologicas
+04_hidrometeorologicos  eje4    vw_hidrometeorologicos
+04_hidrometricas        eje4    vw_hidrometricas
+04_infrapresas          eje4    vw_infrapresas
+04_presas               eje4    vw_presas
+04_riesgosmunicipales   eje4    vw_riesgosmunicipales
+04_sequias              eje4    vw_sequias
+
+# --- Eje 5: Gobernanza ---
+05_comiscuenca          eje5    vw_comiscuenca
+05_comitescuenca        eje5    vw_comitescuenca
+05_consejocuenca        eje5    vw_consejocuenca
+05_cotas                eje5    vw_cotas
+05_ola                  eje5    vw_ola
+05_recextraccion        eje5    vw_recextraccion
+05_recobro              eje5    vw_recobro

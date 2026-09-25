@@ -313,6 +313,34 @@ La capa `04_sequias` debe tener:
 
 ## 🌐 Despliegue
 
+### Docker
+
+`docker-compose.yml` levanta el stack completo:
+
+| Servicio | Imagen | Puerto host | Función |
+|----------|--------|-------------|---------|
+| `db` | `postgis/postgis:17-3.5-alpine` | `5433` | PostgreSQL 17 + PostGIS; restaura respaldos de `docker/db/backups/` |
+| `geoserver` | `docker.osgeo.org/geoserver:2.26.2` | `8086` | WFS/WMS (`/geoserver/web`, admin/geoserver por defecto) |
+| `geoserver-init` | `alpine` | — | Tarea única: crea el workspace, el datastore PostGIS y publica las tablas |
+| `geovisor` | build local (nginx) | `3000` | Frontend; nginx hace proxy de `/geoserver/` al contenedor `geoserver` (sin CORS) |
+
+```bash
+# 1. (Opcional) credenciales/puertos: copiar la sección DOCKER de .env.example a .env
+# 2. Colocar el respaldo (.sql, .sql.gz, .dump o .backup) en docker/db/backups/
+# 3. Levantar
+docker compose up -d --build
+
+# Tras agregar tablas nuevas a la BD, publicarlas en GeoServer
+docker compose run --rm geoserver-init
+
+# Reiniciar desde cero (borra BD y configuración de GeoServer)
+docker compose down -v
+```
+
+Los respaldos solo se restauran cuando se crea el volumen `pgdata`. El formato se detecta por contenido (`pg_dump -Fc` o SQL plano), sin importar la extensión.
+
+La base tiene los esquemas `public` y `eje1`…`eje5`. GeoServer crea un datastore por esquema y publica las vistas `vw_*` con los nombres que espera el front (`00_Estado` ← `public.vw_estados`, `04_sequias` ← `eje4.vw_sequias`, …). Esa correspondencia está en [docker/geoserver/layers.txt](docker/geoserver/layers.txt). Para agregar una capa, añade una línea y ejecuta `docker compose run --rm geoserver-init`. Los estilos de GeoServer se dejan por defecto porque el front aplica sus propios estilos.
+
 ### Build de producción
 
 ```bash
